@@ -286,9 +286,13 @@ INSTALLED_APPS = [
     'rosetta',          # For i18n testing
     'compressor',
     'apps.gateway',     # For allowing dashboard access
+    'feincms',
+    'feincms.module.page',
+    'feincms.module.medialibrary',
 ]
 from oscar import get_core_apps
 INSTALLED_APPS = INSTALLED_APPS + get_core_apps()
+INSTALLED_APPS.append('oscar.apps.editorial')
 
 # Add Oscar's custom auth backend so users can sign in using their email
 # address.

@@ -6,7 +6,7 @@ from oscar.apps.catalogue import models
 class ProductResource(ModelResource):
     class Meta:
         queryset = models.Product.browsable.all()
-        resource_name = 'product'
+        resource_name = 'products'
         excludes = ('date_created', 'date_updated', 'status', 'slug')
 
     def dehydrate(self, bundle):

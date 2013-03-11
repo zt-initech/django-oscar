@@ -16,7 +16,7 @@ window.TastypieCollection = Backbone.Collection.extend({
     }
 });
 
-//
+// Backbone models
 
 var Product = TastypieModel.extend({
     urlRoot: '/api/products/'
@@ -33,8 +33,28 @@ var Products = TastypieCollection.extend({
     model: Product
 });
 
+// Knockout view models
 
-function test() {
+// "view model" for Knockout
+function ProductList() {
+    var self = this;
+
+    // Methods
+
+    // Fetch products using Backbone
+    self.getProducts = function() {
+        var products = new Products();
+        products.fetch();
+        return products;
+    };
+
+    // Data
+    var products = self.getProducts();
+    self.products = kb.collectionObservable(products);
+}
+
+
+function test_backbone() {
     console.log("Testing Backbone");
 
     console.log("Loading products");
@@ -48,12 +68,20 @@ function test() {
     console.log(product);
 
     console.log("Loading a single product using classmethod");
-    var p2 = Product.fetchById(4);
-    console.log(p2)
+    p2 = Product.fetchById(4);
+    console.log(p2);
 
     console.log("Saving ");
     p = new Product({'title': 'Testing'});
     p.save();
 }
 
-$(function(){ test(); });
+function test_knockout() {
+    console.log("Knockout!");
+    ko.applyBindings(new ProductList());
+}
+
+$(function(){
+    // test_backbone();
+    test_knockout();
+});

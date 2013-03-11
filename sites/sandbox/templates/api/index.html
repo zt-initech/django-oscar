@@ -2,20 +2,29 @@
 {% load staticfiles %}
 
 {% block extrascripts %}
-<script type="text/javascript" src="{% static 'api/underscore.js' %}"></script>
-<script type="text/javascript" src="{% static 'api/backbone.js' %}"></script>
-<script type="text/javascript" src="{% static 'api/api.js' %}"></script>
-
+    <script type="text/javascript" src="{% static 'api/underscore.js' %}"></script>
+    <script type="text/javascript" src="{% static 'api/backbone.js' %}"></script>
+    <script type="text/javascript" src="{% static 'api/knockout.js' %}"></script>
+    <script type="text/javascript" src="{% static 'api/knockback.js' %}"></script>
+    <script type="text/javascript" src="{% static 'api/api.js' %}"></script>
 {% endblock %}
 
 {% block headertext %}API testing{% endblock %}
 
 {% block content %}
     <table class="table">
-        <tr>
-            <th>Image</th>
-            <th>Title</th>
-            <th></th>
-        </tr>
+        <thead>
+            <tr>
+                <th>Image</th>
+                <th>Title</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody data-bind="foreach: products">
+            <tr>
+                <td><img data-bind="attr: { src: image_url }" /></td>
+                <td data-bind="text: title"></td>
+            </tr>
+        </tbody>
     </table>
 {% endblock %}

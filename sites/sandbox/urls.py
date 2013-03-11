@@ -16,8 +16,11 @@ urlpatterns = patterns('',
     (r'^admin/', include(admin.site.urls)),
     # Custom functionality to allow dashboard users to be created
     (r'^gateway/', include('apps.gateway.urls')),
+    # Tastypie testing
+    (r'^api/', include('apps.tasty.urls')),
     (r'', include(shop.urls)),
 )
+
 
 # Allow rosetta to be used to add translations
 if 'rosetta' in settings.INSTALLED_APPS:

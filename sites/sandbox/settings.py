@@ -260,6 +260,8 @@ INSTALLED_APPS = [
     'south',
     'rosetta',          # For i18n testing
     'compressor',
+    'tastypie',
+    'apps.tasty',
     'apps.user',        # For profile testing
     'apps.gateway',     # For allowing dashboard access
 ]

@@ -58,6 +58,7 @@ setup(name='django-oscar',
           'Unidecode>=0.04.12,<0.05',
           # Oscar's default CSS is generated from Less and so we need node.js
           # and lessc to be available to compile the Less files.
+          'django-tastypie',
           'virtual-node>=0.0.1',
           'virtual-less>=0.0.1-1.3.3'],
       dependency_links=['https://github.com/toastdriven/django-haystack/tarball/f91a9a7ce6fb26093f4ecf09b28d71cf4b59283c#egg=django-haystack-2.0.0-beta'],

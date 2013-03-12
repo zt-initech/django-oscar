@@ -12,6 +12,11 @@
 {% block headertext %}API testing{% endblock %}
 
 {% block content %}
+    <form data-bind="submit: filterProducts">
+        <input data-bind="value: query" />
+        <button type="submit">Filter products</button>
+    </form>
+    <a data-bind="click: resetFilters">Reset</a>
     <table class="table">
         <thead>
             <tr>

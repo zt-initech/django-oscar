@@ -17,6 +17,7 @@ window.TastypieCollection = Backbone.Collection.extend({
 });
 
 // Backbone models
+// ===============
 
 var Product = TastypieModel.extend({
     urlRoot: '/api/products/'
@@ -30,10 +31,27 @@ var Product = TastypieModel.extend({
 
 var Products = TastypieCollection.extend({
     url: '/api/products/',
-    model: Product
+    model: Product,
+    startsWith: function() {
+        return this.filter(function(p) {
+            return p.get('title') == 'The Debutante';
+        });
+    }
+}, {
+    fetchAll: function() {
+        var products = new Products();
+        products.fetch();
+        return products;
+    },
+    fetchByQuery: function() {
+        var products = new Products();
+        products.fetch({data: {'title': 'The Debutante'}});
+        return products;
+    }
 });
 
 // Knockout view models
+// ====================
 
 // "view model" for Knockout
 function ProductList() {
@@ -41,16 +59,26 @@ function ProductList() {
 
     // Methods
 
-    // Fetch products using Backbone
-    self.getProducts = function() {
-        var products = new Products();
-        products.fetch();
-        return products;
+    self.filterProducts = function() {
+        // Note we simply modify the current collection in place, we don't instantiate a new one.
+        // We use the .collection method to load a new dataset into the obserable
+        // See http://kmalakoff.github.com/knockback/doc/index.html
+        backboneData.products.fetch({data: {'title__icontains': self.query()}});
+        self.products.collection(backboneData.products);
+    };
+    self.resetFilters = function() {
+        backboneData.products.fetch();
+        self.products.collection(backboneData.products);
     };
 
-    // Data
-    var products = self.getProducts();
-    self.products = kb.collectionObservable(products);
+    // Data - keep a reference to the backbone collections
+    var backboneData = {
+        'products': Products.fetchAll()
+    };
+    self.products = kb.collectionObservable(backboneData.products);
+
+    // No initial filter
+    self.query = ko.observable();
 }
 
 

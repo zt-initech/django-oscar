@@ -1,4 +1,5 @@
 from tastypie.resources import ModelResource
+from tastypie.constants import ALL
 
 from oscar.apps.catalogue import models
 
@@ -8,6 +9,9 @@ class ProductResource(ModelResource):
         queryset = models.Product.browsable.all()
         resource_name = 'products'
         excludes = ('date_created', 'date_updated', 'status', 'slug')
+        filtering = {
+            'title': ALL,
+        }
 
     def dehydrate(self, bundle):
         # Add extra fields to the serialised object

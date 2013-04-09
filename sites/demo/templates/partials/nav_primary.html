@@ -1,0 +1,46 @@
+{% load currency_filters %}
+{% load category_tags %}
+{% load i18n %}
+
+<div class="navbar primary navbar-static-top navbar-inverse">
+    <div class="navbar-inner">
+
+        <a class="btn btn-navbar" data-toggle="collapse" data-target=".primary-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </a>
+
+        <a class="btn btn-navbar btn-cart visible-phone" href="{% url checkout:index %}">
+            <i class="icon-shopping-cart"></i>
+            <strong>{% trans "Basket" %}
+            {% if request.basket.all_lines.count %}
+            {% trans "Total:" %} {{ basket.total_incl_tax|currency }}
+            {% endif %}
+            </strong>
+        </a>
+
+        <div class="nav-collapse primary-collapse">
+            <ul class="nav">
+                <li><a tabindex="-1" href="{% url catalogue:index %}">{% trans "All" %}</a></li>
+                {% for category in categories %}
+                <li class="dropdown">
+                    <a tabindex="-1" href="{{ category.0.get_absolute_url }}" class="dropdown-toggle" data-toggle="dropdown">
+                        {{ category.0.name }} {% if category.1 %}{% endif %}
+                        <span class="caret"></span>
+                    </a>
+                    {% if category.1 %}
+                    <ul class="dropdown-menu">
+                    {% for subcategory in category.1 %}
+                        <li><a tabindex="-1" href="{{ subcategory.0.get_absolute_url }}"> {{ subcategory.0.name }}</a></li>
+                    {% endfor %}
+                    </ul>
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+            {% include "partials/search.html" %}
+        </div>
+
+    </div>
+</div>

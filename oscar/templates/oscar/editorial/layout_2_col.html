@@ -1,0 +1,21 @@
+{% extends "layout_2_col.html" %}
+
+{% block title %}
+    {{ feincms_page.title }}
+{% endblock %}
+
+{% block headertext %}
+    {{ feincms_page.title }}
+{% endblock %}
+
+{% block column_left %}
+    {% for content in feincms_page.content.sidebar %}
+        {{ content.render }}
+    {% endfor %}
+{% endblock %}
+
+{% block content %}
+    {% for content in feincms_page.content.main %}
+        {{ content.render }}
+    {% endfor %}
+{% endblock %}

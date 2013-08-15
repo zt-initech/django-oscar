@@ -286,6 +286,7 @@ INSTALLED_APPS = [
     'rosetta',          # For i18n testing
     'compressor',
     'apps.gateway',     # For allowing dashboard access
+    'mptt',
     'feincms',
     'feincms.module.page',
     'feincms.module.medialibrary',

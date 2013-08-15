@@ -48,3 +48,8 @@ class HeroProduct(models.Model):
             'promotions/singleproduct.html', ctx)
 
 Page.create_content_type(HeroProduct)
+
+# Form designer
+from form_designer.models import FormContent
+
+Page.create_content_type(FormContent)

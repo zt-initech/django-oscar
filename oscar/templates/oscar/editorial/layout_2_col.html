@@ -1,5 +1,7 @@
 {% extends "layout_2_col.html" %}
 {% load feincms_tags %}
+{% load feincms_page_tags %}
+{% load mptt_tags %}
 
 {% block title %}
     {{ feincms_page.title }}
@@ -10,6 +12,24 @@
 {% endblock %}
 
 {% block column_left %}
+    <h3>Navigation</h3>
+    {% feincms_nav feincms_page level=1 depth=3 as pages %}
+    <ul>
+        {% recursetree pages %}
+        <li>
+            {% if node.id == feincms_page.id %}
+                <strong>{{ node.title }}</strong>
+            {% else %}
+                <a href="{{ node.get_absolute_url }}">{{ node.title }}</a>
+            {% endif %}
+            {% if not node.is_leaf_node %}
+                <ul class="children">
+                    {{ children }}
+                </ul>
+            {% endif %}
+        </li>
+        {% endrecursetree %}
+    </ul>
     {% for content in feincms_page.content.sidebar %}
         {% feincms_render_content content request %}
     {% endfor %}

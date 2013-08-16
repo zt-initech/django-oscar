@@ -1,0 +1,19 @@
+{% load i18n %}
+{% load url from future %}
+
+<ul class="breadcrumb">
+    <li>
+        <a href="{% url 'promotions:home' %}">{% trans "Home" %}</a>
+        <span class="divider">/</span>
+    </li>
+    {% for url, title in trail %}
+        {% if url %}
+            <li>
+                <a href="{{ url }}">{{ title }}</a>
+                <span class="divider">/</span>
+            </li>
+        {% else %}
+            <li class="active">{{ title }}</li>
+        {% endif %}
+    {% endfor %}
+</ul>

@@ -115,9 +115,9 @@ SECRET_KEY = '$)a7n&o80u!6y5t-+jrd3)3!%vh&shg$wqpjpxc!ar&p#!)n1a'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.Loader',
+    'django.template.loaders.filesystem.Loader',
+    #     'django.template.loaders.eggs.Loader',
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
@@ -134,9 +134,11 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'oscar.apps.checkout.context_processors.checkout',
     'oscar.core.context_processors.metadata',
     'oscar.apps.customer.notifications.context_processors.notifications',
+    "mezzanine.conf.context_processors.settings",
 )
 
 MIDDLEWARE_CLASSES = (
+    "mezzanine.core.middleware.UpdateCacheMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -152,6 +154,16 @@ MIDDLEWARE_CLASSES = (
     # Enable the ProfileMiddleware, then add ?cprofile to any
     # URL path to print out profile details
     #'oscar.profiling.middleware.ProfileMiddleware',
+    "mezzanine.core.request.CurrentRequestMiddleware",
+    "mezzanine.core.middleware.RedirectFallbackMiddleware",
+    "mezzanine.core.middleware.TemplateForDeviceMiddleware",
+    "mezzanine.core.middleware.TemplateForHostMiddleware",
+    "mezzanine.core.middleware.AdminLoginInterfaceSelectorMiddleware",
+    "mezzanine.core.middleware.SitePermissionMiddleware",
+    # Uncomment the following if using any of the SSL settings:
+    # "mezzanine.core.middleware.SSLRedirectMiddleware",
+    "mezzanine.pages.middleware.PageMiddleware",
+    "mezzanine.core.middleware.FetchFromCacheMiddleware",
 )
 
 
@@ -290,6 +302,15 @@ INSTALLED_APPS = [
     'rosetta',          # For i18n testing
     'compressor',
     'apps.gateway',     # For allowing dashboard access
+    "mezzanine.boot",
+    "mezzanine.conf",
+    "mezzanine.core",
+    "mezzanine.generic",
+    "mezzanine.blog",
+    "mezzanine.forms",
+    "mezzanine.pages",
+    "mezzanine.galleries",
+    "mezzanine.twitter",
 ]
 from oscar import get_core_apps
 INSTALLED_APPS = INSTALLED_APPS + get_core_apps()
@@ -423,6 +444,20 @@ if not os.path.exists(LOG_ROOT):
 THUMBNAIL_DEBUG = True
 THUMBNAIL_KEY_PREFIX = 'oscar-sandbox'
 
+# Mezzanine
+# =========
+
+PACKAGE_NAME_FILEBROWSER = "filebrowser_safe"
+PACKAGE_NAME_GRAPPELLI = "grappelli_safe"
+
+NEVERCACHE_KEY = "asdfasdf123asd345"
+
+try:
+    from mezzanine.utils.conf import set_dynamic_settings
+except ImportError:
+    pass
+else:
+    set_dynamic_settings(globals())
 
 # Try and import local settings which can be used to override any of the above.
 try:

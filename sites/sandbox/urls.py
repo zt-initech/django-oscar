@@ -16,6 +16,8 @@ urlpatterns = patterns('',
     # Custom functionality to allow dashboard users to be created
     (r'^gateway/', include('apps.gateway.urls')),
     (r'', include(shop.urls)),
+    url("^$", "mezzanine.pages.views.page", {"slug": "/"}, name="home"),
+    ("^", include("mezzanine.urls")),
 )
 
 # Allow rosetta to be used to add translations

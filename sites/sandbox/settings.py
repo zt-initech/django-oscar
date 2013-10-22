@@ -291,6 +291,7 @@ INSTALLED_APPS = [
     'rosetta',          # For i18n testing
     'compressor',
     'apps.gateway',     # For allowing dashboard access
+    'apps.foobar',
 ]
 from oscar import get_core_apps
 INSTALLED_APPS = INSTALLED_APPS + get_core_apps()

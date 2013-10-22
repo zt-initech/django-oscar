@@ -17,6 +17,8 @@ urlpatterns = patterns('',
     (r'^admin/', include(admin.site.urls)),
     # Custom functionality to allow dashboard users to be created
     (r'^gateway/', include('apps.gateway.urls')),
+    # Dynamic dashboard testing
+    (r'^dashboard/foobar/', include('apps.foobar.dashboard.urls')),
     (r'', include(shop.urls)),
 )
 

@@ -20,7 +20,7 @@ OSCAR_IMAGE_FOLDER = 'images/products/%Y/%m/'
 OSCAR_PROMOTION_FOLDER = 'images/promotions/'
 
 # Copy this image from oscar/static/img to your MEDIA_ROOT folder.
-# It needs to be there so Sorl can resize it.
+# It needs to be there so Easy Thumbnail can resize it.
 OSCAR_MISSING_IMAGE_URL = 'image_not_found.jpg'
 OSCAR_UPLOAD_ROOT = '/tmp'
 

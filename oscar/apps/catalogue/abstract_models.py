@@ -1020,11 +1020,11 @@ class MissingProductImage(object):
     """
     Mimics a Django file field by having a name property.
 
-    sorl-thumbnail requires all it's images to be in MEDIA_ROOT. This class
+    Easy Thumbnails requires all it's images to be in MEDIA_ROOT. This class
     tries symlinking the default "missing image" image in STATIC_ROOT
     into MEDIA_ROOT for convenience, as that is necessary every time an Oscar
     project is setup. This avoids the less helpful NotFound IOError that would
-    be raised when sorl-thumbnail tries to access it.
+    be raised when Easy Thumbnails tries to access it.
     """
 
     def __init__(self, name=None):

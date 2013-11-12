@@ -47,8 +47,8 @@ setup(name='django-oscar',
           'django-haystack>=2.0.0',
           # Treebeard is used for categories
           'django-treebeard==2.0b2',
-          # Sorl is used as the default thumbnailer
-          'sorl-thumbnail==11.12',
+          # Easy Thumbnails is used as the default thumbnailer
+          'easy-thumbnails==1.4',
           'python-memcached>=1.48,<1.53',
           # Babel is used for currency formatting
           'Babel>=1.0',

@@ -215,10 +215,10 @@ LOGGING = {
             'filename': 'errors.log',
             'formatter': 'verbose'
         },
-        'sorl_file': {
+        'easy_thumbnails_file': {
             'level': 'INFO',
             'class': 'oscar.core.logging.handlers.EnvFileHandler',
-            'filename': 'sorl.log',
+            'filename': 'easy_thumbnails.log',
             'formatter': 'verbose'
         },
         'mail_admins': {
@@ -253,8 +253,8 @@ LOGGING = {
             'propagate': True,
             'level': 'INFO',
         },
-        'sorl.thumbnail': {
-            'handlers': ['sorl_file'],
+        'easy-thumbnail': {
+            'handlers': ['easy_thumbnails_file'],
             'propagate': True,
             'level': 'INFO',
         },
@@ -418,17 +418,8 @@ LOG_ROOT = location('logs')
 if not os.path.exists(LOG_ROOT):
     os.mkdir(LOG_ROOT)
 
-# Sorl
-# ====
-
-THUMBNAIL_DEBUG = True
-THUMBNAIL_KEY_PREFIX = 'oscar-sandbox'
-
-# Use a custom KV store to handle integrity error
-THUMBNAIL_KVSTORE = 'oscar.sorl_kvstore.ConcurrentKVStore'
-
-# Easy Thumbnail
-# ==============
+# Easy Thumbnails
+# ===============
 THUMBNAIL_ALIASES = {
     '': {
         'x155': {'size': (0,155)},

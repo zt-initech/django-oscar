@@ -361,7 +361,7 @@ The folder within ``MEDIA_ROOT`` used for uploaded promotion images.
 Default: ``image_not_found.jpg``
 
 Copy this image from ``oscar/static/img`` to your ``MEDIA_ROOT`` folder. It needs to
-be there so Sorl can resize it.
+be there so Easy Thumbnails can resize it.
 
 ``OSCAR_UPLOAD_ROOT``
 ---------------------

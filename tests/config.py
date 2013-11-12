@@ -28,7 +28,7 @@ def configure():
                 'django.contrib.sites',
                 'django.contrib.flatpages',
                 'django.contrib.staticfiles',
-                'sorl.thumbnail',
+                'easy_thumbnails',
                 'compressor',
             ] + OSCAR_CORE_APPS,
             'TEMPLATE_CONTEXT_PROCESSORS': (

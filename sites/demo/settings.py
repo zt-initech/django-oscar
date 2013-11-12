@@ -305,7 +305,7 @@ DISPLAY_VERSION = False
 
 USE_TZ = True
 
-# Must be within MEDIA_ROOT for sorl to work
+# Must be within MEDIA_ROOT for Easy Thumbnails to work
 OSCAR_MISSING_IMAGE_URL = 'image_not_found.jpg'
 
 GOOGLE_ANALYTICS_ID = 'UA-45363517-4'

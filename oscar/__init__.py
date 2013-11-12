@@ -63,7 +63,7 @@ OSCAR_CORE_APPS = [
     # 3rd-party apps that oscar depends on
     'haystack',
     'treebeard',
-    'sorl.thumbnail',
+    'easy_thumbnails',
 ]
 
 

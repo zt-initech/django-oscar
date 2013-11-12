@@ -78,7 +78,6 @@
                                                     <a href="{{ image.original.url }}" rel="lightbox_{{ product.upc|default:"-" }}">
                                                         <img src="{% static thumb.url %}" alt="{{ product.get_title }}" class="img-polaroid" data-description="{% if image.caption %}{{ image.caption }}{% endif %}">
                                                     </a>
-                                                    {% endthumbnail %}
                                                 {% endwith %}
                                             {% endif %}
                                         </div>

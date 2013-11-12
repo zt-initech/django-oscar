@@ -90,7 +90,6 @@
                                     <a href="{{ image.original.url }}" rel="lightbox_{{ product.upc|default:"-" }}" class="sub-image">
                                         <img src="{% static thumb.url %}" alt="{{ product.get_title }}" data-description="{% if image.caption %}{{ image.caption }}{% endif %}">
                                     </a>
-                                    {% endthumbnail %}
                                 {% endwith %}
                             {% else %}
                                 -

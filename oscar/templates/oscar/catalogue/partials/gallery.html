@@ -37,7 +37,6 @@
                             <li>
                                 {% thumbnail image.original "100x100" upscale=False as thumb %}
                                 <a href="{{ image.original.url }}" rel="lightbox"><img src="{% static thumb.url %}" data-large="{{ image.original.url }}" alt="image02" data-description="{% if image.caption %}{{ image.caption }}{% endif %}" /> </a>
-                                {% endthumbnail %}
                             </li>
                             {% endfor %}
                         </ul>
@@ -58,7 +57,6 @@
                 {% else %}
                     <img src="{% static thumb.url %}" alt="image02" />
                 {% endif %}
-                {% endthumbnail %}
             {% endwith %}
             </div>
         </div>

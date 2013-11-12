@@ -573,7 +573,7 @@ class AbstractProduct(models.Model):
             # the ProductImage class so this missing image can be used
             # interchangably in templates.  Strategy pattern ftw!
             return {
-                'original': self.get_missing_image(),
+                'original': settings.OSCAR_MISSING_IMAGE_URL,
                 'caption': '',
                 'is_missing': True}
 

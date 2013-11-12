@@ -291,6 +291,7 @@ INSTALLED_APPS = [
     'rosetta',          # For i18n testing
     'compressor',
     'apps.gateway',     # For allowing dashboard access
+    'easy_thumbnails'
 ]
 from oscar import get_core_apps
 INSTALLED_APPS = INSTALLED_APPS + get_core_apps()
@@ -426,7 +427,19 @@ THUMBNAIL_KEY_PREFIX = 'oscar-sandbox'
 # Use a custom KV store to handle integrity error
 THUMBNAIL_KVSTORE = 'oscar.sorl_kvstore.ConcurrentKVStore'
 
-
+# Easy Thumbnail
+# ==============
+THUMBNAIL_ALIASES = {
+    '': {
+        'x155': {'size': (0,155)},
+        '70x70': {'size': (70,70)},
+        '100x100': {'size': (100,100)},
+        '200x200': {'size': (200,200)},
+        '240x240': {'size': (240,240)},
+        '400x400': {'size': (400,400)},
+        '600x600': {'size': (600,600)},
+    }
+}
 # Try and import local settings which can be used to override any of the above.
 try:
     from settings_local import *

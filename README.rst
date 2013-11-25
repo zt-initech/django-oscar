@@ -1,3 +1,10 @@
+Specific changes in this branch:
+
+* Merged `PR 964`_
+
+.. _`PR 964`: https://github.com/tangentlabs/django-oscar/pull/964
+
+
 .. image:: https://github.com/tangentlabs/django-oscar/raw/master/docs/images/logos/oscar.png
     :target: http://oscarcommerce.com
 

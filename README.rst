@@ -1,8 +1,10 @@
 Specific changes in this branch:
 
-* Merged `PR 964`_
+* Merged `PR 964`_ (not needed)
+* Merged `PR 1020`_
 
 .. _`PR 964`: https://github.com/tangentlabs/django-oscar/pull/964
+.. _`PR 1020`: https://github.com/tangentlabs/django-oscar/pull/1020
 
 
 .. image:: https://github.com/tangentlabs/django-oscar/raw/master/docs/images/logos/oscar.png

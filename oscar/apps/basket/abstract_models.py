@@ -664,7 +664,7 @@ class AbstractLine(models.Model):
             raise RuntimeError("A price breakdown can only be determined "
                                "when taxes are known")
         prices = []
-        if not self.has_discount:
+        if not self.discount_value:
             prices.append((self.unit_price_incl_tax, self.unit_price_excl_tax,
                            self.quantity))
         else:
@@ -673,6 +673,7 @@ class AbstractLine(models.Model):
             item_incl_tax_discount = (
                 self.discount_value / int(self._affected_quantity))
             item_excl_tax_discount = item_incl_tax_discount * self._tax_ratio
+            item_excl_tax_discount = item_excl_tax_discount.quantize(D('0.01'))
             prices.append((self.unit_price_incl_tax - item_incl_tax_discount,
                            self.unit_price_excl_tax - item_excl_tax_discount,
                            self._affected_quantity))

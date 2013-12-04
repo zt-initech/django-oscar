@@ -1,4 +1,4 @@
-from decimal import Decimal
+from decimal import Decimal as D
 import zlib
 
 from django.db import models

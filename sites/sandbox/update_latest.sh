@@ -24,8 +24,8 @@ touch deploy/wsgi/latest
 cp deploy/nginx/latest.conf /etc/nginx/sites-enabled/latest.oscarcommerce.com
 /etc/init.d/nginx configtest 2> /dev/null && /etc/init.d/nginx force-reload 2> /dev/null
 
-cp deploy/supervisord/latest.conf /etc/supervisord/conf.d/oscar-latest.conf
-touch /var/www/oscar/builds/latest/deploy/wsgi/prod.wsgi
+cp deploy/supervisord/latest.conf /etc/supervisor/conf.d/oscar-latest.conf
+supervisorctl reread && supervisorctl reload
 
 # Copy down cronjob file
-cp deploy/cron.d/oscar /etc/cron.d/oscar-latest
+/etc/init.d/supervisor restart

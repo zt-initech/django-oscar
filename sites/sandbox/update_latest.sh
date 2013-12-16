@@ -28,4 +28,4 @@ cp deploy/supervisord/latest.conf /etc/supervisor/conf.d/oscar-latest.conf
 supervisorctl reread && supervisorctl reload
 
 # Copy down cronjob file
-/etc/init.d/supervisor restart
+cp deploy/cron.d/oscar /etc/cron.d/oscar-latest

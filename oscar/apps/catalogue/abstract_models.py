@@ -35,6 +35,10 @@ class AbstractProductClass(models.Model):
     name = models.CharField(_('Name'), max_length=128)
     slug = models.SlugField(_('Slug'), max_length=128, unique=True)
 
+    attributes = models.ManyToManyField(
+        'catalogue.ProductAttribute', related_name='product_classes', blank=True,
+        null=True, verbose_name=_("Product Attributes"))
+
     #: Some product type don't require shipping (eg digital products) - we use
     #: this field to take some shortcuts in the checkout.
     requires_shipping = models.BooleanField(_("Requires shipping?"),
@@ -695,9 +699,6 @@ class AbstractProductAttribute(models.Model):
     Defines an attribute for a product class. (For example, number_of_pages for
     a 'book' class)
     """
-    product_class = models.ForeignKey(
-        'catalogue.ProductClass', related_name='attributes', blank=True,
-        null=True, verbose_name=_("Product Class"))
     name = models.CharField(_('Name'), max_length=128)
     code = models.SlugField(
         _('Code'), max_length=128,

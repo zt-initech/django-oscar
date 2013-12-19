@@ -45,26 +45,30 @@
     <form action="." method="post" class="well">
         {% csrf_token %}
 
-        {% blocktrans with title=product_class.name %}
-            <p>Delete product class <strong>{{ title }}</strong> - are you sure?</p>
-        {% endblocktrans %}
-
         {% if product_class.products.all %}
-            <p> {% trans "This will also permanently delete the following products:" %}
+            <p> {% trans "It is not possible to delete product classes that contain products. Please first delete the following products:" %}
                 <ul>
                     {% for product in product_class.products.all %}
-                        <li><strong>{{ product.title }}</strong></li>
+                        {% if product.is_top_level %}
+                            <li><a href="{% url 'dashboard:catalogue-product-delete' pk=product.id %}"><strong>{{ product }}</strong></a></li>
+                        {% endif %}
                     {% endfor %}
                 </ul>
             </p>
+        {% else %}
+            {% blocktrans with title=product_class.name %}
+                <p>Delete product class <strong>{{ title }}</strong> - are you sure?</p>
+            {% endblocktrans %}
         {% endif %}
 
-        <p class="text-danger"><h2>{% trans "WARNING: THIS ACTION CAN NOT BE UNDONE." %}</h2></p>
-
         <div class="form-actions">
-            <button type="submit" class="btn btn-danger">{% trans "Delete" %}</button>
-            {% trans "or" %}
-            <a href="{% url 'dashboard:catalogue-product-class-list' %}">{% trans "cancel" %}</a>
+            {% if not product_class.products.all %}
+                <button type="submit" class="btn btn-danger">{% trans "Delete" %}</button>
+                {% trans "or" %}
+            {% endif %}
+            <div class="btn btn-secondary">
+                <a href="{% url 'dashboard:catalogue-product-class-list' %}">{% trans "cancel" %}</a>
+            </div>
         </div>
     </form>
 {% endblock %}

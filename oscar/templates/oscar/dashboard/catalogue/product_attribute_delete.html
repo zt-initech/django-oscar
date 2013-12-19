@@ -25,7 +25,7 @@
             <span class="divider">/</span>
         </li>
         <li>
-            <a href="{% url 'dashboard:catalogue-product' pk=product.pk %}">{{ product.title }}</a>
+            <a href="{% url 'dashboard:catalogue-product-attribute' pk=product_attribute.pk %}">{{ product_attribute.name }}</a>
             <span class="divider">/</span>
         </li>
         <li class="active">{% trans "Delete?" %}</li>
@@ -34,35 +34,40 @@
 
 {% block header %}
     <div class="page-header">
-        <h1>{% trans "Delete product?" %}</h1>
+        <h1>{% trans "Delete product attribute?" %}</h1>
     </div>
 {% endblock header%}
 
 {% block dashboard_content %}
     <div class="table-header">
-        <h2>{% trans "Delete product" %}</h2>
+        <h2>{% trans "Delete product attribute" %}</h2>
     </div>
     <form action="." method="post" class="well">
         {% csrf_token %}
 
-        {% blocktrans with title=product.title %}
-            <p>Delete product <strong>{{ title }}</strong> - are you sure?</p>
-        {% endblocktrans %}
-
-        {% if product.is_group %}
-            <p> {% trans "This will also delete the following variant products:" %}
+        {% if product_attribute.product_classes.all %}
+            <p> 
+            {% blocktrans with title=product_attribute.name %}
+                <p>Product attribute <strong>{{ title }}</strong> is currently being used by the following product classes - are you sure you want to delete it?</p>
+            {% endblocktrans %}
                 <ul>
-                    {% for variant in product.variants.all %}
-                        <li><strong>{{ variant }}</strong></li>
+                    {% for product_class in product_attribute.product_classes.all %}
+                        <li><a href="{% url 'dashboard:catalogue-product-class' pk=product_class.id %}"><strong>{{ product_class.name }}</strong></a></li>
                     {% endfor %}
                 </ul>
             </p>
+        {% else %}
+            {% blocktrans with title=product_attribute.name %}
+                <p>Delete product attribute <strong>{{ title }}</strong> - are you sure?</p>
+            {% endblocktrans %}
         {% endif %}
 
         <div class="form-actions">
             <button type="submit" class="btn btn-danger">{% trans "Delete" %}</button>
             {% trans "or" %}
-            <a href="{% url 'dashboard:catalogue-product-list' %}">{% trans "cancel" %}</a>
+            <div class="btn btn-secondary">
+                <a href="{% url 'dashboard:catalogue-product-attribute-list' %}">{% trans "cancel" %}</a>
+            </div>
         </div>
     </form>
 {% endblock %}

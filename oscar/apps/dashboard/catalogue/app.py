@@ -27,7 +27,11 @@ class CatalogueApplication(Application):
 
     product_class_list_view = views.ProductClassListView
     product_class_create_update_view = views.ProductClassCreateUpdateView
-    product_delete_view = views.ProductClassDeleteView
+    product_class_delete_view = views.ProductClassDeleteView
+
+    product_attribute_list_view = views.AttributeListView
+    product_attribute_create_update_view = views.AttributeCreateUpdateView
+    product_attribute_delete_view = views.AttributeDeleteView
 
     category_list_view = views.CategoryListView
     category_detail_list_view = views.CategoryDetailListView
@@ -53,10 +57,12 @@ class CatalogueApplication(Application):
                 name='catalogue-product-delete'),
             url(r'^$', self.product_list_view.as_view(),
                 name='catalogue-product-list'),
+
             url(r'^stock-alerts/$', self.stock_alert_view.as_view(),
                 name='stock-alert-list'),
             url(r'^product-lookup/$', self.product_lookup_view.as_view(),
                 name='catalogue-product-lookup'),
+
             url(r'^categories/$', self.category_list_view.as_view(),
                 name='catalogue-category-list'),
             url(r'^categories/(?P<pk>\d+)/$',
@@ -71,7 +77,6 @@ class CatalogueApplication(Application):
                 self.category_delete_view.as_view(),
                 name='catalogue-category-delete'),
 
-
             url(r'^product-classes/$', self.product_class_list_view.as_view(),
                 name='catalogue-product-class-list'),
             url(r'^product-classes/(?P<pk>\d+)$', 
@@ -81,9 +86,21 @@ class CatalogueApplication(Application):
                 self.product_class_create_update_view.as_view(),
                 name='catalogue-product-class-create'),
             url(r'^product-classes/(?P<pk>\d+)/delete/$',
-                self.product_delete_view.as_view(),
+                self.product_class_delete_view.as_view(),
                 name='catalogue-product-class-delete'),
 
+            url(r'^product-attributes/$', 
+                self.product_attribute_list_view.as_view(),
+                name='catalogue-product-attribute-list'),
+            url(r'^product-attributes/create/$', 
+                self.product_attribute_create_update_view.as_view(),
+                name='catalogue-product-attribute-create'),
+            url(r'^product-attributes/(?P<pk>\d+)$', 
+                self.product_attribute_create_update_view.as_view(),
+                name='catalogue-product-attribute'),
+           url(r'^product-attributes/(?P<pk>\d+)/delete/$',
+                self.product_attribute_delete_view.as_view(),
+                name='catalogue-product-attribute-delete'),
 
         ]
         return self.post_process_urls(patterns('', *urls))

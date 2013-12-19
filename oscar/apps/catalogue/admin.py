@@ -61,7 +61,7 @@ class ProductAdmin(admin.ModelAdmin):
 
 
 class ProductAttributeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'code', 'product_class', 'type')
+    list_display = ('name', 'code', 'type')
     prepopulated_fields = {"code": ("name", )}
 
 

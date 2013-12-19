@@ -17,22 +17,22 @@
             <a href="{% url 'dashboard:index' %}">{% trans "Dashboard" %}</a>
             <span class="divider">/</span>
         </li>
-        <li class="active">{% trans "Product Class management" %}</li>
+        <li class="active">{% trans "Product Attribute management" %}</li>
     </ul>
 {% endblock %}
 
 {% block header %}
     <div class="page-header action">
-        <h1>{% trans "Product Class management" %}</h1>
+        <h1>{% trans "Product Attribute management" %}</h1>
         <div class="btn btn-secondary pull-right">
-            <a href="{% url 'dashboard:catalogue-product-class-create' %}">{% trans "New Product Class" %}</a>
+            <a href="{% url 'dashboard:catalogue-product-attribute-create' %}">{% trans "New Product Attribute" %}</a>
         </div>
     </div>
 {% endblock header %}
 
 {% block dashboard_content %}
-    {% if product_classes %}
-        {% block product_class_list %}
+    {% if product_attributes %}
+        {% block attribute_list %}
             <div class="table-header">
                 <h2><i class="icon-sitemap icon-large"></i>{{ queryset_description }}</h2>
             </div>
@@ -42,24 +42,20 @@
                     {% block product_class_list_header %}
                         <tr>
                             <th>{% trans "Name" %}</th>
-                            <th>{% trans "Requires Shipping?" %}</th>
-                            <th>{% trans "Track Stock?" %}</th>
+                            <th>{% trans "Type" %}</th>
+                            <th>{% trans "In Use?" %}</th>
                             <th></th>
                         </tr>
                     {% endblock %}
-                    {% for product_class in product_classes %}
-                        {% block product_class %}
+                    {% for product_attribute in product_attributes %}
+                        {% block product_attribute %}
                             <tr>
-                                <td><a href="{% url 'dashboard:catalogue-product-class' pk=product_class.id %}">{{ product_class.name }}</a></td>
+                                <td><a href="{% url 'dashboard:catalogue-product-attribute' pk=product_attribute.id %}">{{ product_attribute.name }}</a></td>
                                 <td>
-                                    {% if product_class.requires_shipping %}
-                                        {% trans "Yes" %}
-                                    {% else %}
-                                        {% trans "No" %}
-                                    {% endif %}
+                                    {{ product_attribute.type }}
                                 </td>
                                 <td>
-                                    {% if product_class.track_stock %}
+                                    {% if product_attribute.product_classes.all.count %}
                                         {% trans "Yes" %}
                                     {% else %}
                                         {% trans "No" %}
@@ -74,23 +70,23 @@
                                             </a>
                                             <ul class="dropdown-menu pull-right">
                                                 <li>
-                                                    <a href="{% url 'dashboard:catalogue-product-class' pk=product_class.id %}{% if request.GET.urlencode %}?{{ request.GET.urlencode }}{% endif %}">{% trans "Edit" %}</a>
+                                                    <a href="{% url 'dashboard:catalogue-product-attribute' pk=product_attribute.id %}{% if request.GET.urlencode %}?{{ request.GET.urlencode }}{% endif %}">{% trans "Edit" %}</a>
                                                 </li>
                                                 <li>
-                                                    <a href="{% url 'dashboard:catalogue-product-class-delete' pk=product_class.id%}">{% trans "Delete" %}</a>
+                                                    <a href="{% url 'dashboard:catalogue-product-attribute-delete' pk=product_attribute.id%}">{% trans "Delete" %}</a>
                                                 </li>
                                             </ul>
                                         </div>
                                     </div>
                                 </td>
                             </tr>
-                        {% endblock product_class %}
+                        {% endblock product_attribute %}
                     {% endfor %}
                 </table>
             </form>
-        {% endblock product_class_list %}
+        {% endblock attribute_list %}
     {% else %}
-        <p>{% trans "No product classes found." %}</p>
+        <p>{% trans "No product attributes found." %}</p>
     {% endif %}
 
 {% endblock dashboard_content %}

@@ -13,6 +13,7 @@ from oscar.views.generic import ObjectLookupView
 (ProductForm,
  ProductClassForm,
  ProductSearchForm,
+ ProductAttributeForm,
  ProductClassSearchForm,
  CategoryForm,
  StockRecordFormSet,
@@ -24,6 +25,7 @@ from oscar.views.generic import ObjectLookupView
                   ('ProductForm',
                    'ProductClassForm',
                    'ProductSearchForm',
+                   'ProductAttributeForm',
                    'ProductClassSearchForm',
                    'CategoryForm',
                    'StockRecordFormSet',
@@ -36,6 +38,7 @@ Category = get_model('catalogue', 'Category')
 ProductImage = get_model('catalogue', 'ProductImage')
 ProductCategory = get_model('catalogue', 'ProductCategory')
 ProductClass = get_model('catalogue', 'ProductClass')
+ProductAttribute = get_model('catalogue', 'ProductAttribute')
 StockRecord = get_model('partner', 'StockRecord')
 StockAlert = get_model('partner', 'StockAlert')
 Partner = get_model('partner', 'Partner')
@@ -525,3 +528,68 @@ class ProductClassDeleteView(generic.DeleteView):
         messages.success(self.request, msg)
         return reverse('dashboard:catalogue-product-class-list')
 
+
+class AttributeListView(generic.ListView):
+    template_name = 'dashboard/catalogue/product_attribute_list.html'
+    model = ProductAttribute
+    context_object_name = 'product_attributes'
+    paginate_by = 20
+
+
+class AttributeCreateUpdateView(generic.UpdateView):
+    template_name = 'dashboard/catalogue/product_attribute_update.html'
+    model = ProductAttribute
+    context_object_name = 'product_attribute'
+    form_class = ProductAttributeForm
+
+    def get_object(self, queryset=None):
+        """
+        This parts allows generic.UpdateView to handle creating products as
+        well. The only distinction between an UpdateView and a CreateView
+        is that self.object is None. We emulate this behavior.
+        Additionally, self.product_class is set.
+        """
+        self.creating = not 'pk' in self.kwargs
+        if self.creating:
+            return None  # success
+        else:
+            return super(AttributeCreateUpdateView, self).get_object(queryset)
+
+    def get_context_data(self, **kwargs):
+        ctx = super(AttributeCreateUpdateView, self).get_context_data(**kwargs)
+        if self.object is None:
+            ctx['title'] = _('Create new attribute')
+        else:
+            ctx['title'] = ctx['product_attribute'].name
+        return ctx
+
+    def get_success_url(self):
+        if self.creating:
+            msg = _("Created product attribute '%s'") % self.object.name
+        else:
+            msg = _("Updated product attribute '%s'") % self.object.name
+        messages.success(self.request, msg)
+        url = reverse('dashboard:catalogue-product-attribute-list')
+        if self.request.POST.get('action') == 'continue':
+            url = reverse('dashboard:catalogue-attribute-class',
+                          kwargs={"pk": self.object.id})
+        return self.get_url_with_querystring(url)
+
+    def get_url_with_querystring(self, url):
+        url_parts = [url]
+        if self.request.GET.urlencode():
+            url_parts += [self.request.GET.urlencode()]
+        return "?".join(url_parts)
+
+class AttributeDeleteView(generic.DeleteView):
+    """
+    Dashboard view to delete a product attribute.
+    """
+    template_name = 'dashboard/catalogue/product_attribute_delete.html'
+    model = ProductAttribute
+    context_object_name = 'product_attribute'
+
+    def get_success_url(self):
+        msg = _("Deleted product attribute '%s'") % self.object.name
+        messages.success(self.request, msg)
+        return reverse('dashboard:catalogue-product-attribute-list')

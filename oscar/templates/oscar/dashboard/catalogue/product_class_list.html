@@ -1,0 +1,118 @@
+{% extends 'dashboard/layout.html' %}
+{% load url from future %}
+{% load i18n %}
+{% load thumbnail %}
+{% load staticfiles %}
+{% load sorting_tags %}
+
+{% block body_class %}catalogue{% endblock %}
+
+{% block title %}
+    {% trans "Product management" %} | {{ block.super }}
+{% endblock %}
+
+{% block breadcrumbs %}
+    <ul class="breadcrumb">
+        <li>
+            <a href="{% url 'dashboard:index' %}">{% trans "Dashboard" %}</a>
+            <span class="divider">/</span>
+        </li>
+        <li class="active">{% trans "Product Class management" %}</li>
+    </ul>
+{% endblock %}
+
+{% block header %}
+    <div class="page-header action">
+        <h1>{% trans "Product Class management" %}</h1>
+    </div>
+{% endblock header %}
+
+{% block dashboard_content %}
+
+    {% block create_product_class %}
+        <div class="row">
+            <div class="span12">
+                <div class="table-header">
+                    <h3><i class="icon-sitemap icon-large"></i> {% trans "Create new product class" %}</h3>
+                </div>
+                <div class="well">
+                    <div class="span6">
+                        <form action="." method="get" class="form-inline">
+                            {% include "partials/form_fields_inline.html" with form=form %}
+                            <button type="submit" class="btn btn-primary">{% trans "Search" %}</button>
+                        </form>
+                    </div>
+                    <div class="span6">
+                        <div class="btn btn-secondary">
+                            <a href="{% url 'dashboard:catalogue-product-class-create' %}">{% trans "New Product Class" %}</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endblock %}
+
+    {% if product_classes %}
+        {% block product_class_list %}
+            <div class="table-header">
+                <h2><i class="icon-sitemap icon-large"></i>{{ queryset_description }}</h2>
+            </div>
+            <form action="." method="post">
+                {% csrf_token %}
+                <table class="table table-striped table-bordered">
+                    {% block product_class_list_header %}
+                        <tr>
+                            <th>{% trans "Name" %}</th>
+                            <th>{% trans "Requires Shipping?" %}</th>
+                            <th>{% trans "Track Stock?" %}</th>
+                            <th></th>
+                        </tr>
+                    {% endblock %}
+                    {% for product_class in product_classes %}
+                        {% block product_class %}
+                            <tr>
+                                <td><a href="{% url 'dashboard:catalogue-product-class' pk=product_class.id %}">{{ product_class.name }}</a></td>
+                                <td>
+                                    {% if product_class.requires_shipping %}
+                                        {% trans "Yes" %}
+                                    {% else %}
+                                        {% trans "No" %}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if product_class.track_stock %}
+                                        {% trans "Yes" %}
+                                    {% else %}
+                                        {% trans "No" %}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-toolbar">
+                                        <div class="btn-group">
+                                            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                                                {% trans "Actions" %}
+                                                <span class="caret"></span>
+                                            </a>
+                                            <ul class="dropdown-menu pull-right">
+                                                <li>
+                                                    <a href="{% url 'dashboard:catalogue-product-class' pk=product_class.id %}{% if request.GET.urlencode %}?{{ request.GET.urlencode }}{% endif %}">{% trans "Edit" %}</a>
+                                                </li>
+                                                <li>
+                                                    <a href="{% url 'dashboard:catalogue-product-class-delete' pk=product_class.id%}">{% trans "Delete" %}</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endblock product_class %}
+                    {% endfor %}
+                </table>
+                {% include "partials/pagination.html" %}
+            </form>
+        {% endblock product_class_list %}
+    {% else %}
+        <p>{% trans "No product classes found." %}</p>
+    {% endif %}
+
+{% endblock dashboard_content %}

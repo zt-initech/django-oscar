@@ -1,0 +1,70 @@
+{% extends 'dashboard/layout.html' %}
+
+{% load url from future %}
+{% load i18n %}
+
+{% block title %}
+    {% blocktrans with title=product.get_title %}
+        Delete {{ title}}?
+    {% endblocktrans %} |
+    {{ block.super }}
+{% endblock %}
+
+{% block body_class %}
+    create-page
+{% endblock %}
+
+{% block breadcrumbs %}
+    <ul class="breadcrumb">
+        <li>
+            <a href="{% url 'dashboard:index' %}">{% trans "Dashboard" %}</a>
+            <span class="divider">/</span>
+        </li>
+        <li>
+            <a href="{% url 'dashboard:catalogue-product-list' %}">{% trans "Product management" %}</a>
+            <span class="divider">/</span>
+        </li>
+        <li>
+            <a href="{% url 'dashboard:catalogue-product-class' pk=product_class.pk %}">{{ product_class.name }}</a>
+            <span class="divider">/</span>
+        </li>
+        <li class="active">{% trans "Delete?" %}</li>
+    </ul>
+{% endblock %}
+
+{% block header %}
+    <div class="page-header">
+        <h1>{% trans "Delete product class?" %}</h1>
+    </div>
+{% endblock header%}
+
+{% block dashboard_content %}
+    <div class="table-header">
+        <h2>{% trans "Delete product class" %}</h2>
+    </div>
+    <form action="." method="post" class="well">
+        {% csrf_token %}
+
+        {% blocktrans with title=product_class.name %}
+            <p>Delete product class <strong>{{ title }}</strong> - are you sure?</p>
+        {% endblocktrans %}
+
+        {% if product_class.products.all %}
+            <p> {% trans "This will also permanently delete the following products:" %}
+                <ul>
+                    {% for product in product_class.products.all %}
+                        <li><strong>{{ product.title }}</strong></li>
+                    {% endfor %}
+                </ul>
+            </p>
+        {% endif %}
+
+        <p class="text-danger"><h2>{% trans "WARNING: THIS ACTION CAN NOT BE UNDONE." %}</h2></p>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-danger">{% trans "Delete" %}</button>
+            {% trans "or" %}
+            <a href="{% url 'dashboard:catalogue-product-class-list' %}">{% trans "cancel" %}</a>
+        </div>
+    </form>
+{% endblock %}

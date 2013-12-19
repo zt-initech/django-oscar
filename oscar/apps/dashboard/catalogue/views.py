@@ -11,7 +11,9 @@ from oscar.views import sort_queryset
 from oscar.views.generic import ObjectLookupView
 
 (ProductForm,
+ ProductClassForm,
  ProductSearchForm,
+ ProductClassSearchForm,
  CategoryForm,
  StockRecordFormSet,
  StockAlertSearchForm,
@@ -20,7 +22,9 @@ from oscar.views.generic import ObjectLookupView
  ProductRecommendationFormSet) \
     = get_classes('dashboard.catalogue.forms',
                   ('ProductForm',
+                   'ProductClassForm',
                    'ProductSearchForm',
+                   'ProductClassSearchForm',
                    'CategoryForm',
                    'StockRecordFormSet',
                    'StockAlertSearchForm',
@@ -451,3 +455,73 @@ class ProductLookupView(ObjectLookupView):
     def lookup_filter(self, qs, term):
         return qs.filter(Q(title__icontains=term)
                          | Q(parent__title__icontains=term))
+
+
+class ProductClassListView(generic.ListView):
+    template_name = 'dashboard/catalogue/product_class_list.html'
+    model = ProductClass
+    context_object_name = 'product_classes'
+    form_class = ProductClassSearchForm
+    paginate_by = 20
+
+
+class ProductClassCreateUpdateView(generic.UpdateView):
+    template_name = 'dashboard/catalogue/product_class_update.html'
+    model = ProductClass
+    context_object_name = 'product_class'
+    form_class = ProductClassForm
+
+    def get_object(self, queryset=None):
+        """
+        This parts allows generic.UpdateView to handle creating products as
+        well. The only distinction between an UpdateView and a CreateView
+        is that self.object is None. We emulate this behavior.
+        Additionally, self.product_class is set.
+        """
+        self.creating = not 'pk' in self.kwargs
+        if self.creating:
+            return None  # success
+        else:
+            return super(
+                ProductClassCreateUpdateView, self).get_object(queryset)
+
+    def get_context_data(self, **kwargs):
+        ctx = super(ProductClassCreateUpdateView, self).get_context_data(**kwargs)
+        if self.object is None:
+            ctx['title'] = _('Create new product class')
+        else:
+            ctx['title'] = ctx['product_class'].name
+        return ctx
+
+    def get_success_url(self):
+        if self.creating:
+            msg = _("Created product class '%s'") % self.object.name
+        else:
+            msg = _("Updated product class '%s'") % self.object.name
+        messages.success(self.request, msg)
+        url = reverse('dashboard:catalogue-product-class-list')
+        if self.request.POST.get('action') == 'continue':
+            url = reverse('dashboard:catalogue-product-class',
+                          kwargs={"pk": self.object.id})
+        return self.get_url_with_querystring(url)
+
+    def get_url_with_querystring(self, url):
+        url_parts = [url]
+        if self.request.GET.urlencode():
+            url_parts += [self.request.GET.urlencode()]
+        return "?".join(url_parts)
+    
+
+class ProductClassDeleteView(generic.DeleteView):
+    """
+    Dashboard view to delete a product class.
+    """
+    template_name = 'dashboard/catalogue/product_class_delete.html'
+    model = ProductClass
+    context_object_name = 'product_class'
+
+    def get_success_url(self):
+        msg = _("Deleted product class '%s'") % self.object.name
+        messages.success(self.request, msg)
+        return reverse('dashboard:catalogue-product-class-list')
+

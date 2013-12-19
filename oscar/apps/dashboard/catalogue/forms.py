@@ -10,6 +10,7 @@ from oscar.core.loading import get_class
 from oscar.forms.widgets import ImageInput
 
 Product = get_model('catalogue', 'Product')
+ProductClass = get_model('catalogue', 'ProductClass')
 Category = get_model('catalogue', 'Category')
 StockRecord = get_model('partner', 'StockRecord')
 Partner = get_model('partner', 'Partner')
@@ -430,3 +431,10 @@ class ProductRecommendationForm(forms.ModelForm):
 ProductRecommendationFormSet = inlineformset_factory(
     Product, ProductRecommendation, form=ProductRecommendationForm,
     extra=5, fk_name="primary")
+
+class ProductClassSearchForm(forms.Form):
+    name = forms.CharField(max_length=255, required=False, label=_('Name'))
+
+class ProductClassForm(forms.ModelForm):
+    class Meta:
+        model = ProductClass

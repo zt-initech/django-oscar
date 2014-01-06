@@ -44,6 +44,7 @@
                             <th>{% trans "Name" %}</th>
                             <th>{% trans "Requires Shipping?" %}</th>
                             <th>{% trans "Track Stock?" %}</th>
+                            <th>{% trans "Num Products" %}</th>
                             <th></th>
                         </tr>
                     {% endblock %}
@@ -64,6 +65,9 @@
                                     {% else %}
                                         {% trans "No" %}
                                     {% endif %}
+                                </td>
+                                <td>
+                                    {{ product_class.products.all.count }}
                                 </td>
                                 <td>
                                     <div class="btn-toolbar">

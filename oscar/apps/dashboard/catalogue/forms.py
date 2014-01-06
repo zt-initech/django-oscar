@@ -446,5 +446,5 @@ class ProductClassForm(forms.ModelForm):
 class ProductAttributeForm(forms.ModelForm):
     class Meta:
         model = ProductAttribute
-        # exclude = ('entity_type')
+        exclude = ('entity_type',)
 

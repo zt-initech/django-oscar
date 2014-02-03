@@ -139,7 +139,11 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'oscar.apps.checkout.context_processors.checkout',
     'oscar.core.context_processors.metadata',
     'oscar.apps.customer.notifications.context_processors.notifications',
+    # Django CMS
+    'cms.context_processors.media',
+    'sekizai.context_processors.sekizai',
 )
+
 
 MIDDLEWARE_CLASSES = (
     'debug_toolbar.middleware.DebugToolbarMiddleware',
@@ -152,6 +156,11 @@ MIDDLEWARE_CLASSES = (
     # Allow languages to be selected
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
+    # Django CMS
+    'cms.middleware.page.CurrentPageMiddleware',
+    'cms.middleware.user.CurrentUserMiddleware',
+    'cms.middleware.toolbar.ToolbarMiddleware',
+    'cms.middleware.language.LanguageCookieMiddleware',
     # Ensure a valid basket is added to the request instance for every request
     'oscar.apps.basket.middleware.BasketMiddleware',
     # Enable the ProfileMiddleware, then add ?cprofile to any
@@ -307,6 +316,14 @@ INSTALLED_APPS = [
     'rosetta',          # For i18n testing
     'compressor',
     'apps.gateway',     # For allowing dashboard access
+    # Django CMS
+    'cms',
+    'mptt',
+    'menus',
+    'sekizai',
+    'cms.plugins.text',
+    'cms.plugins.video',
+    'cms.plugins.picture',
 ]
 from oscar import get_core_apps
 INSTALLED_APPS = INSTALLED_APPS + get_core_apps()
@@ -449,6 +466,14 @@ THUMBNAIL_KVSTORE = 'oscar.sorl_kvstore.ConcurrentKVStore'
 # django/core/serializers/json.Serializer to have the `dumps` function. Also
 # in tests/config.py
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
+
+# Django CMS
+# ==========
+
+CMS_TEMPLATES = (
+    ('djangocms/full_width.html', 'Full width (no sidebars)'),
+    ('djangocms/with_sidebar.html', 'Two column (left-hand sidebar)'),
+)
 
 # Try and import local settings which can be used to override any of the above.
 try:

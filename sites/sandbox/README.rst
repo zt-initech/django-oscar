@@ -18,3 +18,15 @@ http://qa.oscar.tangentlabs.co.uk/
 This site is for Tangent's QA team to test release candidates.  Like the sandbox
 site, it is not customised but is built from fixed tags rather than continually
 updated.
+
+
+=====
+Notes
+=====
+
+Django CMS
+----------
+Integration of Django CMS using version 2.4.3 requires the use od Django < 1.6.
+Therefore to use this branch and play with Django CMS you are required to
+install it separately, however this branch does have the CMS configured and
+ready to use.

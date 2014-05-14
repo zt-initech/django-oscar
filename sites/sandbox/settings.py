@@ -330,6 +330,8 @@ INSTALLED_APPS = [
 PROJECT_APPS = [
     # Custom Plugins
     'apps.plugins',
+    # Apphooks
+    'apps.apphooks',
 ]
 
 from oscar import get_core_apps
@@ -480,6 +482,7 @@ SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
 CMS_TEMPLATES = (
     ('djangocms/full_width.html', 'Full width (no sidebars)'),
     ('djangocms/with_sidebar.html', 'Two column (left-hand sidebar)'),
+    ('djangocms/product-listing.html', 'Product Listing'),
 )
 
 # Try and import local settings which can be used to override any of the above.

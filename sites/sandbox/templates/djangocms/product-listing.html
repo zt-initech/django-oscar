@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% load cms_tags menu_tags product_tags i18n %}
+
+{# Use a custom breadcrumb template #}
+{% block breadcrumbs %}{% show_breadcrumb 0 "djangocms/breadcrumb.html" 0 %}{% endblock %}
+
+{# Hide header as we put the H1 into the main content below #}
+{% block header %}{% endblock %}
+
+{% block content %}
+    {% placeholder main %}
+    {% if products %}
+    <section>
+        <div class="mod">
+            <ol class="row-fluid">
+                {% for product in products %}
+                    <li class="span3 {% if forloop.counter0|divisibleby:"4" %}no-margin{% endif %}">{% render_product product %}</li>
+                {% endfor %}
+            </ol>
+            {% include "partials/pagination.html" %}
+        </div>
+    </section>
+{% else %}
+    <p class="nonefound">{% trans "No products found." %}</p>
+{% endif %}
+{% endblock %}

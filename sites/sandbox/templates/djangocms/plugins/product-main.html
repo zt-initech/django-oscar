@@ -1,0 +1,15 @@
+{% load cms_tags thumbnail product_tags %}
+
+{% with instance=plugin.instance %}
+<div>
+    {% if instance.title %}
+    <h3>{{ instance.title }}</h3>
+    {% endif %}
+
+    {% if instance.description %}
+    <div>{{ instance.description|safe }}</div>
+    {% endif %}
+
+    {% render_product instance.product %}
+</div>
+{% endwith %}

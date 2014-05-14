@@ -300,6 +300,7 @@ LOGGING = {
 
 
 INSTALLED_APPS = [
+    'djangocms_admin_style',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -325,8 +326,14 @@ INSTALLED_APPS = [
     'cms.plugins.video',
     'cms.plugins.picture',
 ]
+
+PROJECT_APPS = [
+    # Custom Plugins
+    'apps.plugins',
+]
+
 from oscar import get_core_apps
-INSTALLED_APPS = INSTALLED_APPS + get_core_apps()
+INSTALLED_APPS = INSTALLED_APPS + get_core_apps() + PROJECT_APPS
 
 # Add Oscar's custom auth backend so users can sign in using their email
 # address.

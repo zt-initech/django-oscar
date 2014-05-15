@@ -26,7 +26,10 @@ Notes
 
 Django CMS
 ----------
-Integration of Django CMS using version 2.4.3 requires the use od Django < 1.6.
-Therefore to use this branch and play with Django CMS you are required to
-install it separately, however this branch does have the CMS configured and
-ready to use.
+Integration of Django CMS using version 3.0.1 which is compatible with
+Django < 1.7 (Officially).
+
+This is an example of upgrading Django CMS from 2.4.3 to 3.0.1.
+
+Install the CMS and note that, unlike 2.4.3, you need to install the plugins
+manually (they are listed in the installed apps).

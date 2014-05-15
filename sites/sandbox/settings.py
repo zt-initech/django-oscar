@@ -322,9 +322,12 @@ INSTALLED_APPS = [
     'mptt',
     'menus',
     'sekizai',
-    'cms.plugins.text',
-    'cms.plugins.video',
-    'cms.plugins.picture',
+    'djangocms_file',
+    'djangocms_googlemap',
+    'djangocms_picture',
+    'djangocms_link',
+    'djangocms_text_ckeditor',  # note this needs to be above the 'cms' entry
+    'djangocms_video',
 ]
 
 PROJECT_APPS = [

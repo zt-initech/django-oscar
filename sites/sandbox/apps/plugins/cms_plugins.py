@@ -9,13 +9,10 @@ class FeaturedProductPlugin(CMSPluginBase):
     model = FeaturedProduct
     name = 'Featured Product'
     admin_preview = True
+    render_template = ''
 
     def render(self, context, instance, placeholder):
-        # self.render_template = instance.template
-        # print 'self render template', self.render_template
-        # print 'prod'
-        print 'product', instance.product
-        print instance
+        self.render_template = instance.render_template
         return context
 
 

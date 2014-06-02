@@ -4,6 +4,11 @@ from django.conf.urls.i18n import i18n_patterns
 from django.contrib import admin
 from django.conf.urls.static import static
 
+from wagtail.wagtailcore import urls as wagtail_urls
+from wagtail.wagtailadmin import urls as wagtailadmin_urls
+from wagtail.wagtaildocs import urls as wagtaildocs_urls
+from wagtail.wagtailsearch.urls import frontend as wagtailsearch_frontend_urls
+
 from oscar.app import shop
 from oscar.views import handler500, handler404, handler403  # noqa
 
@@ -31,6 +36,12 @@ urlpatterns += i18n_patterns('',
     url(r'gateway/', include('apps.gateway.urls')),
     # Oscar's normal URLs
     url(r'', include(shop.urls)),
+    # Wagtail
+    url(r'^wagtail/', include(wagtailadmin_urls)),
+    url(r'^documents/', include(wagtaildocs_urls)),
+    url(r'^search/', include(wagtailsearch_frontend_urls)),
+    url(r'^documents/', include(wagtaildocs_urls)),
+    url(r'', include(wagtail_urls)),
 )
 
 if settings.DEBUG:

@@ -160,6 +160,8 @@ MIDDLEWARE_CLASSES = (
     # Enable the ProfileMiddleware, then add ?cprofile to any
     # URL path to print out profile details
     #'oscar.profiling.middleware.ProfileMiddleware',
+    'wagtail.wagtailcore.middleware.SiteMiddleware',
+    'wagtail.wagtailredirects.middleware.RedirectMiddleware',
 )
 
 ROOT_URLCONF = 'urls'
@@ -310,6 +312,19 @@ INSTALLED_APPS = [
     'south',
     'compressor',       # Oscar's templates use compressor
     'apps.gateway',     # For allowing dashboard access
+    # Wagtail
+    'taggit',
+    'modelcluster',
+    'wagtail.wagtailcore',
+    'wagtail.wagtailadmin',
+    'wagtail.wagtaildocs',
+    'wagtail.wagtailsnippets',
+    'wagtail.wagtailusers',
+    'wagtail.wagtailimages',
+    'wagtail.wagtailembeds',
+    'wagtail.wagtailsearch',
+    'wagtail.wagtailredirects',
+    'wagtail.wagtailforms',
 ]
 from oscar import get_core_apps
 INSTALLED_APPS = INSTALLED_APPS + get_core_apps()
@@ -427,6 +442,7 @@ USE_LESS = False
 COMPRESS_ENABLED = True
 COMPRESS_PRECOMPILERS = (
     ('text/less', 'lessc {infile} {outfile}'),
+    ('text/x-scss', 'django_libsass.SassCompiler'),
 )
 COMPRESS_OFFLINE_CONTEXT = {
     'STATIC_URL': 'STATIC_URL',
@@ -461,6 +477,11 @@ THUMBNAIL_KVSTORE = 'oscar.sorl_kvstore.ConcurrentKVStore'
 # django/core/serializers/json.Serializer to have the `dumps` function. Also
 # in tests/config.py
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
+
+# Wagtail
+# =======
+
+WAGTAIL_SITE_NAME = 'Oscar'
 
 # Try and import local settings which can be used to override any of the above.
 try:

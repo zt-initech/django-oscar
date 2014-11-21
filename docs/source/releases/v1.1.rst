@@ -34,6 +34,8 @@ What's new in Oscar 1.1?
 Minor changes
 ~~~~~~~~~~~~~
 
+* ``django-compressor`` has been removed in favor of offline compilation of
+  LESS files.
 
 
 .. _incompatible_changes_in_1.1:

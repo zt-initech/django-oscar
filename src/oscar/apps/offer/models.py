@@ -31,8 +31,7 @@ def load_proxy(proxy_class):
     try:
         mod = import_module(module)
     except ImportError as e:
-        raise exceptions.ImproperlyConfigured(
-            "Error importing module %s: %s" % (module, e))
+        raise exceptions.ImproperlyConfigured("Error importing module %s: %s" % (module, e))
     try:
         return getattr(mod, classname)
     except AttributeError:
@@ -42,8 +41,9 @@ def load_proxy(proxy_class):
 
 def range_anchor(range):
     return u'<a href="%s">%s</a>' % (
-        reverse('dashboard:range-update', kwargs={'pk': range.pk}),
-        range.name)
+        reverse('dashboard:range-update',
+                kwargs={'pk': range.pk}), range.name
+    )
 
 
 def unit_price(offer, line):
@@ -68,11 +68,13 @@ class ConditionalOffer(models.Model):
     A conditional offer (eg buy 1, get 10% off)
     """
     name = models.CharField(
-        _("Name"), max_length=128, unique=True,
+        _("Name"),
+        max_length=128,
+        unique=True,
         help_text=_("This is displayed within the customer's basket"))
-    slug = fields.AutoSlugField(
-        _("Slug"), max_length=128, unique=True, populate_from='name')
-    description = models.TextField(_("Description"), blank=True,
+    slug = fields.AutoSlugField(_("Slug"), max_length=128, unique=True, populate_from='name')
+    description = models.TextField(_("Description"),
+                                   blank=True,
                                    help_text=_("This is displayed on the offer"
                                                " browsing page"))
 
@@ -88,28 +90,26 @@ class ConditionalOffer(models.Model):
     #     off.
     SITE, VOUCHER, USER, SESSION = ("Site", "Voucher", "User", "Session")
     TYPE_CHOICES = (
-        (SITE, _("Site offer - available to all users")),
-        (VOUCHER, _("Voucher offer - only available after entering "
-                    "the appropriate voucher code")),
-        (USER, _("User offer - available to certain types of user")),
+        (SITE, _("Site offer - available to all users")), (
+            VOUCHER, _("Voucher offer - only available after entering "
+                       "the appropriate voucher code")
+        ), (USER, _("User offer - available to certain types of user")),
         (SESSION, _("Session offer - temporary offer, available for "
-                    "a user for the duration of their session")),
-    )
-    offer_type = models.CharField(
-        _("Type"), choices=TYPE_CHOICES, default=SITE, max_length=128)
+                    "a user for the duration of their session")), )
+    offer_type = models.CharField(_("Type"), choices=TYPE_CHOICES, default=SITE, max_length=128)
 
     # We track a status variable so it's easier to load offers that are
     # 'available' in some sense.
     OPEN, SUSPENDED, CONSUMED = "Open", "Suspended", "Consumed"
     status = models.CharField(_("Status"), max_length=64, default=OPEN)
 
-    condition = models.ForeignKey(
-        'offer.Condition', verbose_name=_("Condition"))
+    condition = models.ForeignKey('offer.Condition', verbose_name=_("Condition"))
     benefit = models.ForeignKey('offer.Benefit', verbose_name=_("Benefit"))
 
     # Some complicated situations require offers to be applied in a set order.
     priority = models.IntegerField(
-        _("Priority"), default=0,
+        _("Priority"),
+        default=0,
         help_text=_("The highest priority offers are applied first"))
 
     # AVAILABILITY
@@ -117,10 +117,11 @@ class ConditionalOffer(models.Model):
     # Range of availability.  Note that if this is a voucher offer, then these
     # dates are ignored and only the dates from the voucher are used to
     # determine availability.
-    start_datetime = models.DateTimeField(
-        _("Start date"), blank=True, null=True)
+    start_datetime = models.DateTimeField(_("Start date"), blank=True, null=True)
     end_datetime = models.DateTimeField(
-        _("End date"), blank=True, null=True,
+        _("End date"),
+        blank=True,
+        null=True,
         help_text=_("Offers are active until the end of the 'end date'"))
 
     # Use this field to limit the number of times this offer can be applied in
@@ -129,7 +130,9 @@ class ConditionalOffer(models.Model):
     max_global_applications = models.PositiveIntegerField(
         _("Max global applications"),
         help_text=_("The number of times this offer can be used before it "
-                    "is unavailable"), blank=True, null=True)
+                    "is unavailable"),
+        blank=True,
+        null=True)
 
     # Use this field to limit the number of times this offer can be used by a
     # single user.  This only works for signed-in users - it doesn't really
@@ -137,20 +140,25 @@ class ConditionalOffer(models.Model):
     max_user_applications = models.PositiveIntegerField(
         _("Max user applications"),
         help_text=_("The number of times a single user can use this offer"),
-        blank=True, null=True)
+        blank=True,
+        null=True)
 
     # Use this field to limit the number of times this offer can be applied to
     # a basket (and hence a single order).
     max_basket_applications = models.PositiveIntegerField(
         _("Max basket applications"),
-        blank=True, null=True,
+        blank=True,
+        null=True,
         help_text=_("The number of times this offer can be applied to a "
                     "basket (and order)"))
 
     # Use this field to limit the amount of discount an offer can lead to.
     # This can be helpful with budgeting.
     max_discount = models.DecimalField(
-        _("Max discount"), decimal_places=2, max_digits=12, null=True,
+        _("Max discount"),
+        decimal_places=2,
+        max_digits=12,
+        null=True,
         blank=True,
         help_text=_("When an offer has given more discount to orders "
                     "than this threshold, then the offer becomes "
@@ -159,15 +167,14 @@ class ConditionalOffer(models.Model):
     # TRACKING
 
     total_discount = models.DecimalField(
-        _("Total Discount"), decimal_places=2, max_digits=12,
+        _("Total Discount"),
+        decimal_places=2,
+        max_digits=12,
         default=D('0.00'))
-    num_applications = models.PositiveIntegerField(
-        _("Number of applications"), default=0)
-    num_orders = models.PositiveIntegerField(
-        _("Number of Orders"), default=0)
+    num_applications = models.PositiveIntegerField(_("Number of applications"), default=0)
+    num_orders = models.PositiveIntegerField(_("Number of Orders"), default=0)
 
-    redirect_url = fields.ExtendedURLField(
-        _("URL redirect (optional)"), blank=True)
+    redirect_url = fields.ExtendedURLField(_("URL redirect (optional)"), blank=True)
     date_created = models.DateTimeField(_("Date Created"), auto_now_add=True)
 
     objects = models.Manager()
@@ -200,10 +207,8 @@ class ConditionalOffer(models.Model):
         return self.name
 
     def clean(self):
-        if (self.start_datetime and self.end_datetime and
-                self.start_datetime > self.end_datetime):
-            raise exceptions.ValidationError(
-                _('End date should be later than start date'))
+        if (self.start_datetime and self.end_datetime and self.start_datetime > self.end_datetime):
+            raise exceptions.ValidationError(_('End date should be later than start date'))
 
     @property
     def is_open(self):
@@ -216,11 +221,13 @@ class ConditionalOffer(models.Model):
     def suspend(self):
         self.status = self.SUSPENDED
         self.save()
+
     suspend.alters_data = True
 
     def unsuspend(self):
         self.status = self.OPEN
         self.save()
+
     unsuspend.alters_data = True
 
     def is_available(self, user=None, test_date=None):
@@ -255,8 +262,7 @@ class ConditionalOffer(models.Model):
         """
         if not self.is_condition_satisfied(basket):
             return ZERO_DISCOUNT
-        return self.benefit.proxy().apply(
-            basket, self.condition.proxy(), self)
+        return self.benefit.proxy().apply(basket, self.condition.proxy(), self)
 
     def apply_deferred_benefit(self, basket, order, application):
         """
@@ -283,13 +289,12 @@ class ConditionalOffer(models.Model):
         # when there are not other caps.
         limits = [10000]
         if self.max_user_applications and user:
-            limits.append(max(0, self.max_user_applications -
-                          self.get_num_user_applications(user)))
+            limits.append(max(0,
+                              self.max_user_applications - self.get_num_user_applications(user)))
         if self.max_basket_applications:
             limits.append(self.max_basket_applications)
         if self.max_global_applications:
-            limits.append(
-                max(0, self.max_global_applications - self.num_applications))
+            limits.append(max(0, self.max_global_applications - self.num_applications))
         return min(limits)
 
     def get_num_user_applications(self, user):
@@ -307,6 +312,7 @@ class ConditionalOffer(models.Model):
         self.total_discount += discount['discount']
         self.num_orders += 1
         self.save()
+
     record_usage.alters_data = True
 
     def availability_description(self):
@@ -320,17 +326,14 @@ class ConditionalOffer(models.Model):
     def availability_restrictions(self):  # noqa (too complex (15))
         restrictions = []
         if self.is_suspended:
-            restrictions.append({
-                'description': _("Offer is suspended"),
-                'is_satisfied': False})
+            restrictions.append({'description': _("Offer is suspended"), 'is_satisfied': False})
 
         if self.max_global_applications:
             remaining = self.max_global_applications - self.num_applications
             desc = _("Limited to %(total)d uses (%(remainder)d remaining)") \
                 % {'total': self.max_global_applications,
-                   'remainder': remaining}
-            restrictions.append({'description': desc,
-                                 'is_satisfied': remaining > 0})
+                                                                                                 'remainder': remaining}
+            restrictions.append({'description': desc, 'is_satisfied': remaining > 0})
 
         if self.max_user_applications:
             if self.max_user_applications == 1:
@@ -338,8 +341,7 @@ class ConditionalOffer(models.Model):
             else:
                 desc = _("Limited to %(total)d uses per user") \
                     % {'total': self.max_user_applications}
-            restrictions.append({'description': desc,
-                                 'is_satisfied': True})
+            restrictions.append({'description': desc, 'is_satisfied': True})
 
         if self.max_basket_applications:
             if self.max_user_applications == 1:
@@ -347,9 +349,7 @@ class ConditionalOffer(models.Model):
             else:
                 desc = _("Limited to %(total)d uses per basket") \
                     % {'total': self.max_basket_applications}
-            restrictions.append({
-                'description': desc,
-                'is_satisfied': True})
+            restrictions.append({'description': desc, 'is_satisfied': True})
 
         def hide_time_if_zero(dt):
             # Only show hours/minutes if they have been specified
@@ -366,27 +366,25 @@ class ConditionalOffer(models.Model):
             if self.start_datetime and self.end_datetime:
                 desc = _("Available between %(start)s and %(end)s") \
                     % {'start': hide_time_if_zero(self.start_datetime),
-                       'end': hide_time_if_zero(self.end_datetime)}
+                                                                                             'end': hide_time_if_zero(self.end_datetime)}
                 is_satisfied \
                     = self.start_datetime <= today <= self.end_datetime
             elif self.start_datetime:
                 desc = _("Available from %(start)s") % {
-                    'start': hide_time_if_zero(self.start_datetime)}
+                    'start': hide_time_if_zero(self.start_datetime)
+                }
                 is_satisfied = today >= self.start_datetime
             elif self.end_datetime:
-                desc = _("Available until %(end)s") % {
-                    'end': hide_time_if_zero(self.end_datetime)}
+                desc = _("Available until %(end)s") % {'end': hide_time_if_zero(self.end_datetime)}
                 is_satisfied = today <= self.end_datetime
-            restrictions.append({
-                'description': desc,
-                'is_satisfied': is_satisfied})
+            restrictions.append({'description': desc, 'is_satisfied': is_satisfied})
 
         if self.max_discount:
-            desc = _("Limited to a cost of %(max)s") % {
-                'max': currency(self.max_discount)}
+            desc = _("Limited to a cost of %(max)s") % {'max': currency(self.max_discount)}
             restrictions.append({
                 'description': desc,
-                'is_satisfied': self.total_discount < self.max_discount})
+                'is_satisfied': self.total_discount < self.max_discount
+            })
 
         return restrictions
 
@@ -408,8 +406,7 @@ class ConditionalOffer(models.Model):
             queryset = Product.browsable
         else:
             queryset = cond_range.included_products
-        return queryset.filter(is_discountable=True).exclude(
-            structure=Product.CHILD)
+        return queryset.filter(is_discountable=True).exclude(structure=Product.CHILD)
 
 
 @python_2_unicode_compatible
@@ -421,20 +418,26 @@ class Condition(models.Model):
     COUNT, VALUE, COVERAGE = ("Count", "Value", "Coverage")
     TYPE_CHOICES = (
         (COUNT, _("Depends on number of items in basket that are in "
-                  "condition range")),
-        (VALUE, _("Depends on value of items in basket that are in "
-                  "condition range")),
-        (COVERAGE, _("Needs to contain a set number of DISTINCT items "
-                     "from the condition range")))
-    range = models.ForeignKey(
-        'offer.Range', verbose_name=_("Range"), null=True, blank=True)
-    type = models.CharField(_('Type'), max_length=128, choices=TYPE_CHOICES,
-                            blank=True)
+                  "condition range")), (
+                      VALUE, _("Depends on value of items in basket that are in "
+                               "condition range")
+                  ), (COVERAGE, _("Needs to contain a set number of DISTINCT items "
+                                  "from the condition range"))
+    )
+    range = models.ForeignKey('offer.Range', verbose_name=_("Range"), null=True, blank=True)
+    type = models.CharField(_('Type'), max_length=128, choices=TYPE_CHOICES, blank=True)
     value = fields.PositiveDecimalField(
-        _('Value'), decimal_places=2, max_digits=12, null=True, blank=True)
+        _('Value'),
+        decimal_places=2,
+        max_digits=12,
+        null=True,
+        blank=True)
 
     proxy_class = fields.NullCharField(
-        _("Custom class"), max_length=255, unique=True, default=None)
+        _("Custom class"),
+        max_length=255,
+        unique=True,
+        default=None)
 
     class Meta:
         app_label = 'offer'
@@ -448,7 +451,8 @@ class Condition(models.Model):
         klassmap = {
             self.COUNT: CountCondition,
             self.VALUE: ValueCondition,
-            self.COVERAGE: CoverageCondition}
+            self.COVERAGE: CoverageCondition
+        }
         # Short-circuit logic if current class is already a proxy class.
         if self.__class__ in klassmap.values():
             return self
@@ -518,8 +522,7 @@ class Condition(models.Model):
         if not line.stockrecord_id:
             return False
         product = line.product
-        return (self.range.contains_product(product)
-                and product.get_is_discountable())
+        return (self.range.contains_product(product) and product.get_is_discountable())
 
     def get_applicable_lines(self, offer, basket, most_expensive_first=True):
         """
@@ -542,46 +545,53 @@ class Condition(models.Model):
 
 @python_2_unicode_compatible
 class Benefit(models.Model):
-    range = models.ForeignKey(
-        'offer.Range', null=True, blank=True, verbose_name=_("Range"))
+    range = models.ForeignKey('offer.Range', null=True, blank=True, verbose_name=_("Range"))
 
     # Benefit types
     PERCENTAGE, FIXED, MULTIBUY, FIXED_PRICE = (
-        "Percentage", "Absolute", "Multibuy", "Fixed price")
+        "Percentage", "Absolute", "Multibuy", "Fixed price"
+    )
     SHIPPING_PERCENTAGE, SHIPPING_ABSOLUTE, SHIPPING_FIXED_PRICE = (
-        'Shipping percentage', 'Shipping absolute', 'Shipping fixed price')
+        'Shipping percentage', 'Shipping absolute', 'Shipping fixed price'
+    )
     TYPE_CHOICES = (
         (PERCENTAGE, _("Discount is a percentage off of the product's value")),
         (FIXED, _("Discount is a fixed amount off of the product's value")),
-        (MULTIBUY, _("Discount is to give the cheapest product for free")),
-        (FIXED_PRICE,
-         _("Get the products that meet the condition for a fixed price")),
-        (SHIPPING_ABSOLUTE,
-         _("Discount is a fixed amount of the shipping cost")),
-        (SHIPPING_FIXED_PRICE, _("Get shipping for a fixed price")),
-        (SHIPPING_PERCENTAGE, _("Discount is a percentage off of the shipping"
-                                " cost")),
-    )
-    type = models.CharField(
-        _("Type"), max_length=128, choices=TYPE_CHOICES, blank=True)
+        (MULTIBUY, _("Discount is to give the cheapest product for free")), (
+            FIXED_PRICE, _("Get the products that meet the condition for a fixed price")
+        ), (SHIPPING_ABSOLUTE, _("Discount is a fixed amount of the shipping cost")
+            ), (SHIPPING_FIXED_PRICE, _("Get shipping for a fixed price")), (
+                SHIPPING_PERCENTAGE, _("Discount is a percentage off of the shipping"
+                                       " cost")
+            ), )
+    type = models.CharField(_("Type"), max_length=128, choices=TYPE_CHOICES, blank=True)
 
     # The value to use with the designated type.  This can be either an integer
     # (eg for multibuy) or a decimal (eg an amount) which is slightly
     # confusing.
     value = fields.PositiveDecimalField(
-        _("Value"), decimal_places=2, max_digits=12, null=True, blank=True)
+        _("Value"),
+        decimal_places=2,
+        max_digits=12,
+        null=True,
+        blank=True)
 
     # If this is not set, then there is no upper limit on how many products
     # can be discounted by this benefit.
     max_affected_items = models.PositiveIntegerField(
-        _("Max Affected Items"), blank=True, null=True,
+        _("Max Affected Items"),
+        blank=True,
+        null=True,
         help_text=_("Set this to prevent the discount consuming all items "
                     "within the range that are in the basket."))
 
     # A custom benefit class can be used instead.  This means the
     # type/value/max_affected_items fields should all be None.
     proxy_class = fields.NullCharField(
-        _("Custom class"), max_length=255, unique=True, default=None)
+        _("Custom class"),
+        max_length=255,
+        unique=True,
+        default=None)
 
     class Meta:
         app_label = 'offer'
@@ -596,7 +606,8 @@ class Benefit(models.Model):
             self.FIXED_PRICE: FixedPriceBenefit,
             self.SHIPPING_ABSOLUTE: ShippingAbsoluteDiscountBenefit,
             self.SHIPPING_FIXED_PRICE: ShippingFixedPriceBenefit,
-            self.SHIPPING_PERCENTAGE: ShippingPercentageDiscountBenefit}
+            self.SHIPPING_PERCENTAGE: ShippingPercentageDiscountBenefit
+        }
         # Short-circuit logic if current class is already a proxy class.
         if self.__class__ in klassmap.values():
             return self
@@ -653,11 +664,9 @@ class Benefit(models.Model):
 
     def clean_multibuy(self):
         if not self.range:
-            raise ValidationError(
-                _("Multibuy benefits require a product range"))
+            raise ValidationError(_("Multibuy benefits require a product range"))
         if self.value:
-            raise ValidationError(
-                _("Multibuy benefits don't require a value"))
+            raise ValidationError(_("Multibuy benefits don't require a value"))
         if self.max_affected_items:
             raise ValidationError(
                 _("Multibuy benefits don't require a 'max affected items' "
@@ -665,16 +674,13 @@ class Benefit(models.Model):
 
     def clean_percentage(self):
         if not self.range:
-            raise ValidationError(
-                _("Percentage benefits require a product range"))
+            raise ValidationError(_("Percentage benefits require a product range"))
         if self.value > 100:
-            raise ValidationError(
-                _("Percentage discount cannot be greater than 100"))
+            raise ValidationError(_("Percentage discount cannot be greater than 100"))
 
     def clean_shipping_absolute(self):
         if not self.value:
-            raise ValidationError(
-                _("A discount value is required"))
+            raise ValidationError(_("A discount value is required"))
         if self.range:
             raise ValidationError(
                 _("No range should be selected as this benefit does not "
@@ -686,8 +692,7 @@ class Benefit(models.Model):
 
     def clean_shipping_percentage(self):
         if self.value > 100:
-            raise ValidationError(
-                _("Percentage discount cannot be greater than 100"))
+            raise ValidationError(_("Percentage discount cannot be greater than 100"))
         if self.range:
             raise ValidationError(
                 _("No range should be selected as this benefit does not "
@@ -715,11 +720,9 @@ class Benefit(models.Model):
 
     def clean_absolute(self):
         if not self.range:
-            raise ValidationError(
-                _("Fixed discount benefits require a product range"))
+            raise ValidationError(_("Fixed discount benefits require a product range"))
         if not self.value:
-            raise ValidationError(
-                _("Fixed discount benefits require a value"))
+            raise ValidationError(_("Fixed discount benefits require a value"))
 
     def round(self, amount):
         """
@@ -756,8 +759,7 @@ class Benefit(models.Model):
         for line in basket.all_lines():
             product = line.product
 
-            if (not range.contains(product) or
-                    not self.can_apply_benefit(line)):
+            if (not range.contains(product) or not self.can_apply_benefit(line)):
                 continue
 
             price = unit_price(offer, line)
@@ -784,35 +786,46 @@ class Range(models.Model):
     consider child products automatically.
     """
     name = models.CharField(_("Name"), max_length=128, unique=True)
-    slug = fields.AutoSlugField(
-        _("Slug"), max_length=128, unique=True, populate_from="name")
+    slug = fields.AutoSlugField(_("Slug"), max_length=128, unique=True, populate_from="name")
 
     description = models.TextField(blank=True)
 
     # Whether this range is public
     is_public = models.BooleanField(
-        _('Is public?'), default=False,
+        _('Is public?'),
+        default=False,
         help_text=_("Public ranges have a customer-facing page"))
 
-    includes_all_products = models.BooleanField(
-        _('Includes all products?'), default=False)
+    includes_all_products = models.BooleanField(_('Includes all products?'), default=False)
 
     included_products = models.ManyToManyField(
-        'catalogue.Product', related_name='includes', blank=True,
-        verbose_name=_("Included Products"), through='offer.RangeProduct')
+        'catalogue.Product',
+        related_name='includes',
+        blank=True,
+        verbose_name=_("Included Products"),
+        through='offer.RangeProduct')
     excluded_products = models.ManyToManyField(
-        'catalogue.Product', related_name='excludes', blank=True,
+        'catalogue.Product',
+        related_name='excludes',
+        blank=True,
         verbose_name=_("Excluded Products"))
     classes = models.ManyToManyField(
-        'catalogue.ProductClass', related_name='classes', blank=True,
+        'catalogue.ProductClass',
+        related_name='classes',
+        blank=True,
         verbose_name=_("Product Types"))
     included_categories = models.ManyToManyField(
-        'catalogue.Category', related_name='includes', blank=True,
+        'catalogue.Category',
+        related_name='includes',
+        blank=True,
         verbose_name=_("Included Categories"))
 
     # Allow a custom range instance to be specified
     proxy_class = fields.NullCharField(
-        _("Custom class"), max_length=255, default=None, unique=True)
+        _("Custom class"),
+        max_length=255,
+        default=None,
+        unique=True)
 
     date_created = models.DateTimeField(_("Date Created"), auto_now_add=True)
 
@@ -833,8 +846,7 @@ class Range(models.Model):
         return self.name
 
     def get_absolute_url(self):
-        return reverse(
-            'catalogue:range', kwargs={'slug': self.slug})
+        return reverse('catalogue:range', kwargs={'slug': self.slug})
 
     def add_product(self, product, display_order=None):
         """ Add product to the range
@@ -846,16 +858,15 @@ class Range(models.Model):
         the product at the top of the list.
         """
         if product.is_child:
-            raise ValueError(
-                "Ranges can only contain parent and stand-alone products.")
+            raise ValueError("Ranges can only contain parent and stand-alone products.")
 
         initial_order = display_order or 0
         relation, __ = RangeProduct.objects.get_or_create(
-            range=self, product=product,
+            range=self,
+            product=product,
             defaults={'display_order': initial_order})
 
-        if (display_order is not None and
-                relation.display_order != display_order):
+        if (display_order is not None and relation.display_order != display_order):
             relation.display_order = display_order
             relation.save()
 
@@ -918,16 +929,14 @@ class Range(models.Model):
         if not self.id:
             return []
         if self.__included_product_ids is None:
-            self.__included_product_ids = self.__get_pks_and_child_pks(
-                self.included_products)
+            self.__included_product_ids = self.__get_pks_and_child_pks(self.included_products)
         return self.__included_product_ids
 
     def _excluded_product_ids(self):
         if not self.id:
             return []
         if self.__excluded_product_ids is None:
-            self.__excluded_product_ids = self.__get_pks_and_child_pks(
-                self.excluded_products)
+            self.__excluded_product_ids = self.__get_pks_and_child_pks(self.excluded_products)
         return self.__excluded_product_ids
 
     def _class_ids(self):
@@ -937,11 +946,9 @@ class Range(models.Model):
 
     def _category_ids(self):
         if self.__category_ids is None:
-            category_ids_list = list(
-                self.included_categories.values_list('pk', flat=True))
+            category_ids_list = list(self.included_categories.values_list('pk', flat=True))
             for category in self.included_categories.all():
-                children_ids = category.get_descendants().values_list(
-                    'pk', flat=True)
+                children_ids = category.get_descendants().values_list('pk', flat=True)
                 category_ids_list.extend(list(children_ids))
 
             self.__category_ids = category_ids_list
@@ -973,10 +980,10 @@ class Range(models.Model):
             return Product.browsable.all()
 
         return Product.objects.filter(
-            Q(id__in=self._included_product_ids()) |
-            Q(product_class_id__in=self._class_ids()) |
-            Q(productcategory__category_id__in=self._category_ids())
-        ).exclude(id__in=self._excluded_product_ids())
+            Q(id__in=self._included_product_ids()) | Q(
+                product_class_id__in=self._class_ids()) |
+            Q(productcategory__category_id__in=self._category_ids())).exclude(
+                id__in=self._excluded_product_ids())
 
     @property
     def is_editable(self):
@@ -1012,13 +1019,12 @@ class CountCondition(Condition):
     def name(self):
         return self._description % {
             'count': self.value,
-            'range': six.text_type(self.range).lower()}
+            'range': six.text_type(self.range).lower()
+        }
 
     @property
     def description(self):
-        return self._description % {
-            'count': self.value,
-            'range': range_anchor(self.range)}
+        return self._description % {'count': self.value, 'range': range_anchor(self.range)}
 
     class Meta:
         app_label = 'offer'
@@ -1032,8 +1038,7 @@ class CountCondition(Condition):
         """
         num_matches = 0
         for line in basket.all_lines():
-            if (self.can_apply_condition(line)
-                    and line.quantity_without_discount > 0):
+            if (self.can_apply_condition(line) and line.quantity_without_discount > 0):
                 num_matches += line.quantity_without_discount
             if num_matches >= self.value:
                 return True
@@ -1044,8 +1049,7 @@ class CountCondition(Condition):
             return getattr(self, '_num_matches')
         num_matches = 0
         for line in basket.all_lines():
-            if (self.can_apply_condition(line)
-                    and line.quantity_without_discount > 0):
+            if (self.can_apply_condition(line) and line.quantity_without_discount > 0):
                 num_matches += line.quantity_without_discount
         self._num_matches = num_matches
         return num_matches
@@ -1079,10 +1083,8 @@ class CountCondition(Condition):
         if to_consume == 0:
             return
 
-        for __, line in self.get_applicable_lines(offer, basket,
-                                                  most_expensive_first=True):
-            quantity_to_consume = min(line.quantity_without_discount,
-                                      to_consume)
+        for __, line in self.get_applicable_lines(offer, basket, most_expensive_first=True):
+            quantity_to_consume = min(line.quantity_without_discount, to_consume)
             line.consume(quantity_to_consume)
             to_consume -= quantity_to_consume
             if to_consume == 0:
@@ -1094,20 +1096,18 @@ class CoverageCondition(Condition):
     An offer condition dependent on the number of DISTINCT matching items from
     the basket.
     """
-    _description = _("Basket includes %(count)d distinct item(s) from"
-                     " %(range)s")
+    _description = _("Basket includes %(count)d distinct item(s) from" " %(range)s")
 
     @property
     def name(self):
         return self._description % {
             'count': self.value,
-            'range': six.text_type(self.range).lower()}
+            'range': six.text_type(self.range).lower()
+        }
 
     @property
     def description(self):
-        return self._description % {
-            'count': self.value,
-            'range': range_anchor(self.range)}
+        return self._description % {'count': self.value, 'range': range_anchor(self.range)}
 
     class Meta:
         app_label = 'offer'
@@ -1124,8 +1124,7 @@ class CoverageCondition(Condition):
             if not line.is_available_for_discount:
                 continue
             product = line.product
-            if (self.can_apply_condition(line) and product.id not in
-                    covered_ids):
+            if (self.can_apply_condition(line) and product.id not in covered_ids):
                 covered_ids.append(product.id)
             if len(covered_ids) >= self.value:
                 return True
@@ -1137,8 +1136,7 @@ class CoverageCondition(Condition):
             if not line.is_available_for_discount:
                 continue
             product = line.product
-            if (self.can_apply_condition(line) and product.id not in
-                    covered_ids):
+            if (self.can_apply_condition(line) and product.id not in covered_ids):
                 covered_ids.append(product.id)
         return len(covered_ids)
 
@@ -1185,8 +1183,7 @@ class CoverageCondition(Condition):
         covered_ids = []
         value = D('0.00')
         for line in basket.all_lines():
-            if (self.can_apply_condition(line) and line.product.id not in
-                    covered_ids):
+            if (self.can_apply_condition(line) and line.product.id not in covered_ids):
                 covered_ids.append(line.product.id)
                 value += unit_price(offer, line)
             if len(covered_ids) >= self.value:
@@ -1205,13 +1202,15 @@ class ValueCondition(Condition):
     def name(self):
         return self._description % {
             'amount': currency(self.value),
-            'range': six.text_type(self.range).lower()}
+            'range': six.text_type(self.range).lower()
+        }
 
     @property
     def description(self):
         return self._description % {
             'amount': currency(self.value),
-            'range': range_anchor(self.range)}
+            'range': range_anchor(self.range)
+        }
 
     class Meta:
         app_label = 'offer'
@@ -1225,8 +1224,7 @@ class ValueCondition(Condition):
         """
         value_of_matches = D('0.00')
         for line in basket.all_lines():
-            if (self.can_apply_condition(line) and
-                    line.quantity_without_discount > 0):
+            if (self.can_apply_condition(line) and line.quantity_without_discount > 0):
                 price = unit_price(offer, line)
                 value_of_matches += price * int(line.quantity_without_discount)
             if value_of_matches >= self.value:
@@ -1238,8 +1236,7 @@ class ValueCondition(Condition):
             return getattr(self, '_value_of_matches')
         value_of_matches = D('0.00')
         for line in basket.all_lines():
-            if (self.can_apply_condition(line) and
-                    line.quantity_without_discount > 0):
+            if (self.can_apply_condition(line) and line.quantity_without_discount > 0):
                 price = unit_price(offer, line)
                 value_of_matches += price * int(line.quantity_without_discount)
         self._value_of_matches = value_of_matches
@@ -1253,7 +1250,8 @@ class ValueCondition(Condition):
         value_of_matches = self._get_value_of_matches(offer, basket)
         return _('Spend %(value)s more from %(range)s') % {
             'value': currency(self.value - value_of_matches),
-            'range': self.range}
+            'range': self.range
+        }
 
     def consume_items(self, offer, basket, affected_lines):
         """
@@ -1273,16 +1271,13 @@ class ValueCondition(Condition):
         if to_consume == 0:
             return
 
-        for price, line in self.get_applicable_lines(
-                offer, basket, most_expensive_first=True):
+        for price, line in self.get_applicable_lines(offer, basket, most_expensive_first=True):
             quantity_to_consume = min(
-                line.quantity_without_discount,
-                (to_consume / price).quantize(D(1), ROUND_UP))
+                line.quantity_without_discount, (to_consume / price).quantize(D(1), ROUND_UP))
             line.consume(quantity_to_consume)
             to_consume -= price * quantity_to_consume
             if to_consume <= 0:
                 break
-
 
 # ============
 # Result types
@@ -1335,7 +1330,6 @@ class BasketDiscount(ApplicationResult):
     def __repr__(self):
         return '%s(%r)' % (self.__class__.__name__, self.discount)
 
-
 # Helper global as returning zero discount is quite common
 ZERO_DISCOUNT = BasketDiscount(D('0.00'))
 
@@ -1362,7 +1356,6 @@ class PostOrderAction(ApplicationResult):
     def __init__(self, description):
         self.description = description
 
-
 # ========
 # Benefits
 # ========
@@ -1376,15 +1369,11 @@ class PercentageDiscountBenefit(Benefit):
 
     @property
     def name(self):
-        return self._description % {
-            'value': self.value,
-            'range': self.range.name}
+        return self._description % {'value': self.value, 'range': self.range.name}
 
     @property
     def description(self):
-        return self._description % {
-            'value': self.value,
-            'range': range_anchor(self.range)}
+        return self._description % {'value': self.value, 'range': range_anchor(self.range)}
 
     class Meta:
         app_label = 'offer'
@@ -1392,8 +1381,7 @@ class PercentageDiscountBenefit(Benefit):
         verbose_name = _("Percentage discount benefit")
         verbose_name_plural = _("Percentage discount benefits")
 
-    def apply(self, basket, condition, offer, discount_percent=None,
-              max_total_discount=None):
+    def apply(self, basket, condition, offer, discount_percent=None, max_total_discount=None):
         if discount_percent is None:
             discount_percent = self.value
 
@@ -1413,8 +1401,8 @@ class PercentageDiscountBenefit(Benefit):
 
             quantity_affected = min(line.quantity_without_discount,
                                     max_affected_items - affected_items)
-            line_discount = self.round(discount_percent / D('100.0') * price
-                                       * int(quantity_affected))
+            line_discount = self.round(discount_percent / D('100.0') * price *
+                                       int(quantity_affected))
 
             if discount_amount_available is not None:
                 line_discount = min(line_discount, discount_amount_available)
@@ -1441,13 +1429,15 @@ class AbsoluteDiscountBenefit(Benefit):
     def name(self):
         return self._description % {
             'value': currency(self.value),
-            'range': self.range.name.lower()}
+            'range': self.range.name.lower()
+        }
 
     @property
     def description(self):
         return self._description % {
             'value': currency(self.value),
-            'range': range_anchor(self.range)}
+            'range': range_anchor(self.range)
+        }
 
     class Meta:
         app_label = 'offer'
@@ -1455,8 +1445,7 @@ class AbsoluteDiscountBenefit(Benefit):
         verbose_name = _("Absolute discount benefit")
         verbose_name_plural = _("Absolute discount benefits")
 
-    def apply(self, basket, condition, offer, discount_amount=None,
-              max_total_discount=None):
+    def apply(self, basket, condition, offer, discount_amount=None, max_total_discount=None):
         if discount_amount is None:
             discount_amount = self.value
 
@@ -1472,8 +1461,7 @@ class AbsoluteDiscountBenefit(Benefit):
         for price, line in line_tuples:
             if num_affected_items >= max_affected_items:
                 break
-            qty = min(line.quantity_without_discount,
-                      max_affected_items - num_affected_items)
+            qty = min(line.quantity_without_discount, max_affected_items - num_affected_items)
             lines_to_discount.append((line, price, qty))
             num_affected_items += qty
             affected_items_total += qty * price
@@ -1498,8 +1486,7 @@ class AbsoluteDiscountBenefit(Benefit):
                 line_discount = discount - applied_discount
             else:
                 # Calculate a weighted discount for the line
-                line_discount = self.round(
-                    ((price * qty) / affected_items_total) * discount)
+                line_discount = self.round(((price * qty) / affected_items_total) * discount)
             apply_discount(line, line_discount, qty)
             affected_lines.append((line, line_discount, qty))
             applied_discount += line_discount
@@ -1520,13 +1507,11 @@ class FixedPriceBenefit(Benefit):
 
     We also ignore the max_affected_items setting.
     """
-    _description = _("The products that meet the condition are sold "
-                     "for %(amount)s")
+    _description = _("The products that meet the condition are sold " "for %(amount)s")
 
     @property
     def name(self):
-        return self._description % {
-            'amount': currency(self.value)}
+        return self._description % {'amount': currency(self.value)}
 
     class Meta:
         app_label = 'offer'
@@ -1540,8 +1525,7 @@ class FixedPriceBenefit(Benefit):
 
         # Fetch basket lines that are in the range and available to be used in
         # an offer.
-        line_tuples = self.get_applicable_lines(offer, basket,
-                                                range=condition.range)
+        line_tuples = self.get_applicable_lines(offer, basket, range=condition.range)
         if not line_tuples:
             return ZERO_DISCOUNT
 
@@ -1555,8 +1539,7 @@ class FixedPriceBenefit(Benefit):
                 quantity_affected = 1
             else:
                 quantity_affected = min(
-                    line.quantity_without_discount,
-                    num_permitted - num_affected)
+                    line.quantity_without_discount, num_permitted - num_affected)
             num_affected += quantity_affected
             value_affected += quantity_affected * price
             covered_lines.append((price, line, quantity_affected))
@@ -1575,8 +1558,7 @@ class FixedPriceBenefit(Benefit):
                 # rounding doesn't lead to an off-by-one error
                 line_discount = discount - discount_applied
             else:
-                line_discount = self.round(
-                    discount * (price * quantity) / value_affected)
+                line_discount = self.round(discount * (price * quantity) / value_affected)
             apply_discount(line, line_discount, quantity)
             discount_applied += line_discount
         return BasketDiscount(discount)
@@ -1587,13 +1569,11 @@ class MultibuyDiscountBenefit(Benefit):
 
     @property
     def name(self):
-        return self._description % {
-            'range': self.range.name.lower()}
+        return self._description % {'range': self.range.name.lower()}
 
     @property
     def description(self):
-        return self._description % {
-            'range': range_anchor(self.range)}
+        return self._description % {'range': range_anchor(self.range)}
 
     class Meta:
         app_label = 'offer'
@@ -1615,14 +1595,12 @@ class MultibuyDiscountBenefit(Benefit):
 
         return BasketDiscount(discount)
 
-
 # =================
 # Shipping benefits
 # =================
 
 
 class ShippingBenefit(Benefit):
-
     def apply(self, basket, condition, offer):
         condition.consume_items(offer, basket, affected_lines=())
         return SHIPPING_DISCOUNT
@@ -1637,8 +1615,7 @@ class ShippingAbsoluteDiscountBenefit(ShippingBenefit):
 
     @property
     def name(self):
-        return self._description % {
-            'amount': currency(self.value)}
+        return self._description % {'amount': currency(self.value)}
 
     class Meta:
         app_label = 'offer'
@@ -1655,8 +1632,7 @@ class ShippingFixedPriceBenefit(ShippingBenefit):
 
     @property
     def name(self):
-        return self._description % {
-            'amount': currency(self.value)}
+        return self._description % {'amount': currency(self.value)}
 
     class Meta:
         app_label = 'offer'
@@ -1675,8 +1651,7 @@ class ShippingPercentageDiscountBenefit(ShippingBenefit):
 
     @property
     def name(self):
-        return self._description % {
-            'value': self.value}
+        return self._description % {'value': self.value}
 
     class Meta:
         app_label = 'offer'
@@ -1690,37 +1665,26 @@ class ShippingPercentageDiscountBenefit(ShippingBenefit):
 
 
 class RangeProductFileUpload(models.Model):
-    range = models.ForeignKey('offer.Range', related_name='file_uploads',
-                              verbose_name=_("Range"))
+    range = models.ForeignKey('offer.Range', related_name='file_uploads', verbose_name=_("Range"))
     filepath = models.CharField(_("File Path"), max_length=255)
     size = models.PositiveIntegerField(_("Size"))
-    uploaded_by = models.ForeignKey(AUTH_USER_MODEL,
-                                    verbose_name=_("Uploaded By"))
+    uploaded_by = models.ForeignKey(AUTH_USER_MODEL, verbose_name=_("Uploaded By"))
     date_uploaded = models.DateTimeField(_("Date Uploaded"), auto_now_add=True)
 
     PENDING, FAILED, PROCESSED = 'Pending', 'Failed', 'Processed'
-    choices = (
-        (PENDING, PENDING),
-        (FAILED, FAILED),
-        (PROCESSED, PROCESSED),
-    )
-    status = models.CharField(_("Status"), max_length=32, choices=choices,
-                              default=PENDING)
-    error_message = models.CharField(_("Error Message"), max_length=255,
-                                     blank=True)
+    choices = ((PENDING, PENDING), (FAILED, FAILED), (PROCESSED, PROCESSED), )
+    status = models.CharField(_("Status"), max_length=32, choices=choices, default=PENDING)
+    error_message = models.CharField(_("Error Message"), max_length=255, blank=True)
 
     # Post-processing audit fields
     date_processed = models.DateTimeField(_("Date Processed"), null=True)
-    num_new_skus = models.PositiveIntegerField(_("Number of New SKUs"),
-                                               null=True)
-    num_unknown_skus = models.PositiveIntegerField(_("Number of Unknown SKUs"),
-                                                   null=True)
-    num_duplicate_skus = models.PositiveIntegerField(
-        _("Number of Duplicate SKUs"), null=True)
+    num_new_skus = models.PositiveIntegerField(_("Number of New SKUs"), null=True)
+    num_unknown_skus = models.PositiveIntegerField(_("Number of Unknown SKUs"), null=True)
+    num_duplicate_skus = models.PositiveIntegerField(_("Number of Duplicate SKUs"), null=True)
 
     class Meta:
         app_label = 'offer'
-        ordering = ('-date_uploaded',)
+        ordering = ('-date_uploaded', )
         verbose_name = _("Range Product Uploaded File")
         verbose_name_plural = _("Range Product Uploaded Files")
 
@@ -1751,8 +1715,7 @@ class RangeProductFileUpload(models.Model):
         """
         all_ids = set(self.extract_ids())
         products = self.range.included_products.all()
-        existing_skus = products.values_list(
-            'stockrecords__partner_sku', flat=True)
+        existing_skus = products.values_list('stockrecords__partner_sku', flat=True)
         existing_skus = set(filter(bool, existing_skus))
         existing_upcs = products.values_list('upc', flat=True)
         existing_upcs = set(filter(bool, existing_upcs))
@@ -1761,14 +1724,12 @@ class RangeProductFileUpload(models.Model):
 
         Product = models.get_model('catalogue', 'Product')
         products = Product._default_manager.filter(
-            models.Q(stockrecords__partner_sku__in=new_ids) |
-            models.Q(upc__in=new_ids))
+            models.Q(stockrecords__partner_sku__in=new_ids) | models.Q(upc__in=new_ids))
         for product in products:
             self.range.add_product(product)
 
         # Processing stats
-        found_skus = products.values_list(
-            'stockrecords__partner_sku', flat=True)
+        found_skus = products.values_list('stockrecords__partner_sku', flat=True)
         found_skus = set(filter(bool, found_skus))
         found_upcs = set(filter(bool, products.values_list('upc', flat=True)))
         found_ids = found_skus.union(found_upcs)

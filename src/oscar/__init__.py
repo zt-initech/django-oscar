@@ -19,7 +19,6 @@ def get_version():
             version = '%s %s' % (version, VERSION[4])
     return version
 
-
 # Cheeky setting that allows each template to be accessible by two paths.
 # Eg: the template 'oscar/templates/oscar/base.html' can be accessed via both
 # 'base.html' and 'oscar/base.html'.  This allows Oscar's templates to be
@@ -78,9 +77,7 @@ def get_core_apps(overrides=None):
     # without the presence Django.
     from django.utils import six
     if isinstance(overrides, six.string_types):
-        raise ValueError(
-            "get_core_apps expects a list or tuple of apps "
-            "to override")
+        raise ValueError("get_core_apps expects a list or tuple of apps " "to override")
 
     def get_app_label(app_label, overrides):
         pattern = app_label.replace('oscar.apps.', '')

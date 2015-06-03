@@ -4,10 +4,8 @@ from django.utils.translation import ugettext_lazy as _
 from oscar.core.loading import get_class
 
 ReportGenerator = get_class('dashboard.reports.reports', 'ReportGenerator')
-ReportCSVFormatter = get_class('dashboard.reports.reports',
-                               'ReportCSVFormatter')
-ReportHTMLFormatter = get_class('dashboard.reports.reports',
-                                'ReportHTMLFormatter')
+ReportCSVFormatter = get_class('dashboard.reports.reports', 'ReportCSVFormatter')
+ReportHTMLFormatter = get_class('dashboard.reports.reports', 'ReportHTMLFormatter')
 ProductRecord = get_model('analytics', 'ProductRecord')
 UserRecord = get_model('analytics', 'UserRecord')
 
@@ -17,16 +15,11 @@ class ProductReportCSVFormatter(ReportCSVFormatter):
 
     def generate_csv(self, response, products):
         writer = self.get_csv_writer(response)
-        header_row = [_('Product'),
-                      _('Views'),
-                      _('Basket additions'),
-                      _('Purchases')]
+        header_row = [_('Product'), _('Views'), _('Basket additions'), _('Purchases')]
         writer.writerow(header_row)
 
         for record in products:
-            row = [record.product,
-                   record.num_views,
-                   record.num_basket_additions,
+            row = [record.product, record.num_views, record.num_basket_additions,
                    record.num_purchases]
             writer.writerow(row)
 
@@ -41,7 +34,8 @@ class ProductReportGenerator(ReportGenerator):
 
     formatters = {
         'CSV_formatter': ProductReportCSVFormatter,
-        'HTML_formatter': ProductReportHTMLFormatter}
+        'HTML_formatter': ProductReportHTMLFormatter
+    }
 
     def report_description(self):
         return self.description
@@ -59,26 +53,15 @@ class UserReportCSVFormatter(ReportCSVFormatter):
 
     def generate_csv(self, response, users):
         writer = self.get_csv_writer(response)
-        header_row = [_('Name'),
-                      _('Date registered'),
-                      _('Product views'),
-                      _('Basket additions'),
-                      _('Orders'),
-                      _('Order lines'),
-                      _('Order items'),
-                      _('Total spent'),
+        header_row = [_('Name'), _('Date registered'), _('Product views'), _('Basket additions'),
+                      _('Orders'), _('Order lines'), _('Order items'), _('Total spent'),
                       _('Date of last order')]
         writer.writerow(header_row)
 
         for record in users:
-            row = [record.user.get_full_name(),
-                   self.format_date(record.user.date_joined),
-                   record.num_product_views,
-                   record.num_basket_additions,
-                   record.num_orders,
-                   record.num_order_lines,
-                   record.num_order_items,
-                   record.total_spent,
+            row = [record.user.get_full_name(), self.format_date(record.user.date_joined),
+                   record.num_product_views, record.num_basket_additions, record.num_orders,
+                   record.num_order_lines, record.num_order_items, record.total_spent,
                    self.format_datetime(record.date_last_order)]
             writer.writerow(row)
 
@@ -93,7 +76,8 @@ class UserReportGenerator(ReportGenerator):
 
     formatters = {
         'CSV_formatter': UserReportCSVFormatter,
-        'HTML_formatter': UserReportHTMLFormatter}
+        'HTML_formatter': UserReportHTMLFormatter
+    }
 
     def generate(self):
         users = UserRecord._default_manager.select_related().all()

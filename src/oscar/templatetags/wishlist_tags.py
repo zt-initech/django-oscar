@@ -1,6 +1,5 @@
 from django import template
 
-
 register = template.Library()
 
 
@@ -18,8 +17,7 @@ def do_basket_form(parse, token):
             "ctx_var %%}" % tokens[0])
 
     wishlists_var, product_var, name_var = tokens[1], tokens[2], tokens[4]
-    return ProductWishlistsNode(
-        wishlists_var, product_var, name_var)
+    return ProductWishlistsNode(wishlists_var, product_var, name_var)
 
 
 class ProductWishlistsNode(template.Node):
@@ -34,6 +32,5 @@ class ProductWishlistsNode(template.Node):
             product = self.product_var.resolve(context)
         except template.VariableDoesNotExist:
             return ''
-        context[self.name_var] = wishlists.filter(
-            lines__product=product)
+        context[self.name_var] = wishlists.filter(lines__product=product)
         return ''

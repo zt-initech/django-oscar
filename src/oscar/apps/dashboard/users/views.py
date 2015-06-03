@@ -47,9 +47,7 @@ class IndexView(BulkEditMixin, SingleTableMixin, FormMixin, TemplateView):
         kwargs = super(IndexView, self).get_form_kwargs()
 
         if 'search' in self.request.GET:
-            kwargs.update({
-                'data': self.request.GET,
-            })
+            kwargs.update({'data': self.request.GET, })
 
         return kwargs
 
@@ -59,11 +57,7 @@ class IndexView(BulkEditMixin, SingleTableMixin, FormMixin, TemplateView):
 
     def apply_search(self, queryset):
         # Set initial queryset description, used for template context
-        self.desc_ctx = {
-            'main_filter': _('All users'),
-            'email_filter': '',
-            'name_filter': '',
-        }
+        self.desc_ctx = {'main_filter': _('All users'), 'email_filter': '', 'name_filter': '', }
         if self.form.is_valid():
             return self.apply_search_filters(queryset, self.form.cleaned_data)
         else:
@@ -145,11 +139,8 @@ class PasswordResetView(SingleObjectMixin, FormView):
         return super(PasswordResetView, self).form_valid(form)
 
     def get_success_url(self):
-        messages.success(
-            self.request, _("A password reset email has been sent"))
-        return reverse(
-            'dashboard:user-detail', kwargs={'pk': self.object.id}
-        )
+        messages.success(self.request, _("A password reset email has been sent"))
+        return reverse('dashboard:user-detail', kwargs={'pk': self.object.id})
 
 
 class ProductAlertListView(ListView):
@@ -183,21 +174,17 @@ class ProductAlertListView(ListView):
             if len(parts) >= 2:
                 queryset = queryset.filter(
                     user__first_name__istartswith=parts[0],
-                    user__last_name__istartswith=parts[1]
-                ).distinct()
+                    user__last_name__istartswith=parts[1]).distinct()
             else:
                 queryset = queryset.filter(
                     Q(user__first_name__istartswith=parts[0]) |
-                    Q(user__last_name__istartswith=parts[-1])
-                ).distinct()
+                    Q(user__last_name__istartswith=parts[-1])).distinct()
             self.description \
                 += _(" with customer name matching '%s'") % data['name']
 
         if data['email']:
             queryset = queryset.filter(
-                Q(user__email__icontains=data['email']) |
-                Q(email__icontains=data['email'])
-            )
+                Q(user__email__icontains=data['email']) | Q(email__icontains=data['email']))
             self.description \
                 += _(" with customer email matching '%s'") % data['email']
 

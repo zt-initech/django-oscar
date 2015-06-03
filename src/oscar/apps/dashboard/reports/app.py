@@ -11,9 +11,7 @@ class ReportsApplication(Application):
     index_view = get_class('dashboard.reports.views', 'IndexView')
 
     def get_urls(self):
-        urls = [
-            url(r'^$', self.index_view.as_view(), name='reports-index'),
-        ]
+        urls = [url(r'^$', self.index_view.as_view(), name='reports-index'), ]
         return self.post_process_urls(urls)
 
 

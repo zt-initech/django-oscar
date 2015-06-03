@@ -16,8 +16,7 @@ AutoSlugField = AutoSlugField
 class ExtendedURLField(CharField):
     description = _("URL")
 
-    def __init__(self, verbose_name=None, name=None,
-                 verify_exists=None, **kwargs):
+    def __init__(self, verbose_name=None, name=None, verify_exists=None, **kwargs):
         kwargs['max_length'] = kwargs.get('max_length', 200)
         CharField.__init__(self, verbose_name, name, **kwargs)
         # 'verify_exists' was deprecated in Django 1.4. To ensure backwards
@@ -25,8 +24,7 @@ class ExtendedURLField(CharField):
         # on to the parent class if it was specified.
         self.verify_exists = verify_exists
         if verify_exists is not None:
-            validator = validators.ExtendedURLValidator(
-                verify_exists=verify_exists)
+            validator = validators.ExtendedURLValidator(verify_exists=verify_exists)
         else:
             validator = validators.ExtendedURLValidator()
         self.validators.append(validator)
@@ -34,10 +32,7 @@ class ExtendedURLField(CharField):
     def formfield(self, **kwargs):
         # As with CharField, this will cause URL validation to be performed
         # twice.
-        defaults = {
-            'form_class': fields.ExtendedURLField,
-            'verify_exists': self.verify_exists
-        }
+        defaults = {'form_class': fields.ExtendedURLField, 'verify_exists': self.verify_exists}
         defaults.update(kwargs)
         return super(ExtendedURLField, self).formfield(**defaults)
 
@@ -60,6 +55,7 @@ class PositiveDecimalField(DecimalField):
     A simple subclass of ``django.db.models.fields.DecimalField`` that
     restricts values to be non-negative.
     """
+
     def formfield(self, **kwargs):
         return super(PositiveDecimalField, self).formfield(min_value=0)
 
@@ -95,8 +91,7 @@ class NullCharField(six.with_metaclass(SubfieldBase, CharField)):
 
     def __init__(self, *args, **kwargs):
         if not kwargs.get('null', True) or not kwargs.get('blank', True):
-            raise ImproperlyConfigured(
-                "NullCharField implies null==blank==True")
+            raise ImproperlyConfigured("NullCharField implies null==blank==True")
         kwargs['null'] = kwargs['blank'] = True
         super(NullCharField, self).__init__(*args, **kwargs)
 
@@ -143,8 +138,7 @@ class PhoneNumberField(six.with_metaclass(SubfieldBase, CharField)):
         # number. To avoid running into issues that are similar to what
         # NullCharField tries to solve, we just forbid settings null=True.
         if kwargs.get('null', False):
-            raise ImproperlyConfigured(
-                "null=True is not supported on PhoneNumberField")
+            raise ImproperlyConfigured("null=True is not supported on PhoneNumberField")
         # Set a default max_length.
         kwargs['max_length'] = kwargs.get('max_length', 128)
         super(PhoneNumberField, self).__init__(*args, **kwargs)

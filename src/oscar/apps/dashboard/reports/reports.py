@@ -29,8 +29,8 @@ class ReportGenerator(object):
     def report_description(self):
         return _('%(report_filter)s between %(start_date)s and %(end_date)s') \
             % {'report_filter': self.description,
-               'start_date': self.start_date,
-               'end_date': self.end_date,
+                                                                                               'start_date': self.start_date,
+                                                                                               'end_date': self.end_date,
                }
 
     def generate(self):
@@ -59,25 +59,16 @@ class ReportGenerator(object):
         # After the start date
         if self.start_date:
             start_datetime = timezone.make_aware(
-                datetime.combine(self.start_date, time(0, 0)),
-                timezone.get_default_timezone())
+                datetime.combine(self.start_date, time(0, 0)), timezone.get_default_timezone())
 
-            filter_kwargs = {
-                "%s__gt" % self.date_range_field_name: start_datetime,
-            }
+            filter_kwargs = {"%s__gt" % self.date_range_field_name: start_datetime, }
             queryset = queryset.filter(**filter_kwargs)
 
         # Before the end of the end date
         if self.end_date:
-            end_of_end_date = datetime.combine(
-                self.end_date,
-                time(hour=23, minute=59, second=59)
-            )
-            end_datetime = timezone.make_aware(end_of_end_date,
-                                               timezone.get_default_timezone())
-            filter_kwargs = {
-                "%s__lt" % self.date_range_field_name: end_datetime,
-            }
+            end_of_end_date = datetime.combine(self.end_date, time(hour=23, minute=59, second=59))
+            end_datetime = timezone.make_aware(end_of_end_date, timezone.get_default_timezone())
+            filter_kwargs = {"%s__lt" % self.date_range_field_name: end_datetime, }
             queryset = queryset.filter(**filter_kwargs)
 
         return queryset
@@ -99,7 +90,6 @@ class ReportFormatter(object):
 
 
 class ReportCSVFormatter(ReportFormatter):
-
     def get_csv_writer(self, file_handle, **kwargs):
         return UnicodeCSVWriter(open_file=file_handle, **kwargs)
 
@@ -112,6 +102,5 @@ class ReportCSVFormatter(ReportFormatter):
 
 
 class ReportHTMLFormatter(ReportFormatter):
-
     def generate_response(self, objects, **kwargs):
         return objects

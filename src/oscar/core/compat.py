@@ -9,14 +9,12 @@ from django.core.exceptions import ImproperlyConfigured
 
 from oscar.core.loading import get_model
 
-
 # A setting that can be used in foreign key declarations
 AUTH_USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
 try:
     AUTH_USER_APP_LABEL, AUTH_USER_MODEL_NAME = AUTH_USER_MODEL.rsplit('.', 1)
 except ValueError:
-    raise ImproperlyConfigured("AUTH_USER_MODEL must be of the form"
-                               " 'app_label.model_name'")
+    raise ImproperlyConfigured("AUTH_USER_MODEL must be of the form" " 'app_label.model_name'")
 
 
 def get_user_model():
@@ -38,8 +36,8 @@ def get_user_model():
         # backwards compatibility with previous Oscar versions and the
         # original get_user_model method in Django.
         raise ImproperlyConfigured(
-            "AUTH_USER_MODEL refers to model '%s' that has not been installed"
-            % settings.AUTH_USER_MODEL)
+            "AUTH_USER_MODEL refers to model '%s' that has not been installed" %
+            settings.AUTH_USER_MODEL)
 
     # Test if user model has any custom fields and add attributes to the _meta
     # class
@@ -70,9 +68,7 @@ def existing_user_fields(fields):
     user_field_names = [field.name for field in user_fields]
     return [field for field in fields if field in user_field_names]
 
-
 # Python3 compatibility layer
-
 """
 Unicode compatible wrapper for CSV reader and writer that abstracts away
 differences between Python 2 and 3. A package like unicodecsv would be
@@ -86,13 +82,11 @@ Changes:
   of a view
 """
 
-
 PY3 = sys.version > '3'
 
 
 class UnicodeCSVReader:
-    def __init__(self, filename, dialect=csv.excel,
-                 encoding="utf-8", **kw):
+    def __init__(self, filename, dialect=csv.excel, encoding="utf-8", **kw):
         self.filename = filename
         self.dialect = dialect
         self.encoding = encoding
@@ -100,12 +94,10 @@ class UnicodeCSVReader:
 
     def __enter__(self):
         if PY3:
-            self.f = open(self.filename, 'rt',
-                          encoding=self.encoding, newline='')
+            self.f = open(self.filename, 'rt', encoding=self.encoding, newline='')
         else:
             self.f = open(self.filename, 'rbU')
-        self.reader = csv.reader(self.f, dialect=self.dialect,
-                                 **self.kw)
+        self.reader = csv.reader(self.f, dialect=self.dialect, **self.kw)
         return self
 
     def __exit__(self, type, value, traceback):
@@ -134,11 +126,10 @@ class UnicodeCSVWriter:
       with UnicodeCSVWriter(filename=filename) as writer:
           ...
     """
-    def __init__(self, filename=None, open_file=None, dialect=csv.excel,
-                 encoding="utf-8", **kw):
+
+    def __init__(self, filename=None, open_file=None, dialect=csv.excel, encoding="utf-8", **kw):
         if filename is open_file is None:
-            raise ImproperlyConfigured(
-                "You need to specify either a filename or an open file")
+            raise ImproperlyConfigured("You need to specify either a filename or an open file")
         self.filename = filename
         self.f = open_file
         self.dialect = dialect
@@ -149,8 +140,7 @@ class UnicodeCSVWriter:
     def __enter__(self):
         assert self.filename is not None
         if PY3:
-            self.f = open(self.filename, 'wt',
-                          encoding=self.encoding, newline='')
+            self.f = open(self.filename, 'wt', encoding=self.encoding, newline='')
         else:
             self.f = open(self.filename, 'wb')
 

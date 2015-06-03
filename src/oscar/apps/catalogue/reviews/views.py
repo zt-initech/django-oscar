@@ -9,8 +9,7 @@ from oscar.core.utils import redirect_to_referrer
 from oscar.apps.catalogue.reviews.signals import review_added
 
 ProductReviewForm, VoteForm, SortReviewsForm = get_classes(
-    'catalogue.reviews.forms',
-    ['ProductReviewForm', 'VoteForm', 'SortReviewsForm'])
+    'catalogue.reviews.forms', ['ProductReviewForm', 'VoteForm', 'SortReviewsForm'])
 Vote = get_model('reviews', 'vote')
 ProductReview = get_model('reviews', 'ProductReview')
 Product = get_model('catalogue', 'product')
@@ -24,8 +23,7 @@ class CreateProductReview(CreateView):
     view_signal = review_added
 
     def dispatch(self, request, *args, **kwargs):
-        self.product = get_object_or_404(
-            self.product_model, pk=kwargs['product_pk'])
+        self.product = get_object_or_404(self.product_model, pk=kwargs['product_pk'])
         # check permission to leave review
         if not self.product.is_review_permitted(request.user):
             if self.product.has_review_by(request.user):
@@ -35,8 +33,7 @@ class CreateProductReview(CreateView):
             messages.warning(self.request, message)
             return redirect(self.product.get_absolute_url())
 
-        return super(CreateProductReview, self).dispatch(
-            request, *args, **kwargs)
+        return super(CreateProductReview, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super(CreateProductReview, self).get_context_data(**kwargs)
@@ -55,13 +52,15 @@ class CreateProductReview(CreateView):
         return response
 
     def get_success_url(self):
-        messages.success(
-            self.request, _("Thank you for reviewing this product"))
+        messages.success(self.request, _("Thank you for reviewing this product"))
         return self.product.get_absolute_url()
 
     def send_signal(self, request, response, review):
-        self.view_signal.send(sender=self, review=review, user=request.user,
-                              request=request, response=response)
+        self.view_signal.send(sender=self,
+                              review=review,
+                              user=request.user,
+                              request=request,
+                              response=response)
 
 
 class ProductReviewDetail(DetailView):
@@ -71,8 +70,7 @@ class ProductReviewDetail(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(ProductReviewDetail, self).get_context_data(**kwargs)
-        context['product'] = get_object_or_404(
-            Product, pk=self.kwargs['product_pk'])
+        context['product'] = get_object_or_404(Product, pk=self.kwargs['product_pk'])
         return context
 
 
@@ -123,7 +121,6 @@ class ProductReviewList(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(ProductReviewList, self).get_context_data(**kwargs)
-        context['product'] = get_object_or_404(
-            self.product_model, pk=self.kwargs['product_pk'])
+        context['product'] = get_object_or_404(self.product_model, pk=self.kwargs['product_pk'])
         context['form'] = self.form
         return context

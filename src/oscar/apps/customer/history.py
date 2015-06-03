@@ -60,8 +60,7 @@ def update(product, request, response):
     ids = extract(request, response)
     updated_ids = add(ids, product.id)
     response.set_cookie(
-        settings.OSCAR_RECENTLY_VIEWED_COOKIE_NAME,
-        json.dumps(updated_ids),
+        settings.OSCAR_RECENTLY_VIEWED_COOKIE_NAME, json.dumps(updated_ids),
         max_age=settings.OSCAR_RECENTLY_VIEWED_COOKIE_LIFETIME,
         secure=settings.OSCAR_RECENTLY_VIEWED_COOKIE_SECURE,
         httponly=True)

@@ -18,8 +18,7 @@ class RequestFactory(BaseRequestFactory):
         request._messages = FallbackStorage(request)
 
         # Mimic basket middleware
-        request.strategy = self.selector.strategy(
-            request=request, user=request.user)
+        request.strategy = self.selector.strategy(request=request, user=request.user)
         request.basket = basket or self.Basket()
         request.basket.strategy = request.strategy
         request.basket_hash = Signer().sign(basket.pk) if basket else None

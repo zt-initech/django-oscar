@@ -4,8 +4,7 @@ from decimal import Decimal as D
 from . import availability, prices
 
 # A container for policies
-PurchaseInfo = namedtuple(
-    'PurchaseInfo', ['price', 'availability', 'stockrecord'])
+PurchaseInfo = namedtuple('PurchaseInfo', ['price', 'availability', 'stockrecord'])
 
 
 class Selector(object):
@@ -70,8 +69,7 @@ class Base(object):
         raise NotImplementedError(
             "A strategy class must define a fetch_for_product method "
             "for returning the availability and pricing "
-            "information."
-        )
+            "information.")
 
     def fetch_for_parent(self, product):
         """
@@ -80,8 +78,7 @@ class Base(object):
         raise NotImplementedError(
             "A strategy class must define a fetch_for_parent method "
             "for returning the availability and pricing "
-            "information."
-        )
+            "information.")
 
     def fetch_for_line(self, line, stockrecord=None):
         """
@@ -174,7 +171,6 @@ class Structured(Base):
             "A structured strategy class must define a "
             "'parent_availability_policy' method")
 
-
 # Mixins - these can be used to construct the appropriate strategy class
 
 
@@ -207,8 +203,7 @@ class StockRequired(object):
         if not product.get_product_class().track_stock:
             return availability.Available()
         else:
-            return availability.StockRequired(
-                stockrecord.net_stock_level)
+            return availability.StockRequired(stockrecord.net_stock_level)
 
     def parent_availability_policy(self, product, children_stock):
         # A parent product is available if one of its children is
@@ -328,7 +323,6 @@ class DeferredTax(object):
         return prices.FixedPrice(
             currency=stockrecord.price_currency,
             excl_tax=stockrecord.price_excl_tax)
-
 
 # Example strategy composed of above mixins.  For real projects, it's likely
 # you'll want to use a different pricing mixin as you'll probably want to

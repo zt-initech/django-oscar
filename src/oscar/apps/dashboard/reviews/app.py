@@ -14,7 +14,8 @@ class ReviewsApplication(Application):
 
     def get_urls(self):
         urls = [
-            url(r'^$', self.list_view.as_view(), name='reviews-list'),
+            url(r'^$', self.list_view.as_view(),
+                name='reviews-list'),
             url(r'^(?P<pk>\d+)/$', self.update_view.as_view(),
                 name='reviews-update'),
             url(r'^(?P<pk>\d+)/delete/$', self.delete_view.as_view(),

@@ -8,7 +8,6 @@ from oscar.core.loading import get_model
 from oscar.core.loading import get_class
 from . import exceptions
 
-
 Order = get_model('order', 'Order')
 Line = get_model('order', 'Line')
 OrderDiscount = get_model('order', 'OrderDiscount')
@@ -36,9 +35,12 @@ class OrderCreator(object):
     """
 
     def place_order(self, basket, total,  # noqa (too complex (12))
-                    shipping_method, shipping_charge, user=None,
-                    shipping_address=None, billing_address=None,
-                    order_number=None, status=None, **kwargs):
+                    shipping_method, shipping_charge,
+                    user=None,
+                    shipping_address=None,
+                    billing_address=None,
+                    order_number=None,
+                    status=None, **kwargs):
         """
         Placing an order involves creating all the relevant models based on the
         basket and session data.
@@ -55,13 +57,12 @@ class OrderCreator(object):
         except Order.DoesNotExist:
             pass
         else:
-            raise ValueError(_("There is already an order with number %s")
-                             % order_number)
+            raise ValueError(_("There is already an order with number %s") % order_number)
 
         # Ok - everything seems to be in order, let's place the order
         order = self.create_order_model(
-            user, basket, shipping_address, shipping_method, shipping_charge,
-            billing_address, total, order_number, status, **kwargs)
+            user, basket, shipping_address, shipping_method, shipping_charge, billing_address,
+            total, order_number, status, **kwargs)
         for line in basket.all_lines():
             self.create_line_models(order, line)
             self.update_stock_records(line)
@@ -72,7 +73,7 @@ class OrderCreator(object):
             # resulting message
             application['message'] \
                 = application['offer'].apply_deferred_benefit(basket, order,
-                                                              application)
+                                                                                                   application)
             # Record offer application results
             if application['result'].affects_shipping:
                 # Skip zero shipping discounts
@@ -94,22 +95,23 @@ class OrderCreator(object):
 
         return order
 
-    def create_order_model(self, user, basket, shipping_address,
-                           shipping_method, shipping_charge, billing_address,
-                           total, order_number, status, **extra_order_fields):
+    def create_order_model(self, user, basket, shipping_address, shipping_method, shipping_charge,
+                           billing_address, total, order_number, status, **extra_order_fields):
         """
         Create an order model.
         """
-        order_data = {'basket': basket,
-                      'number': order_number,
-                      'site': Site._default_manager.get_current(),
-                      'currency': total.currency,
-                      'total_incl_tax': total.incl_tax,
-                      'total_excl_tax': total.excl_tax,
-                      'shipping_incl_tax': shipping_charge.incl_tax,
-                      'shipping_excl_tax': shipping_charge.excl_tax,
-                      'shipping_method': shipping_method.name,
-                      'shipping_code': shipping_method.code}
+        order_data = {
+            'basket': basket,
+            'number': order_number,
+            'site': Site._default_manager.get_current(),
+            'currency': total.currency,
+            'total_incl_tax': total.incl_tax,
+            'total_excl_tax': total.excl_tax,
+            'shipping_incl_tax': shipping_charge.incl_tax,
+            'shipping_excl_tax': shipping_charge.excl_tax,
+            'shipping_method': shipping_method.name,
+            'shipping_code': shipping_method.code
+        }
         if shipping_address:
             order_data['shipping_address'] = shipping_address
         if billing_address:
@@ -150,28 +152,22 @@ class OrderCreator(object):
             'upc': product.upc,
             'quantity': basket_line.quantity,
             # Price details
-            'line_price_excl_tax':
-            basket_line.line_price_excl_tax_incl_discounts,
-            'line_price_incl_tax':
-            basket_line.line_price_incl_tax_incl_discounts,
-            'line_price_before_discounts_excl_tax':
-            basket_line.line_price_excl_tax,
-            'line_price_before_discounts_incl_tax':
-            basket_line.line_price_incl_tax,
+            'line_price_excl_tax': basket_line.line_price_excl_tax_incl_discounts,
+            'line_price_incl_tax': basket_line.line_price_incl_tax_incl_discounts,
+            'line_price_before_discounts_excl_tax': basket_line.line_price_excl_tax,
+            'line_price_before_discounts_incl_tax': basket_line.line_price_incl_tax,
             # Reporting details
             'unit_cost_price': stockrecord.cost_price,
             'unit_price_incl_tax': basket_line.unit_price_incl_tax,
             'unit_price_excl_tax': basket_line.unit_price_excl_tax,
             'unit_retail_price': stockrecord.price_retail,
             # Shipping details
-            'est_dispatch_date':
-            basket_line.purchase_info.availability.dispatch_date
+            'est_dispatch_date': basket_line.purchase_info.availability.dispatch_date
         }
         extra_line_fields = extra_line_fields or {}
         if hasattr(settings, 'OSCAR_INITIAL_LINE_STATUS'):
             if not (extra_line_fields and 'status' in extra_line_fields):
-                extra_line_fields['status'] = getattr(
-                    settings, 'OSCAR_INITIAL_LINE_STATUS')
+                extra_line_fields['status'] = getattr(settings, 'OSCAR_INITIAL_LINE_STATUS')
         if extra_line_fields:
             line_data.update(extra_line_fields)
 
@@ -222,7 +218,6 @@ class OrderCreator(object):
                 value=attr.value)
 
     def create_discount_model(self, order, discount):
-
         """
         Create an order discount model for each offer application attached to
         the basket.

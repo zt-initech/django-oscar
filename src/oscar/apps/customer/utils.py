@@ -28,8 +28,7 @@ class Dispatcher(object):
         if messages['subject'] and messages['body']:
             self.send_email_messages(recipient, messages)
 
-    def dispatch_order_messages(self, order, messages, event_type=None,
-                                **kwargs):
+    def dispatch_order_messages(self, order, messages, event_type=None, **kwargs):
         """
         Dispatch order-related messages to the customer
         """
@@ -45,8 +44,7 @@ class Dispatcher(object):
 
         # Create order communications event for audit
         if event_type is not None:
-            CommunicationEvent._default_manager.create(
-                order=order, event_type=event_type)
+            CommunicationEvent._default_manager.create(order=order, event_type=event_type)
 
     def dispatch_user_messages(self, user, messages):
         """
@@ -89,14 +87,12 @@ class Dispatcher(object):
 
         # Determine whether we are sending a HTML version too
         if messages['html']:
-            email = EmailMultiAlternatives(messages['subject'],
-                                           messages['body'],
+            email = EmailMultiAlternatives(messages['subject'], messages['body'],
                                            from_email=from_email,
                                            to=[recipient])
             email.attach_alternative(messages['html'], "text/html")
         else:
-            email = EmailMessage(messages['subject'],
-                                 messages['body'],
+            email = EmailMessage(messages['subject'], messages['body'],
                                  from_email=from_email,
                                  to=[recipient])
         self.logger.info("Sending email to %s" % recipient)

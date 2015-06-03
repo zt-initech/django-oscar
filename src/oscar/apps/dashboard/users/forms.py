@@ -10,12 +10,10 @@ ProductAlert = get_model('customer', 'ProductAlert')
 
 class UserSearchForm(forms.Form):
     email = forms.CharField(required=False, label=_("Email"))
-    name = forms.CharField(
-        required=False, label=pgettext_lazy(u"User's name", u"Name"))
+    name = forms.CharField(required=False, label=pgettext_lazy(u"User's name", u"Name"))
 
 
 class ProductAlertUpdateForm(forms.ModelForm):
-
     def __init__(self, *args, **kwargs):
         super(ProductAlertUpdateForm, self).__init__(*args, **kwargs)
         alert = kwargs['instance']
@@ -28,17 +26,12 @@ class ProductAlertUpdateForm(forms.ModelForm):
 
     class Meta:
         model = ProductAlert
-        fields = [
-            'status',
-        ]
+        fields = ['status', ]
 
 
 class ProductAlertSearchForm(forms.Form):
-    STATUS_CHOICES = (
-        ('', '------------'),
-    ) + ProductAlert.STATUS_CHOICES
+    STATUS_CHOICES = (('', '------------'), ) + ProductAlert.STATUS_CHOICES
 
-    status = forms.ChoiceField(required=False, choices=STATUS_CHOICES,
-                               label=_('Status'))
+    status = forms.ChoiceField(required=False, choices=STATUS_CHOICES, label=_('Status'))
     name = forms.CharField(required=False, label=_('Name'))
     email = forms.EmailField(required=False, label=_('Email'))

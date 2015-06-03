@@ -56,13 +56,14 @@ class PhoneNumber(phonenumbers.phonenumber.PhoneNumber):
         phone_number_obj = cls()
         if region is None:
             region = getattr(settings, 'PHONENUMBER_DEFAULT_REGION', None)
-        phonenumbers.parse(number=phone_number, region=region,
-                           keep_raw_input=True, numobj=phone_number_obj)
+        phonenumbers.parse(number=phone_number,
+                           region=region,
+                           keep_raw_input=True,
+                           numobj=phone_number_obj)
         return phone_number_obj
 
     def __str__(self):
-        format_string = getattr(
-            settings, 'PHONENUMBER_DEFAULT_FORMAT', 'INTERNATIONAL')
+        format_string = getattr(settings, 'PHONENUMBER_DEFAULT_FORMAT', 'INTERNATIONAL')
         fmt = self.format_map[format_string]
         if self.is_valid():
             return self.format_as(fmt)

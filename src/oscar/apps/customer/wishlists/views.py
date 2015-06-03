@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 from django.contrib import messages
-from django.core.exceptions import (
-    ObjectDoesNotExist, MultipleObjectsReturned, PermissionDenied)
+from django.core.exceptions import (ObjectDoesNotExist, MultipleObjectsReturned, PermissionDenied)
 from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
-from django.views.generic import (ListView, CreateView, UpdateView, DeleteView,
-                                  View, FormView)
+from django.views.generic import (ListView, CreateView, UpdateView, DeleteView, View, FormView)
 from django.utils.translation import ugettext_lazy as _
 
 from oscar.core.loading import get_class, get_classes, get_model
@@ -15,8 +13,7 @@ from oscar.core.utils import redirect_to_referrer, safe_referrer
 WishList = get_model('wishlists', 'WishList')
 Line = get_model('wishlists', 'Line')
 Product = get_model('catalogue', 'Product')
-WishListForm, LineFormset = get_classes('wishlists.forms',
-                                        ['WishListForm', 'LineFormset'])
+WishListForm, LineFormset = get_classes('wishlists.forms', ['WishListForm', 'LineFormset'])
 PageTitleMixin = get_class('customer.mixins', 'PageTitleMixin')
 
 
@@ -43,8 +40,7 @@ class WishListDetailView(PageTitleMixin, FormView):
 
     def dispatch(self, request, *args, **kwargs):
         self.object = self.get_wishlist_or_404(kwargs['key'], request.user)
-        return super(WishListDetailView, self).dispatch(request, *args,
-                                                        **kwargs)
+        return super(WishListDetailView, self).dispatch(request, *args, **kwargs)
 
     def get_wishlist_or_404(self, key, user):
         wishlist = get_object_or_404(WishList, key=key)
@@ -64,8 +60,7 @@ class WishListDetailView(PageTitleMixin, FormView):
     def get_context_data(self, **kwargs):
         ctx = super(WishListDetailView, self).get_context_data(**kwargs)
         ctx['wishlist'] = self.object
-        other_wishlists = self.request.user.wishlists.exclude(
-            pk=self.object.pk)
+        other_wishlists = self.request.user.wishlists.exclude(pk=self.object.pk)
         ctx['other_wishlists'] = other_wishlists
         return ctx
 
@@ -98,11 +93,9 @@ class WishListCreateView(PageTitleMixin, CreateView):
             try:
                 self.product = Product.objects.get(pk=kwargs['product_pk'])
             except ObjectDoesNotExist:
-                messages.error(
-                    request, _("The requested product no longer exists"))
+                messages.error(request, _("The requested product no longer exists"))
                 return redirect('wishlists-create')
-        return super(WishListCreateView, self).dispatch(
-            request, *args, **kwargs)
+        return super(WishListCreateView, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         ctx = super(WishListCreateView, self).get_context_data(**kwargs)
@@ -145,7 +138,8 @@ class WishListCreateWithProductView(View):
         wishlist.add(product)
         messages.success(
             request, _("%(title)s has been added to your wishlist") % {
-                'title': product.get_title()})
+                'title': product.get_title()
+            })
         return redirect_to_referrer(request, wishlist.get_absolute_url())
 
 
@@ -160,8 +154,7 @@ class WishListUpdateView(PageTitleMixin, UpdateView):
         return self.object.name
 
     def get_object(self, queryset=None):
-        return get_object_or_404(WishList, owner=self.request.user,
-                                 key=self.kwargs['key'])
+        return get_object_or_404(WishList, owner=self.request.user, key=self.kwargs['key'])
 
     def get_form_kwargs(self):
         kwargs = super(WishListUpdateView, self).get_form_kwargs()
@@ -169,9 +162,7 @@ class WishListUpdateView(PageTitleMixin, UpdateView):
         return kwargs
 
     def get_success_url(self):
-        messages.success(
-            self.request, _("Your '%s' wishlist has been updated")
-            % self.object.name)
+        messages.success(self.request, _("Your '%s' wishlist has been updated") % self.object.name)
         return reverse('customer:wishlists-list')
 
 
@@ -184,13 +175,11 @@ class WishListDeleteView(PageTitleMixin, DeleteView):
         return _(u'Delete %s') % self.object.name
 
     def get_object(self, queryset=None):
-        return get_object_or_404(WishList, owner=self.request.user,
-                                 key=self.kwargs['key'])
+        return get_object_or_404(WishList, owner=self.request.user, key=self.kwargs['key'])
 
     def get_success_url(self):
         messages.success(
-            self.request, _("Your '%s' wish list has been deleted")
-            % self.object.name)
+            self.request, _("Your '%s' wish list has been deleted") % self.object.name)
         return reverse('customer:wishlists-list')
 
 
@@ -210,8 +199,7 @@ class WishListAddProduct(View):
 
     def get_or_create_wishlist(self, request, *args, **kwargs):
         if 'key' in kwargs:
-            wishlist = get_object_or_404(
-                WishList, key=kwargs['key'], owner=request.user)
+            wishlist = get_object_or_404(WishList, key=kwargs['key'], owner=request.user)
         else:
             wishlists = request.user.wishlists.all()[:1]
             if not wishlists:
@@ -235,8 +223,7 @@ class WishListAddProduct(View):
         self.wishlist.add(self.product)
         msg = _("'%s' was added to your wish list.") % self.product.get_title()
         messages.success(self.request, msg)
-        return redirect_to_referrer(
-            self.request, self.product.get_absolute_url())
+        return redirect_to_referrer(self.request, self.product.get_absolute_url())
 
 
 class LineMixin(object):
@@ -253,8 +240,7 @@ class LineMixin(object):
     """
 
     def fetch_line(self, user, wishlist_key, line_pk=None, product_pk=None):
-        self.wishlist = WishList._default_manager.get(
-            owner=user, key=wishlist_key)
+        self.wishlist = WishList._default_manager.get(owner=user, key=wishlist_key)
         if line_pk is not None:
             self.line = self.wishlist.lines.get(pk=line_pk)
         else:
@@ -271,8 +257,8 @@ class WishListRemoveProduct(LineMixin, PageTitleMixin, DeleteView):
 
     def get_object(self, queryset=None):
         self.fetch_line(
-            self.request.user, self.kwargs['key'],
-            self.kwargs.get('line_pk'), self.kwargs.get('product_pk'))
+            self.request.user, self.kwargs['key'], self.kwargs.get('line_pk'),
+            self.kwargs.get('product_pk'))
         return self.line
 
     def get_context_data(self, **kwargs):
@@ -284,42 +270,37 @@ class WishListRemoveProduct(LineMixin, PageTitleMixin, DeleteView):
     def get_success_url(self):
         msg = _("'%(title)s' was removed from your '%(name)s' wish list") % {
             'title': self.line.get_title(),
-            'name': self.wishlist.name}
+            'name': self.wishlist.name
+        }
         messages.success(self.request, msg)
 
         # We post directly to this view on product pages; and should send the
         # user back there if that was the case
         referrer = safe_referrer(self.request, '')
-        if (referrer and self.product and
-                self.product.get_absolute_url() in referrer):
+        if (referrer and self.product and self.product.get_absolute_url() in referrer):
             return referrer
         else:
-            return reverse(
-                'customer:wishlists-detail', kwargs={'key': self.wishlist.key})
+            return reverse('customer:wishlists-detail', kwargs={'key': self.wishlist.key})
 
 
 class WishListMoveProductToAnotherWishList(LineMixin, View):
-
     def dispatch(self, request, *args, **kwargs):
         try:
-            self.fetch_line(request.user, kwargs['key'],
-                            line_pk=kwargs['line_pk'])
+            self.fetch_line(request.user, kwargs['key'], line_pk=kwargs['line_pk'])
         except (ObjectDoesNotExist, MultipleObjectsReturned):
             raise Http404
-        return super(WishListMoveProductToAnotherWishList, self).dispatch(
-            request, *args, **kwargs)
+        return super(WishListMoveProductToAnotherWishList, self).dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
-        to_wishlist = get_object_or_404(
-            WishList, owner=request.user, key=kwargs['to_key'])
+        to_wishlist = get_object_or_404(WishList, owner=request.user, key=kwargs['to_key'])
         self.line.wishlist = to_wishlist
         self.line.save()
 
         msg = _("'%(title)s' moved to '%(name)s' wishlist") % {
             'title': self.product.get_title(),
-            'name': to_wishlist.name}
+            'name': to_wishlist.name
+        }
         messages.success(self.request, msg)
 
-        default_url = reverse(
-            'customer:wishlists-detail', kwargs={'key': self.wishlist.key})
+        default_url = reverse('customer:wishlists-detail', kwargs={'key': self.wishlist.key})
         return redirect_to_referrer(self.request, default_url)

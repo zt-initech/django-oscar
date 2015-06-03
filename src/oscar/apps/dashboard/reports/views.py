@@ -5,8 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from oscar.core.loading import get_class
 ReportForm = get_class('dashboard.reports.forms', 'ReportForm')
-GeneratorRepository = get_class('dashboard.reports.utils',
-                                'GeneratorRepository')
+GeneratorRepository = get_class('dashboard.reports.utils', 'GeneratorRepository')
 
 
 class IndexView(ListView):
@@ -37,8 +36,7 @@ class IndexView(ListView):
             if form.is_valid():
                 generator = self._get_generator(form)
                 if not generator.is_available_to(request.user):
-                    return HttpResponseForbidden(_("You do not have access to"
-                                                   " this report"))
+                    return HttpResponseForbidden(_("You do not have access to" " this report"))
 
                 report = generator.generate()
 

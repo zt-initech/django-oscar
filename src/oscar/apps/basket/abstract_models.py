@@ -24,34 +24,30 @@ class AbstractBasket(models.Model):
     # Baskets can be anonymously owned - hence this field is nullable.  When a
     # anon user signs in, their two baskets are merged.
     owner = models.ForeignKey(
-        AUTH_USER_MODEL, related_name='baskets', null=True,
+        AUTH_USER_MODEL,
+        related_name='baskets',
+        null=True,
         verbose_name=_("Owner"))
 
     # Basket statuses
     # - Frozen is for when a basket is in the process of being submitted
     #   and we need to prevent any changes to it.
-    OPEN, MERGED, SAVED, FROZEN, SUBMITTED = (
-        "Open", "Merged", "Saved", "Frozen", "Submitted")
+    OPEN, MERGED, SAVED, FROZEN, SUBMITTED = ("Open", "Merged", "Saved", "Frozen", "Submitted")
     STATUS_CHOICES = (
-        (OPEN, _("Open - currently active")),
-        (MERGED, _("Merged - superceded by another basket")),
+        (OPEN, _("Open - currently active")), (MERGED, _("Merged - superceded by another basket")),
         (SAVED, _("Saved - for items to be purchased later")),
         (FROZEN, _("Frozen - the basket cannot be modified")),
-        (SUBMITTED, _("Submitted - has been ordered at the checkout")),
-    )
-    status = models.CharField(
-        _("Status"), max_length=128, default=OPEN, choices=STATUS_CHOICES)
+        (SUBMITTED, _("Submitted - has been ordered at the checkout")), )
+    status = models.CharField(_("Status"), max_length=128, default=OPEN, choices=STATUS_CHOICES)
 
     # A basket can have many vouchers attached to it.  However, it is common
     # for sites to only allow one voucher per basket - this will need to be
     # enforced in the project's codebase.
-    vouchers = models.ManyToManyField(
-        'voucher.Voucher', verbose_name=_("Vouchers"), blank=True)
+    vouchers = models.ManyToManyField('voucher.Voucher', verbose_name=_("Vouchers"), blank=True)
 
     date_created = models.DateTimeField(_("Date created"), auto_now_add=True)
     date_merged = models.DateTimeField(_("Date merged"), null=True, blank=True)
-    date_submitted = models.DateTimeField(_("Date submitted"), null=True,
-                                          blank=True)
+    date_submitted = models.DateTimeField(_("Date submitted"), null=True, blank=True)
 
     # Only if a basket is in one of these statuses can it be edited
     editable_statuses = (OPEN, SAVED)
@@ -81,8 +77,8 @@ class AbstractBasket(models.Model):
         return _(
             u"%(status)s basket (owner: %(owner)s, lines: %(num_lines)d)") \
             % {'status': self.status,
-               'owner': self.owner,
-               'num_lines': self.num_lines}
+                                                                                            'owner': self.owner,
+                                                                                            'num_lines': self.num_lines}
 
     # ========
     # Strategy
@@ -99,8 +95,7 @@ class AbstractBasket(models.Model):
                 "This is normally assigned to the incoming request in "
                 "oscar.apps.basket.middleware.BasketMiddleware. "
                 "Since it is missing, you must be doing something different. "
-                "Ensure that a strategy instance is assigned to the basket!"
-            )
+                "Ensure that a strategy instance is assigned to the basket!")
         return self._strategy
 
     def _set_strategy(self, strategy):
@@ -120,10 +115,9 @@ class AbstractBasket(models.Model):
             return self.lines.none()
         if self._lines is None:
             self._lines = (
-                self.lines
-                .select_related('product', 'stockrecord')
-                .prefetch_related(
-                    'attributes', 'product__images'))
+                self.lines.select_related('product', 'stockrecord').prefetch_related(
+                    'attributes', 'product__images')
+            )
         return self._lines
 
     def is_quantity_allowed(self, qty):
@@ -183,8 +177,8 @@ class AbstractBasket(models.Model):
         if price_currency and stock_info.price.currency != price_currency:
             raise ValueError((
                 "Basket lines must all have the same currency. Proposed "
-                "line has currency %s, while basket has currency %s")
-                % (stock_info.price.currency, price_currency))
+                "line has currency %s, while basket has currency %s"
+            ) % (stock_info.price.currency, price_currency))
 
         if stock_info.stockrecord is None:
             raise ValueError((
@@ -193,8 +187,7 @@ class AbstractBasket(models.Model):
 
         # Line reference is used to distinguish between variations of the same
         # product (eg T-shirts with different personalisations)
-        line_ref = self._create_line_reference(
-            product, stock_info.stockrecord, options)
+        line_ref = self._create_line_reference(product, stock_info.stockrecord, options)
 
         # Determine price to store (if one exists).  It is only stored for
         # audit and sometimes caching.
@@ -213,8 +206,7 @@ class AbstractBasket(models.Model):
             defaults=defaults)
         if created:
             for option_dict in options:
-                line.attributes.create(option=option_dict['option'],
-                                       value=option_dict['value'])
+                line.attributes.create(option=option_dict['option'], value=option_dict['value'])
         else:
             line.quantity += quantity
             line.save()
@@ -222,6 +214,7 @@ class AbstractBasket(models.Model):
 
         # Returning the line is useful when overriding this method.
         return line, created
+
     add_product.alters_data = True
     add = add_product
 
@@ -259,12 +252,12 @@ class AbstractBasket(models.Model):
             if add_quantities:
                 existing_line.quantity += line.quantity
             else:
-                existing_line.quantity = max(existing_line.quantity,
-                                             line.quantity)
+                existing_line.quantity = max(existing_line.quantity, line.quantity)
             existing_line.save()
             line.delete()
         finally:
             self._lines = None
+
     merge_line.alters_data = True
 
     def merge(self, basket, add_quantities=True):
@@ -286,6 +279,7 @@ class AbstractBasket(models.Model):
         for voucher in basket.vouchers.all():
             basket.vouchers.remove(voucher)
             self.vouchers.add(voucher)
+
     merge.alters_data = True
 
     def freeze(self):
@@ -294,6 +288,7 @@ class AbstractBasket(models.Model):
         """
         self.status = self.FROZEN
         self.save()
+
     freeze.alters_data = True
 
     def thaw(self):
@@ -302,6 +297,7 @@ class AbstractBasket(models.Model):
         """
         self.status = self.OPEN
         self.save()
+
     thaw.alters_data = True
 
     def submit(self):
@@ -311,6 +307,7 @@ class AbstractBasket(models.Model):
         self.status = self.SUBMITTED
         self.date_submitted = now()
         self.save()
+
     submit.alters_data = True
 
     # Kept for backwards compatibility
@@ -554,36 +551,38 @@ class AbstractLine(models.Model):
     """
     A line of a basket (product and a quantity)
     """
-    basket = models.ForeignKey('basket.Basket', related_name='lines',
-                               verbose_name=_("Basket"))
+    basket = models.ForeignKey('basket.Basket', related_name='lines', verbose_name=_("Basket"))
 
     # This is to determine which products belong to the same line
     # We can't just use product.id as you can have customised products
     # which should be treated as separate lines.  Set as a
     # SlugField as it is included in the path for certain views.
-    line_reference = models.SlugField(
-        _("Line Reference"), max_length=128, db_index=True)
+    line_reference = models.SlugField(_("Line Reference"), max_length=128, db_index=True)
 
     product = models.ForeignKey(
-        'catalogue.Product', related_name='basket_lines',
+        'catalogue.Product',
+        related_name='basket_lines',
         verbose_name=_("Product"))
 
     # We store the stockrecord that should be used to fulfil this line.
-    stockrecord = models.ForeignKey(
-        'partner.StockRecord', related_name='basket_lines')
+    stockrecord = models.ForeignKey('partner.StockRecord', related_name='basket_lines')
 
     quantity = models.PositiveIntegerField(_('Quantity'), default=1)
 
     # We store the unit price incl tax of the product when it is first added to
     # the basket.  This allows us to tell if a product has changed price since
     # a person first added it to their basket.
-    price_currency = models.CharField(
-        _("Currency"), max_length=12, default=get_default_currency)
+    price_currency = models.CharField(_("Currency"), max_length=12, default=get_default_currency)
     price_excl_tax = models.DecimalField(
-        _('Price excl. Tax'), decimal_places=2, max_digits=12,
+        _('Price excl. Tax'),
+        decimal_places=2,
+        max_digits=12,
         null=True)
     price_incl_tax = models.DecimalField(
-        _('Price incl. Tax'), decimal_places=2, max_digits=12, null=True)
+        _('Price incl. Tax'),
+        decimal_places=2,
+        max_digits=12,
+        null=True)
 
     # Track date of first addition
     date_created = models.DateTimeField(_("Date Created"), auto_now_add=True)
@@ -605,15 +604,18 @@ class AbstractLine(models.Model):
     def __str__(self):
         return _(
             u"Basket #%(basket_id)d, Product #%(product_id)d, quantity"
-            u" %(quantity)d") % {'basket_id': self.basket.pk,
-                                 'product_id': self.product.pk,
-                                 'quantity': self.quantity}
+            u" %(quantity)d") % {
+                'basket_id': self.basket.pk,
+                'product_id': self.product.pk,
+                'quantity': self.quantity
+            }
 
     def save(self, *args, **kwargs):
         if not self.basket.can_be_edited:
             raise PermissionDenied(
                 _("You cannot modify a %s basket") % (
-                    self.basket.status.lower(),))
+                    self.basket.status.lower(),
+                ))
         return super(AbstractLine, self).save(*args, **kwargs)
 
     # =============
@@ -666,25 +668,21 @@ class AbstractLine(models.Model):
         tuples.
         """
         if not self.is_tax_known:
-            raise RuntimeError("A price breakdown can only be determined "
-                               "when taxes are known")
+            raise RuntimeError("A price breakdown can only be determined " "when taxes are known")
         prices = []
         if not self.discount_value:
-            prices.append((self.unit_price_incl_tax, self.unit_price_excl_tax,
-                           self.quantity))
+            prices.append((self.unit_price_incl_tax, self.unit_price_excl_tax, self.quantity))
         else:
             # Need to split the discount among the affected quantity
             # of products.
-            item_incl_tax_discount = (
-                self.discount_value / int(self._affected_quantity))
+            item_incl_tax_discount = (self.discount_value / int(self._affected_quantity))
             item_excl_tax_discount = item_incl_tax_discount * self._tax_ratio
             item_excl_tax_discount = item_excl_tax_discount.quantize(D('0.01'))
             prices.append((self.unit_price_incl_tax - item_incl_tax_discount,
                            self.unit_price_excl_tax - item_excl_tax_discount,
                            self._affected_quantity))
             if self.quantity_without_discount:
-                prices.append((self.unit_price_incl_tax,
-                               self.unit_price_excl_tax,
+                prices.append((self.unit_price_incl_tax, self.unit_price_excl_tax,
                                self.quantity_without_discount))
         return prices
 
@@ -730,8 +728,7 @@ class AbstractLine(models.Model):
         """
         if not hasattr(self, '_info'):
             # Cache the PurchaseInfo instance.
-            self._info = self.basket.strategy.fetch_for_line(
-                self, self.stockrecord)
+            self._info = self.basket.strategy.fetch_for_line(self, self.stockrecord)
         return self._info
 
     @property
@@ -838,8 +835,7 @@ class AbstractLineAttribute(models.Model):
     """
     An attribute of a basket line
     """
-    line = models.ForeignKey('basket.Line', related_name='attributes',
-                             verbose_name=_("Line"))
+    line = models.ForeignKey('basket.Line', related_name='attributes', verbose_name=_("Line"))
     option = models.ForeignKey('catalogue.Option', verbose_name=_("Option"))
     value = models.CharField(_("Value"), max_length=255)
 

@@ -10,8 +10,7 @@ class PageSearchForm(forms.Form):
     """
     Search form to filter pages by *title.
     """
-    title = forms.CharField(
-        required=False, label=pgettext_lazy(u"Page title", u"Title"))
+    title = forms.CharField(required=False, label=pgettext_lazy(u"Page title", u"Title"))
 
 
 class PageUpdateForm(forms.ModelForm):
@@ -20,7 +19,9 @@ class PageUpdateForm(forms.ModelForm):
     and *content* field. The specified URL will be validated and check if
     the same URL already exists in the system.
     """
-    url = forms.CharField(max_length=128, required=False, label=_("URL"),
+    url = forms.CharField(max_length=128,
+                          required=False,
+                          label=_("URL"),
                           help_text=_("Example: '/about/contact/'."))
 
     def clean_url(self):

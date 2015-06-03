@@ -6,10 +6,8 @@ from django.utils.translation import ugettext_lazy as _
 
 from oscar.core.loading import get_class
 ReportGenerator = get_class('dashboard.reports.reports', 'ReportGenerator')
-ReportCSVFormatter = get_class('dashboard.reports.reports',
-                               'ReportCSVFormatter')
-ReportHTMLFormatter = get_class('dashboard.reports.reports',
-                                'ReportHTMLFormatter')
+ReportCSVFormatter = get_class('dashboard.reports.reports', 'ReportCSVFormatter')
+ReportHTMLFormatter = get_class('dashboard.reports.reports', 'ReportHTMLFormatter')
 ConditionalOffer = get_model('offer', 'ConditionalOffer')
 OrderDiscount = get_model('order', 'OrderDiscount')
 
@@ -19,9 +17,7 @@ class OfferReportCSVFormatter(ReportCSVFormatter):
 
     def generate_csv(self, response, offers):
         writer = self.get_csv_writer(response)
-        header_row = [_('Offer'),
-                      _('Total discount')
-                      ]
+        header_row = [_('Offer'), _('Total discount')]
         writer.writerow(header_row)
 
         for offer in offers:
@@ -47,9 +43,7 @@ class OfferReportGenerator(ReportGenerator):
         if self.start_date:
             qs = qs.filter(order__date_placed__gte=self.start_date)
         if self.end_date:
-            qs = qs.filter(
-                order__date_placed__lt=
-                    self.end_date + datetime.timedelta(days=1))
+            qs = qs.filter(order__date_placed__lt=self.end_date + datetime.timedelta(days=1))
 
         offer_discounts = {}
         for discount in qs:
@@ -59,10 +53,7 @@ class OfferReportGenerator(ReportGenerator):
                     offer = all_offers.get(id=discount.offer_id)
                 except ConditionalOffer.DoesNotExist:
                     continue
-                offer_discounts[discount.offer_id] = {
-                    'offer': offer,
-                    'total_discount': D('0.00')
-                }
+                offer_discounts[discount.offer_id] = {'offer': offer, 'total_discount': D('0.00')}
             offer_discounts[discount.offer_id]['total_discount'] \
                 += discount.amount
 

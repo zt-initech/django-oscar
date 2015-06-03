@@ -11,8 +11,7 @@ def get_parameters(parser, token):
 
     args = token.split_contents()
     if len(args) < 2:
-        raise template.TemplateSyntaxError(
-            "get_parameters tag takes at least 1 argument")
+        raise template.TemplateSyntaxError("get_parameters tag takes at least 1 argument")
     return GetParametersNode(args[1].strip())
 
 
@@ -20,6 +19,7 @@ class GetParametersNode(template.Node):
     """
     Renders current get parameters except for the specified parameter
     """
+
     def __init__(self, field):
         self.field = field
 
@@ -43,15 +43,14 @@ get_parameters = register.tag(get_parameters)
 
 @register.tag()
 def iffeature(parser, token):
-    nodelist = parser.parse(('endiffeature',))
+    nodelist = parser.parse(('endiffeature', ))
     try:
         tag_name, app_name, = token.split_contents()
     except ValueError:
         raise template.TemplateSyntaxError(
             "%r tag requires a single argument" % token.contents.split()[0])
     if not (app_name[0] == app_name[-1] and app_name[0] in ('"', "'")):
-        raise template.TemplateSyntaxError(
-            "%r tag's argument should be in quotes" % tag_name)
+        raise template.TemplateSyntaxError("%r tag's argument should be in quotes" % tag_name)
     parser.delete_first_token()
     return ConditionalOutputNode(nodelist, app_name[1:-1])
 

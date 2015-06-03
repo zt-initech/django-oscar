@@ -58,6 +58,7 @@ class AutoSlugField(SlugField):
     Inspired by SmileyChris' Unique Slugify snippet:
     http://www.djangosnippets.org/snippets/690/
     """
+
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('blank', True)
         kwargs.setdefault('editable', False)
@@ -107,6 +108,7 @@ class AutoSlugField(SlugField):
             # slugify the original field content and set next step to 2
             def slug_for_field(field):
                 return self.slugify_func(getattr(model_instance, field))
+
             slug = self.separator.join(map(slug_for_field, self._populate_from))  # NOQA
             next = 2
         else:

@@ -11,7 +11,8 @@ class OfferApplication(Application):
 
     def get_urls(self):
         urls = [
-            url(r'^$', self.list_view.as_view(), name='list'),
+            url(r'^$', self.list_view.as_view(),
+                name='list'),
             url(r'^(?P<slug>[\w-]+)/$', self.detail_view.as_view(),
                 name='detail'),
         ]

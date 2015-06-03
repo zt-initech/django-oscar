@@ -1,0 +1,5 @@
+[style]
+# YAPF uses the chromium style
+based_on_style = pep8
+column_limit=99
+

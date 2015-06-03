@@ -14,8 +14,7 @@ class OfferListView(ListView):
     template_name = 'offer/list.html'
 
     def get_queryset(self):
-        return ConditionalOffer.active.filter(
-            offer_type=ConditionalOffer.SITE)
+        return ConditionalOffer.active.filter(offer_type=ConditionalOffer.SITE)
 
 
 class OfferDetailView(ListView):
@@ -25,8 +24,7 @@ class OfferDetailView(ListView):
 
     def get(self, request, *args, **kwargs):
         try:
-            self.offer = ConditionalOffer.objects.select_related().get(
-                slug=self.kwargs['slug'])
+            self.offer = ConditionalOffer.objects.select_related().get(slug=self.kwargs['slug'])
         except ConditionalOffer.DoesNotExist:
             raise http.Http404
         return super(OfferDetailView, self).get(request, *args, **kwargs)
@@ -34,8 +32,7 @@ class OfferDetailView(ListView):
     def get_context_data(self, **kwargs):
         ctx = super(OfferDetailView, self).get_context_data(**kwargs)
         ctx['offer'] = self.offer
-        ctx['upsell_message'] = self.offer.get_upsell_message(
-            self.request.basket)
+        ctx['upsell_message'] = self.offer.get_upsell_message(self.request.basket)
         return ctx
 
     def get_queryset(self):
@@ -47,10 +44,8 @@ class RangeDetailView(ListView):
     context_object_name = 'products'
 
     def dispatch(self, request, *args, **kwargs):
-        self.range = get_object_or_404(
-            Range, slug=kwargs['slug'], is_public=True)
-        return super(RangeDetailView, self).dispatch(
-            request, *args, **kwargs)
+        self.range = get_object_or_404(Range, slug=kwargs['slug'], is_public=True)
+        return super(RangeDetailView, self).dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
         products = self.range.included_products.all()

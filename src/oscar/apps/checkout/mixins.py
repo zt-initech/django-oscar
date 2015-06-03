@@ -76,14 +76,11 @@ class OrderPlacementMixin(CheckoutSessionMixin):
         """
         Record a payment event for creation once the order is placed
         """
-        event_type, __ = PaymentEventType.objects.get_or_create(
-            name=event_type_name)
+        event_type, __ = PaymentEventType.objects.get_or_create(name=event_type_name)
         # We keep a local cache of (unsaved) payment events
         if self._payment_events is None:
             self._payment_events = []
-        event = PaymentEvent(
-            event_type=event_type, amount=amount,
-            reference=reference)
+        event = PaymentEvent(event_type=event_type, amount=amount, reference=reference)
         self._payment_events.append(event)
 
     # Placing order methods
@@ -95,10 +92,8 @@ class OrderPlacementMixin(CheckoutSessionMixin):
         """
         return OrderNumberGenerator().order_number(basket)
 
-    def handle_order_placement(self, order_number, user, basket,
-                               shipping_address, shipping_method,
-                               shipping_charge, billing_address, order_total,
-                               **kwargs):
+    def handle_order_placement(self, order_number, user, basket, shipping_address, shipping_method,
+                               shipping_charge, billing_address, order_total, **kwargs):
         """
         Write out the order models and return the appropriate HTTP response
 
@@ -107,15 +102,19 @@ class OrderPlacementMixin(CheckoutSessionMixin):
         can happen when a basket gets frozen.
         """
         order = self.place_order(
-            order_number=order_number, user=user, basket=basket,
-            shipping_address=shipping_address, shipping_method=shipping_method,
-            shipping_charge=shipping_charge, order_total=order_total,
+            order_number=order_number,
+            user=user,
+            basket=basket,
+            shipping_address=shipping_address,
+            shipping_method=shipping_method,
+            shipping_charge=shipping_charge,
+            order_total=order_total,
             billing_address=billing_address, **kwargs)
         basket.submit()
         return self.handle_successful_order(order)
 
-    def place_order(self, order_number, user, basket, shipping_address,
-                    shipping_method, shipping_charge, order_total,
+    def place_order(self, order_number, user, basket, shipping_address, shipping_method,
+                    shipping_charge, order_total,
                     billing_address=None, **kwargs):
         """
         Writes the order out to the DB including the payment models
@@ -126,8 +125,7 @@ class OrderPlacementMixin(CheckoutSessionMixin):
 
         # We pass the kwargs as they often include the billing address form
         # which will be needed to save a billing address.
-        billing_address = self.create_billing_address(
-            billing_address, shipping_address, **kwargs)
+        billing_address = self.create_billing_address(billing_address, shipping_address, **kwargs)
 
         if 'status' not in kwargs:
             status = self.get_initial_order_status(basket)
@@ -168,8 +166,7 @@ class OrderPlacementMixin(CheckoutSessionMixin):
         Update the user's address book based on the new shipping address
         """
         try:
-            user_addr = user.addresses.get(
-                hash=shipping_addr.generate_hash())
+            user_addr = user.addresses.get(hash=shipping_addr.generate_hash())
         except ObjectDoesNotExist:
             # Create a new user address
             user_addr = UserAddress(user=user)
@@ -177,8 +174,7 @@ class OrderPlacementMixin(CheckoutSessionMixin):
         user_addr.num_orders += 1
         user_addr.save()
 
-    def create_billing_address(self, billing_address=None,
-                               shipping_address=None, **kwargs):
+    def create_billing_address(self, billing_address=None, shipping_address=None, **kwargs):
         """
         Saves any relevant billing data (eg a billing address).
         """
@@ -205,8 +201,7 @@ class OrderPlacementMixin(CheckoutSessionMixin):
             event.save()
         # We assume all lines are involved in the initial payment event
         for line in order.lines.all():
-            PaymentEventQuantity.objects.create(
-                event=event, line=line, quantity=line.quantity)
+            PaymentEventQuantity.objects.create(event=event, line=line, quantity=line.quantity)
 
     def save_payment_sources(self, order):
         """
@@ -250,8 +245,11 @@ class OrderPlacementMixin(CheckoutSessionMixin):
 
     def send_signal(self, request, response, order):
         self.view_signal.send(
-            sender=self, order=order, user=request.user,
-            request=request, response=response)
+            sender=self,
+            order=order,
+            user=request.user,
+            request=request,
+            response=response)
 
     def get_success_url(self):
         return reverse('checkout:thank-you')
@@ -273,11 +271,9 @@ class OrderPlacementMixin(CheckoutSessionMixin):
         if messages and messages['body']:
             logger.info("Order #%s - sending %s messages", order.number, code)
             dispatcher = Dispatcher(logger)
-            dispatcher.dispatch_order_messages(order, messages,
-                                               event_type, **kwargs)
+            dispatcher.dispatch_order_messages(order, messages, event_type, **kwargs)
         else:
-            logger.warning("Order #%s - no %s communication event type",
-                           order.number, code)
+            logger.warning("Order #%s - no %s communication event type", order.number, code)
 
     def get_message_context(self, order):
         ctx = {
@@ -292,8 +288,10 @@ class OrderPlacementMixin(CheckoutSessionMixin):
             # ctx.
             try:
                 path = reverse('customer:anon-order',
-                               kwargs={'order_number': order.number,
-                                       'hash': order.verification_hash()})
+                               kwargs={
+                                   'order_number': order.number,
+                                   'hash': order.verification_hash()
+                               })
             except NoReverseMatch:
                 # We don't care that much if we can't resolve the URL
                 pass

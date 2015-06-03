@@ -18,11 +18,14 @@ class Command(BaseCommand):
     help = "Check unconfirmed alerts and clean them up"
 
     option_list = BaseCommand.option_list + (
-        make_option('--days', dest='days', default=0,
+        make_option('--days',
+                    dest='days',
+                    default=0,
                     help='cleanup alerts older then DAYS from now.'),
-        make_option('--hours', dest='hours', default=0,
-                    help='cleanup alerts older then HOURS from now.'),
-    )
+        make_option('--hours',
+                    dest='hours',
+                    default=0,
+                    help='cleanup alerts older then HOURS from now.'), )
 
     def handle(self, *args, **options):
         """
@@ -32,8 +35,7 @@ class Command(BaseCommand):
         threshold date will be removed assuming that the emails
         are wrong or the customer changed their mind.
         """
-        delta = timedelta(days=int(options['days']),
-                          hours=int(options['hours']))
+        delta = timedelta(days=int(options['days']), hours=int(options['hours']))
         if not delta:
             delta = timedelta(hours=24)
 
@@ -44,7 +46,6 @@ class Command(BaseCommand):
 
         qs = ProductAlert.objects.filter(
             status=ProductAlert.UNCONFIRMED,
-            date_created__lt=threshold_date
-        )
+            date_created__lt=threshold_date)
         logger.info("Found %d stale alerts to delete", qs.count())
         qs.delete()

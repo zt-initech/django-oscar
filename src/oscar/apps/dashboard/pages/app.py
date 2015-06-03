@@ -18,12 +18,12 @@ class FlatPageManagementApplication(Application):
         Get URL patterns defined for flatpage management application.
         """
         urls = [
-            url(r'^$', self.list_view.as_view(), name='page-list'),
-            url(r'^create/$', self.create_view.as_view(), name='page-create'),
-            url(r'^update/(?P<pk>[-\w]+)/$',
-                self.update_view.as_view(), name='page-update'),
-            url(r'^delete/(?P<pk>\d+)/$',
-                self.delete_view.as_view(), name='page-delete')
+            url(r'^$', self.list_view.as_view(),
+                name='page-list'), url(r'^create/$', self.create_view.as_view(),
+                                       name='page-create'),
+            url(r'^update/(?P<pk>[-\w]+)/$', self.update_view.as_view(),
+                name='page-update'), url(r'^delete/(?P<pk>\d+)/$', self.delete_view.as_view(),
+                                         name='page-delete')
         ]
         return self.post_process_urls(urls)
 

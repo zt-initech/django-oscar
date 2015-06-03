@@ -22,7 +22,7 @@ class ReviewListView(BulkEditMixin, generic.ListView):
     form_class = forms.ProductReviewSearchForm
     review_form_class = forms.DashboardProductReviewForm
     paginate_by = 25
-    actions = ('update_selected_review_status',)
+    actions = ('update_selected_review_status', )
     checkbox_object_name = 'review'
     desc_template = _("%(main_filter)s %(date_filter)s %(status_filter)s"
                       "%(kw_filter)s %(name_filter)s")
@@ -48,14 +48,12 @@ class ReviewListView(BulkEditMixin, generic.ListView):
             # Add 24 hours to make search inclusive
             date_to = date_to + datetime.timedelta(days=1)
             queryset = queryset.filter(
-                date_created__gte=date_from
-            ).filter(
-                date_created__lt=date_to
-            )
+                date_created__gte=date_from).filter(
+                    date_created__lt=date_to)
             self.desc_ctx['date_filter'] \
                 = _(" created between %(start_date)s and %(end_date)s") % {
-                    'start_date': format_datetime(date_from),
-                    'end_date': format_datetime(date_to)}
+                'start_date': format_datetime(date_from),
+                'end_date': format_datetime(date_to)}
         elif date_from:
             queryset = queryset.filter(date_created__gte=date_from)
             self.desc_ctx['date_filter'] \
@@ -71,8 +69,7 @@ class ReviewListView(BulkEditMixin, generic.ListView):
 
     def get_queryset(self):
         queryset = self.model.objects.all()
-        queryset = sort_queryset(queryset, self.request,
-                                 ['score', 'total_votes', 'date_created'])
+        queryset = sort_queryset(queryset, self.request, ['score', 'total_votes', 'date_created'])
         self.desc_ctx = {
             'main_filter': _('All reviews'),
             'date_filter': '',
@@ -99,13 +96,11 @@ class ReviewListView(BulkEditMixin, generic.ListView):
         if data['keyword']:
             queryset = queryset.filter(
                 Q(title__icontains=data['keyword']) |
-                Q(body__icontains=data['keyword'])
-            ).distinct()
+                Q(body__icontains=data['keyword'])).distinct()
             self.desc_ctx['kw_filter'] \
                 = _(" with keyword matching '%s'") % data['keyword']
 
-        queryset = self.get_date_from_to_queryset(data['date_from'],
-                                                  data['date_to'], queryset)
+        queryset = self.get_date_from_to_queryset(data['date_from'], data['date_to'], queryset)
 
         if data['name']:
             # If the value is two words, then assume they are first name and
@@ -114,13 +109,11 @@ class ReviewListView(BulkEditMixin, generic.ListView):
             if len(parts) >= 2:
                 queryset = queryset.filter(
                     user__first_name__istartswith=parts[0],
-                    user__last_name__istartswith=parts[1]
-                ).distinct()
+                    user__last_name__istartswith=parts[1]).distinct()
             else:
                 queryset = queryset.filter(
                     Q(user__first_name__istartswith=parts[0]) |
-                    Q(user__last_name__istartswith=parts[-1])
-                ).distinct()
+                    Q(user__last_name__istartswith=parts[-1])).distinct()
             self.desc_ctx['name_filter'] \
                 = _(" with customer name matching '%s'") % data['name']
 

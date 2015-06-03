@@ -15,7 +15,7 @@ class Repository(object):
     # We default to just free shipping. Customise this class and override this
     # property to add your own shipping methods. This should be a list of
     # instantiated shipping methods.
-    methods = (shipping_methods.Free(),)
+    methods = (shipping_methods.Free(), )
 
     # API
 
@@ -30,30 +30,27 @@ class Repository(object):
             return [shipping_methods.NoShippingRequired()]
 
         methods = self.get_available_shipping_methods(
-            basket=basket, shipping_addr=shipping_addr, **kwargs)
+            basket=basket,
+            shipping_addr=shipping_addr, **kwargs)
         if basket.has_shipping_discounts:
             methods = self.apply_shipping_offers(basket, methods)
         return methods
 
-    def get_default_shipping_method(self, basket, shipping_addr=None,
-                                    **kwargs):
+    def get_default_shipping_method(self, basket, shipping_addr=None, **kwargs):
         """
         Return a 'default' shipping method to show on the basket page to give
         the customer an indication of what their order will cost.
         """
-        shipping_methods = self.get_shipping_methods(
-            basket, shipping_addr=shipping_addr, **kwargs)
+        shipping_methods = self.get_shipping_methods(basket, shipping_addr=shipping_addr, **kwargs)
         if len(shipping_methods) == 0:
-            raise ImproperlyConfigured(
-                _("You need to define some shipping methods"))
+            raise ImproperlyConfigured(_("You need to define some shipping methods"))
 
         # Assume first returned method is default
         return shipping_methods[0]
 
     # Helpers
 
-    def get_available_shipping_methods(
-            self, basket, shipping_addr=None, **kwargs):
+    def get_available_shipping_methods(self, basket, shipping_addr=None, **kwargs):
         """
         Return a list of all applicable shipping method instances for a given
         basket, address etc. This method is intended to be overridden.
@@ -66,8 +63,7 @@ class Repository(object):
         """
         # We default to only applying the first shipping discount.
         offer = basket.shipping_discounts[0]['offer']
-        return [self.apply_shipping_offer(basket, method, offer)
-                for method in methods]
+        return [self.apply_shipping_offer(basket, method, offer) for method in methods]
 
     def apply_shipping_offer(self, basket, method, offer):
         """
@@ -83,11 +79,9 @@ class Repository(object):
             return method
 
         if charge.is_tax_known:
-            return shipping_methods.TaxInclusiveOfferDiscount(
-                method, offer)
+            return shipping_methods.TaxInclusiveOfferDiscount(method, offer)
         else:
             # When returning a tax exclusive discount, it is assumed
             # that this will be used to calculate taxes which will then
             # be assigned directly to the method instance.
-            return shipping_methods.TaxExclusiveOfferDiscount(
-                method, offer)
+            return shipping_methods.TaxExclusiveOfferDiscount(method, offer)

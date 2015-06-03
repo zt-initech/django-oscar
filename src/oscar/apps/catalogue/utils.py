@@ -13,7 +13,8 @@ from django.utils.translation import ugettext_lazy as _
 
 from oscar.core.loading import get_model
 from oscar.apps.catalogue.exceptions import (
-    ImageImportError, IdenticalImageError, InvalidImageArchive)
+    ImageImportError, IdenticalImageError, InvalidImageArchive
+)
 
 Category = get_model('catalogue', 'category')
 Product = get_model('catalogue', 'product')
@@ -32,10 +33,7 @@ class Importer(object):
 
     @atomic  # noqa (too complex (10))
     def handle(self, dirname):
-        stats = {
-            'num_processed': 0,
-            'num_skipped': 0,
-            'num_invalid': 0}
+        stats = {'num_processed': 0, 'num_skipped': 0, 'num_invalid': 0}
         image_dir, filenames = self._get_image_files(dirname)
         if image_dir:
             for filename in filenames:
@@ -46,31 +44,27 @@ class Importer(object):
                     stats['num_processed'] += 1
                 except Product.MultipleObjectsReturned:
                     self.logger.warning("Multiple products matching %s='%s',"
-                                        " skipping"
-                                        % (self._field, lookup_value))
+                                        " skipping" % (self._field, lookup_value))
                     stats['num_skipped'] += 1
                 except Product.DoesNotExist:
-                    self.logger.warning("No item matching %s='%s'"
-                                        % (self._field, lookup_value))
+                    self.logger.warning("No item matching %s='%s'" % (self._field, lookup_value))
                     stats['num_skipped'] += 1
                 except IdenticalImageError:
                     self.logger.warning("Identical image already exists for"
-                                        " %s='%s', skipping"
-                                        % (self._field, lookup_value))
+                                        " %s='%s', skipping" % (self._field, lookup_value))
                     stats['num_skipped'] += 1
                 except IOError as e:
                     stats['num_invalid'] += 1
                     raise ImageImportError(_('%(filename)s is not a valid'
-                                             ' image (%(error)s)')
-                                           % {'filename': filename,
-                                              'error': e})
+                                             ' image (%(error)s)') %
+                                           {'filename': filename,
+                                            'error': e})
                 except FieldError as e:
                     raise ImageImportError(e)
             if image_dir != dirname:
                 shutil.rmtree(image_dir)
         else:
-            raise InvalidImageArchive(_('%s is not a valid image archive')
-                                      % dirname)
+            raise InvalidImageArchive(_('%s is not a valid image archive') % dirname)
         self.logger.info("Finished image import: %(num_processed)d imported,"
                          " %(num_skipped)d skipped" % stats)
 

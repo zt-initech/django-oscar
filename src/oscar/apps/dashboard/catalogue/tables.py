@@ -14,7 +14,8 @@ class ProductTable(DashboardTable):
     title = TemplateColumn(
         verbose_name=_('Title'),
         template_name='dashboard/catalogue/product_row_title.html',
-        order_by='title', accessor=A('title'))
+        order_by='title',
+        accessor=A('title'))
     image = TemplateColumn(
         verbose_name=_('Image'),
         template_name='dashboard/catalogue/product_row_image.html',
@@ -26,8 +27,7 @@ class ProductTable(DashboardTable):
     variants = TemplateColumn(
         verbose_name=_("Variants"),
         template_name='dashboard/catalogue/product_row_variants.html',
-        orderable=False
-    )
+        orderable=False)
     stock_records = TemplateColumn(
         verbose_name=_('Stock records'),
         template_name='dashboard/catalogue/product_row_stockrecords.html',
@@ -42,8 +42,8 @@ class ProductTable(DashboardTable):
     class Meta(DashboardTable.Meta):
         model = Product
         fields = ('upc', 'date_updated')
-        sequence = ('title', 'upc', 'image', 'product_class', 'variants',
-                    'stock_records', '...', 'date_updated', 'actions')
+        sequence = ('title', 'upc', 'image', 'product_class', 'variants', 'stock_records', '...',
+                    'date_updated', 'actions')
         order_by = '-date_updated'
 
 
@@ -51,11 +51,12 @@ class CategoryTable(DashboardTable):
     name = LinkColumn('dashboard:catalogue-category-update', args=[A('pk')])
     description = TemplateColumn(
         template_code='{{ record.description|default:""|striptags'
-                      '|cut:"&nbsp;"|truncatewords:6 }}')
+        '|cut:"&nbsp;"|truncatewords:6 }}')
     # mark_safe is needed because of
     # https://github.com/bradleyayers/django-tables2/issues/187
     num_children = LinkColumn(
-        'dashboard:catalogue-category-detail-list', args=[A('pk')],
+        'dashboard:catalogue-category-detail-list',
+        args=[A('pk')],
         verbose_name=mark_safe(_('Number of child categories')),
         accessor='get_num_children',
         orderable=False)

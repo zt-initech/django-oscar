@@ -26,8 +26,10 @@ class FacetedSearchView(views.FacetedSearchView):
 
         # Raise a signal for other apps to hook into for analytics
         self.search_signal.send(
-            sender=self, session=self.request.session,
-            user=self.request.user, query=self.query)
+            sender=self,
+            session=self.request.session,
+            user=self.request.user,
+            query=self.query)
 
         return response
 
@@ -48,12 +50,10 @@ class FacetedSearchView(views.FacetedSearchView):
         # Convert facet data into a more useful data structure
         if 'fields' in extra['facets']:
             munger = FacetMunger(
-                self.request.get_full_path(),
-                self.form.selected_multi_facets,
+                self.request.get_full_path(), self.form.selected_multi_facets,
                 self.results.facet_counts())
             extra['facet_data'] = munger.facet_data()
-            has_facets = any([len(data['results']) for
-                              data in extra['facet_data'].values()])
+            has_facets = any([len(data['results']) for data in extra['facet_data'].values()])
             extra['has_facets'] = has_facets
 
         # Pass list of selected facets so they can be included in the sorting

@@ -7,8 +7,7 @@ from django.apps.config import MODELS_MODULE_NAME
 from django.conf import settings
 from django.core.exceptions import AppRegistryNotReady
 
-from oscar.core.exceptions import (ModuleNotFoundError, ClassNotFoundError,
-                                   AppNotFoundError)
+from oscar.core.exceptions import (ModuleNotFoundError, ClassNotFoundError, AppNotFoundError)
 
 
 def get_class(module_label, classname):
@@ -77,8 +76,7 @@ def get_classes(module_label, classnames):
         # get_class('shipping', 'Scale'). That should be easy to fix,
         # but @maikhoepfel had a stab and could not get it working reliably.
         # Overridable classes in a __init__.py might not be a good idea anyway.
-        raise ValueError(
-            "Importing from top-level modules is not supported")
+        raise ValueError("Importing from top-level modules is not supported")
 
     # import from Oscar package (should succeed in most cases)
     # e.g. 'oscar.apps.dashboard.catalogue.forms'
@@ -105,8 +103,7 @@ def get_classes(module_label, classnames):
         raise ModuleNotFoundError(
             "The module with label '%s' could not be imported. This either"
             "means that it indeed does not exist, or you might have a problem"
-            " with a circular import." % module_label
-        )
+            " with a circular import." % module_label)
 
     # return imported classes, giving preference to ones from the local package
     return _pluck_classes([local_module, oscar_module], classnames)
@@ -154,7 +151,8 @@ def _pluck_classes(modules, classnames):
         if not klass:
             packages = [m.__name__ for m in modules if m is not None]
             raise ClassNotFoundError("No class '%s' found in %s" % (
-                classname, ", ".join(packages)))
+                classname, ", ".join(packages)
+            ))
         klasses.append(klass)
     return klasses
 
@@ -187,14 +185,12 @@ def _find_installed_apps_entry(module_label):
     modules = module_label.split('.')
     # if module_label is 'dashboard.catalogue.forms.widgets', combinations
     # will be ['dashboard.catalogue.forms', 'dashboard.catalogue', 'dashboard']
-    combinations = [
-        '.'.join(modules[:-count]) for count in range(1, len(modules))]
+    combinations = ['.'.join(modules[:-count]) for count in range(1, len(modules))]
     for app_name in combinations:
         entry = _get_installed_apps_entry(app_name)
         if entry:
             return entry, app_name
-    raise AppNotFoundError(
-        "Couldn't find an app to import %s from" % module_label)
+    raise AppNotFoundError("Couldn't find an app to import %s from" % module_label)
 
 
 def get_profile_class():
@@ -217,8 +213,7 @@ def feature_hidden(feature_name):
     """
     Test if a certain Oscar feature is disabled.
     """
-    return (feature_name is not None and
-            feature_name in settings.OSCAR_HIDDEN_FEATURES)
+    return (feature_name is not None and feature_name in settings.OSCAR_HIDDEN_FEATURES)
 
 
 def get_model(app_label, model_name):

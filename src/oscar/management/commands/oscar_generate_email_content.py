@@ -20,11 +20,8 @@ class Command(BaseCommand):
         except Order.DoesNotExist:
             raise CommandError("No order found with number %s" % args[1])
 
-        ctx = {
-            'order': order,
-            'lines': order.lines.all(),
-        }
-        messages = CommunicationEventType.objects.get_and_render(
-            args[0], ctx)
+        ctx = {'order': order, 'lines': order.lines.all(), }
+        messages = CommunicationEventType.objects.get_and_render(args[0], ctx)
         print("Subject: %s\nBody:\n\n%s\nBody HTML:\n\n%s" % (
-            messages['subject'], messages['body'], messages['html']))
+            messages['subject'], messages['body'], messages['html']
+        ))

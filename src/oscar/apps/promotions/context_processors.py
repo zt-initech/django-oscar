@@ -12,9 +12,7 @@ def promotions(request):
 
     # Split the promotions into separate lists for each position, and add them
     # to the template bindings
-    context = {
-        'url_path': request.path
-    }
+    context = {'url_path': request.path}
     split_by_position(promotions, context)
 
     return context

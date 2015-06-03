@@ -48,17 +48,14 @@ class RegisterUserMixin(object):
 
         # Raise signal robustly (we don't want exceptions to crash the request
         # handling).
-        user_registered.send_robust(
-            sender=self, request=self.request, user=user)
+        user_registered.send_robust(sender=self, request=self.request, user=user)
 
         if getattr(settings, 'OSCAR_SEND_REGISTRATION_EMAIL', True):
             self.send_registration_email(user)
 
         # We have to authenticate before login
         try:
-            user = authenticate(
-                username=user.email,
-                password=form.cleaned_data['password1'])
+            user = authenticate(username=user.email, password=form.cleaned_data['password1'])
         except User.MultipleObjectsReturned:
             # Handle race condition where the registration request is made
             # multiple times in quick succession.  This leads to both requests
@@ -84,9 +81,7 @@ class RegisterUserMixin(object):
 
     def send_registration_email(self, user):
         code = self.communication_type_code
-        ctx = {'user': user,
-               'site': get_current_site(self.request)}
-        messages = CommunicationEventType.objects.get_and_render(
-            code, ctx)
+        ctx = {'user': user, 'site': get_current_site(self.request)}
+        messages = CommunicationEventType.objects.get_and_render(code, ctx)
         if messages and messages['body']:
             Dispatcher().dispatch_user_messages(user, messages)

@@ -23,8 +23,7 @@ class EventHandler(object):
     # Core API
     # --------
 
-    def handle_shipping_event(self, order, event_type, lines,
-                              line_quantities, **kwargs):
+    def handle_shipping_event(self, order, event_type, lines, line_quantities, **kwargs):
         """
         Handle a shipping event for a given order.
 
@@ -36,12 +35,11 @@ class EventHandler(object):
         specifics of you order processing pipeline.
         """
         # Example implementation
-        self.validate_shipping_event(
-            order, event_type, lines, line_quantities, **kwargs)
-        return self.create_shipping_event(
-            order, event_type, lines, line_quantities, **kwargs)
+        self.validate_shipping_event(order, event_type, lines, line_quantities, **kwargs)
+        return self.create_shipping_event(order, event_type, lines, line_quantities, **kwargs)
 
-    def handle_payment_event(self, order, event_type, amount, lines=None,
+    def handle_payment_event(self, order, event_type, amount,
+                             lines=None,
                              line_quantities=None, **kwargs):
         """
         Handle a payment event for a given order.
@@ -51,8 +49,7 @@ class EventHandler(object):
         refunds though where the payment event may be unrelated to a particular
         shipping event and doesn't directly correspond to a set of lines.
         """
-        self.validate_payment_event(
-            order, event_type, amount, lines, line_quantities, **kwargs)
+        self.validate_payment_event(order, event_type, amount, lines, line_quantities, **kwargs)
         return self.create_payment_event(
             order, event_type, amount, lines, line_quantities, **kwargs)
 
@@ -71,8 +68,7 @@ class EventHandler(object):
     # Validation methods
     # ------------------
 
-    def validate_shipping_event(self, order, event_type, lines,
-                                line_quantities, **kwargs):
+    def validate_shipping_event(self, order, event_type, lines, line_quantities, **kwargs):
         """
         Test if the requested shipping event is permitted.
 
@@ -90,8 +86,7 @@ class EventHandler(object):
         if errors:
             raise exceptions.InvalidShippingEvent(", ".join(errors))
 
-    def validate_payment_event(self, order, event_type, amount, lines,
-                               line_quantities, **kwargs):
+    def validate_payment_event(self, order, event_type, amount, lines, line_quantities, **kwargs):
         errors = []
         for line, qty in zip(lines, line_quantities):
             if not line.is_payment_event_permitted(event_type, qty):
@@ -105,8 +100,7 @@ class EventHandler(object):
     # -------------
     # These are to help determine the status of lines
 
-    def have_lines_passed_shipping_event(self, order, lines, line_quantities,
-                                         event_type):
+    def have_lines_passed_shipping_event(self, order, lines, line_quantities, event_type):
         """
         Test whether the passed lines and quantities have been through the
         specified shipping event.
@@ -122,8 +116,7 @@ class EventHandler(object):
     # Payment stuff
     # -------------
 
-    def calculate_payment_event_subtotal(self, event_type, lines,
-                                         line_quantities):
+    def calculate_payment_event_subtotal(self, event_type, lines, line_quantities):
         """
         Calculate the total charge for the passed event type, lines and line
         quantities.
@@ -163,8 +156,7 @@ class EventHandler(object):
                     # Need to account for some of this price instance and
                     # track how many we needed to skip and how many we settled
                     # for.
-                    qty_to_include = min(
-                        qty_to_consume - qty_consumed, qty_available)
+                    qty_to_include = min(qty_to_consume - qty_consumed, qty_available)
                     total += qty_to_include * price.price_incl_tax
                     # There can't be any left to skip if we've included some in
                     # our total
@@ -207,34 +199,32 @@ class EventHandler(object):
     # Model instance creation
     # -----------------------
 
-    def create_shipping_event(self, order, event_type, lines, line_quantities,
-                              **kwargs):
+    def create_shipping_event(self, order, event_type, lines, line_quantities, **kwargs):
         reference = kwargs.get('reference', '')
-        event = order.shipping_events.create(
-            event_type=event_type, notes=reference)
+        event = order.shipping_events.create(event_type=event_type, notes=reference)
         try:
             for line, quantity in zip(lines, line_quantities):
-                event.line_quantities.create(
-                    line=line, quantity=quantity)
+                event.line_quantities.create(line=line, quantity=quantity)
         except exceptions.InvalidShippingEvent:
             event.delete()
             raise
         return event
 
-    def create_payment_event(self, order, event_type, amount, lines=None,
+    def create_payment_event(self, order, event_type, amount,
+                             lines=None,
                              line_quantities=None, **kwargs):
         reference = kwargs.get('reference', "")
         event = order.payment_events.create(
-            event_type=event_type, amount=amount, reference=reference)
+            event_type=event_type,
+            amount=amount,
+            reference=reference)
         if lines and line_quantities:
             for line, quantity in zip(lines, line_quantities):
-                event.line_quantities.create(
-                    line=line, quantity=quantity)
+                event.line_quantities.create(line=line, quantity=quantity)
         return event
 
     def create_communication_event(self, order, event_type):
         return order.communication_events.create(event_type=event_type)
 
     def create_note(self, order, message, note_type='System'):
-        return order.notes.create(
-            message=message, note_type=note_type, user=self.user)
+        return order.notes.create(message=message, note_type=note_type, user=self.user)

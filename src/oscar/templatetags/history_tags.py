@@ -13,16 +13,14 @@ Site = get_model('sites', 'Site')
 register = template.Library()
 
 
-@register.inclusion_tag('customer/history/recently_viewed_products.html',
-                        takes_context=True)
+@register.inclusion_tag('customer/history/recently_viewed_products.html', takes_context=True)
 def recently_viewed_products(context):
     """
     Inclusion tag listing the most recently viewed products
     """
     request = context['request']
     products = history.get(request)
-    return {'products': products,
-            'request': request}
+    return {'products': products, 'request': request}
 
 
 @register.assignment_tag(takes_context=True)  # noqa (too complex (11))
@@ -58,9 +56,7 @@ def get_back_button(context):
         return None
 
     # This dict can be extended to link back to other browsing pages
-    titles = {
-        'search:search': _('Back to search results'),
-    }
+    titles = {'search:search': _('Back to search results'), }
     title = titles.get(match.view_name, None)
 
     if title is None:

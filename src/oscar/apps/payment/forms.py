@@ -20,11 +20,10 @@ VALID_CARDS = set([card_type[0] for card_type in bankcards.CARD_TYPES])
 
 
 class BankcardNumberField(forms.CharField):
-
     def __init__(self, *args, **kwargs):
         _kwargs = {
             'max_length': 20,
-            'widget': forms.TextInput(attrs={'autocomplete': 'off'}),
+            'widget': forms.TextInput(attrs = {'autocomplete': 'off'}),
             'label': _("Card number")
         }
         if 'types' in kwargs:
@@ -46,14 +45,12 @@ class BankcardNumberField(forms.CharField):
         value = non_decimal.sub('', value.strip())
 
         if value and not bankcards.luhn(value):
-            raise forms.ValidationError(
-                _("Please enter a valid credit card number."))
+            raise forms.ValidationError(_("Please enter a valid credit card number."))
 
         if hasattr(self, 'accepted_cards'):
             card_type = bankcards.bankcard_type(value)
             if card_type not in self.accepted_cards:
-                raise forms.ValidationError(
-                    _("%s cards are not accepted." % card_type))
+                raise forms.ValidationError(_("%s cards are not accepted." % card_type))
 
         return super(BankcardNumberField, self).clean(value)
 
@@ -62,6 +59,7 @@ class BankcardMonthWidget(forms.MultiWidget):
     """
     Widget containing two select boxes for selecting the month and year
     """
+
     def decompress(self, value):
         return [value.month, value.year] if value else [None, None]
 
@@ -92,14 +90,12 @@ class BankcardMonthField(forms.MultiValueField):
         fields = (
             forms.ChoiceField(
                 choices=self.month_choices(),
-                error_messages={'invalid': errors['invalid_month']}),
-            forms.ChoiceField(
-                choices=self.year_choices(),
-                error_messages={'invalid': errors['invalid_year']}),
+                error_messages={'invalid': errors['invalid_month']}), forms.ChoiceField(
+                    choices=self.year_choices(),
+                    error_messages={'invalid': errors['invalid_year']}),
         )
         if 'widget' not in kwargs:
-            kwargs['widget'] = BankcardMonthWidget(
-                widgets=[fields[0].widget, fields[1].widget])
+            kwargs['widget'] = BankcardMonthWidget(widgets=[fields[0].widget, fields[1].widget])
         super(BankcardMonthField, self).__init__(fields, *args, **kwargs)
 
     def month_choices(self):
@@ -126,15 +122,12 @@ class BankcardExpiryMonthField(BankcardMonthField):
         return [("%.2d" % x, "%.2d" % x) for x in range(1, 13)]
 
     def year_choices(self):
-        return [(x, x) for x in range(
-            date.today().year,
-            date.today().year + self.num_years)]
+        return [(x, x) for x in range(date.today().year, date.today().year + self.num_years)]
 
     def clean(self, value):
         expiry_date = super(BankcardExpiryMonthField, self).clean(value)
         if date.today() > expiry_date:
-            raise forms.ValidationError(
-                _("The expiration date you entered is in the past."))
+            raise forms.ValidationError(_("The expiration date you entered is in the past."))
         return expiry_date
 
     def compress(self, data_list):
@@ -154,12 +147,8 @@ class BankcardExpiryMonthField(BankcardMonthField):
 
 
 class BankcardStartingMonthField(BankcardMonthField):
-
     def __init__(self, *args, **kwargs):
-        _kwargs = {
-            'required': False,
-            'label': _("Valid from"),
-        }
+        _kwargs = {'required': False, 'label': _("Valid from"), }
         _kwargs.update(kwargs)
         super(BankcardStartingMonthField, self).__init__(*args, **_kwargs)
 
@@ -170,17 +159,14 @@ class BankcardStartingMonthField(BankcardMonthField):
 
     def year_choices(self):
         today = date.today()
-        years = [(x, x) for x in range(
-            today.year - self.num_years,
-            today.year + 1)]
+        years = [(x, x) for x in range(today.year - self.num_years, today.year + 1)]
         years.insert(0, ("", "--"))
         return years
 
     def clean(self, value):
         starting_date = super(BankcardMonthField, self).clean(value)
         if starting_date and date.today() < starting_date:
-            raise forms.ValidationError(
-                _("The starting date you entered is in the future."))
+            raise forms.ValidationError(_("The starting date you entered is in the future."))
         return starting_date
 
     def compress(self, data_list):
@@ -198,19 +184,17 @@ class BankcardStartingMonthField(BankcardMonthField):
 
 
 class BankcardCCVField(forms.RegexField):
-
     def __init__(self, *args, **kwargs):
         _kwargs = {
             'required': True,
             'label': _("CCV number"),
-            'widget': forms.TextInput(attrs={'size': '5'}),
+            'widget': forms.TextInput(attrs = {'size': '5'}),
             'error_message': _("Please enter a 3 or 4 digit number"),
             'help_text': _("This is the 3 or 4 digit security number "
                            "on the back of your bankcard")
         }
         _kwargs.update(kwargs)
-        super(BankcardCCVField, self).__init__(
-            r'^\d{3,4}$', *args, **_kwargs)
+        super(BankcardCCVField, self).__init__(r'^\d{3,4}$', *args, **_kwargs)
 
     def clean(self, value):
         if value is not None:
@@ -263,7 +247,6 @@ class BankcardForm(forms.ModelForm):
 
 
 class BillingAddressForm(PhoneNumberMixin, AbstractAddressForm):
-
     def __init__(self, *args, **kwargs):
         super(BillingAddressForm, self).__init__(*args, **kwargs)
         self.set_country_queryset()
@@ -274,7 +257,14 @@ class BillingAddressForm(PhoneNumberMixin, AbstractAddressForm):
     class Meta:
         model = BillingAddress
         fields = [
-            'title', 'first_name', 'last_name',
-            'line1', 'line2', 'line3', 'line4',
-            'state', 'postcode', 'country',
+            'title',
+            'first_name',
+            'last_name',
+            'line1',
+            'line2',
+            'line3',
+            'line4',
+            'state',
+            'postcode',
+            'country',
         ]

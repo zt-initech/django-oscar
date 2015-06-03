@@ -16,8 +16,7 @@ Basket = get_model('basket', 'Basket')
 Free = get_class('shipping.methods', 'Free')
 Voucher = get_model('voucher', 'Voucher')
 OrderCreator = get_class('order.utils', 'OrderCreator')
-OrderTotalCalculator = get_class('checkout.calculators',
-                                 'OrderTotalCalculator')
+OrderTotalCalculator = get_class('checkout.calculators', 'OrderTotalCalculator')
 Partner = get_model('partner', 'Partner')
 StockRecord = get_model('partner', 'StockRecord')
 
@@ -28,8 +27,11 @@ ProductAttributeValue = get_model('catalogue', 'ProductAttributeValue')
 ProductImage = get_model('catalogue', 'ProductImage')
 
 
-def create_stockrecord(product=None, price_excl_tax=None, partner_sku=None,
-                       num_in_stock=None, partner_name=None,
+def create_stockrecord(product=None,
+                       price_excl_tax=None,
+                       partner_sku=None,
+                       num_in_stock=None,
+                       partner_name=None,
                        currency=settings.OSCAR_DEFAULT_CURRENCY,
                        partner_users=None):
     if product is None:
@@ -43,37 +45,40 @@ def create_stockrecord(product=None, price_excl_tax=None, partner_sku=None,
     if partner_sku is None:
         partner_sku = 'sku_%d_%d' % (product.id, random.randint(0, 10000))
     return product.stockrecords.create(
-        partner=partner, partner_sku=partner_sku,
+        partner=partner,
+        partner_sku=partner_sku,
         price_currency=currency,
-        price_excl_tax=price_excl_tax, num_in_stock=num_in_stock)
+        price_excl_tax=price_excl_tax,
+        num_in_stock=num_in_stock)
 
 
 def create_purchase_info(record):
     return strategy.PurchaseInfo(
         price=prices.FixedPrice(
-            record.price_currency,
-            record.price_excl_tax,
-            D('0.00')  # Default to no tax
+            record.price_currency, record.price_excl_tax, D('0.00')  # Default to no tax
         ),
         availability=availability.StockRequired(
             record.net_stock_level),
-        stockrecord=record
-    )
+        stockrecord=record)
 
 
-def create_product(upc=None, title=u"Dùｍϻϒ title",
+def create_product(upc=None,
+                   title=u"Dùｍϻϒ title",
                    product_class=u"Dùｍϻϒ item class",
-                   partner_name=None, partner_sku=None, price=None,
-                   num_in_stock=None, attributes=None,
+                   partner_name=None,
+                   partner_sku=None,
+                   price=None,
+                   num_in_stock=None,
+                   attributes=None,
                    partner_users=None, **kwargs):
     """
     Helper method for creating products that are used in tests.
     """
-    product_class, __ = ProductClass._default_manager.get_or_create(
-        name=product_class)
+    product_class, __ = ProductClass._default_manager.get_or_create(name=product_class)
     product = product_class.products.model(
         product_class=product_class,
-        title=title, upc=upc, **kwargs)
+        title=title,
+        upc=upc, **kwargs)
     if kwargs.get('parent') and 'structure' not in kwargs:
         product.structure = 'child'
     if attributes:
@@ -84,12 +89,14 @@ def create_product(upc=None, title=u"Dùｍϻϒ title",
     product.save()
 
     # Shortcut for creating stockrecord
-    stockrecord_fields = [
-        price, partner_sku, partner_name, num_in_stock, partner_users]
+    stockrecord_fields = [price, partner_sku, partner_name, num_in_stock, partner_users]
     if any([field is not None for field in stockrecord_fields]):
         create_stockrecord(
-            product, price_excl_tax=price, num_in_stock=num_in_stock,
-            partner_users=partner_users, partner_sku=partner_sku,
+            product,
+            price_excl_tax=price,
+            num_in_stock=num_in_stock,
+            partner_users=partner_users,
+            partner_sku=partner_sku,
             partner_name=partner_name)
     return product
 
@@ -97,21 +104,21 @@ def create_product(upc=None, title=u"Dùｍϻϒ title",
 def create_product_image(product=None,
                          original=None,
                          caption='Dummy Caption',
-                         display_order=None,
-                         ):
+                         display_order=None, ):
     if not product:
         product = create_product()
     if not display_order:
         if not product.images.all():
             display_order = 0
         else:
-            display_order = max(
-                [i.display_order for i in product.images.all()]) + 1
+            display_order = max([i.display_order for i in product.images.all()]) + 1
 
-    kwargs = {'product_id': product.id,
-              'original': original,
-              'display_order': display_order,
-              'caption': caption, }
+    kwargs = {
+        'product_id': product.id,
+        'original': original,
+        'display_order': display_order,
+        'caption': caption,
+    }
 
     return ProductImage.objects.create(**kwargs)
 
@@ -126,8 +133,12 @@ def create_basket(empty=False):
     return basket
 
 
-def create_order(number=None, basket=None, user=None, shipping_address=None,
-                 shipping_method=None, billing_address=None,
+def create_order(number=None,
+                 basket=None,
+                 user=None,
+                 shipping_address=None,
+                 shipping_method=None,
+                 billing_address=None,
                  total=None, **kwargs):
     """
     Helper method for creating an order for testing
@@ -136,8 +147,7 @@ def create_order(number=None, basket=None, user=None, shipping_address=None,
         basket = Basket.objects.create()
         basket.strategy = strategy.Default()
         product = create_product()
-        create_stockrecord(
-            product, num_in_stock=10, price_excl_tax=D('10.00'))
+        create_stockrecord(product, num_in_stock=10, price_excl_tax=D('10.00'))
         basket.add_product(product)
     if not basket.id:
         basket.save()
@@ -154,27 +164,38 @@ def create_order(number=None, basket=None, user=None, shipping_address=None,
         shipping_method=shipping_method,
         shipping_charge=shipping_charge,
         billing_address=billing_address,
-        total=total,
-        **kwargs)
+        total=total, **kwargs)
     basket.set_as_submitted()
     return order
 
 
-def create_offer(name=u"Dùｍϻϒ offer", offer_type="Site",
-                 max_basket_applications=None, range=None, condition=None,
-                 benefit=None, priority=0, status=None, start=None, end=None):
+def create_offer(name=u"Dùｍϻϒ offer",
+                 offer_type="Site",
+                 max_basket_applications=None,
+                 range=None,
+                 condition=None,
+                 benefit=None,
+                 priority=0,
+                 status=None,
+                 start=None,
+                 end=None):
     """
     Helper method for creating an offer
     """
     if range is None:
         range, __ = models.Range.objects.get_or_create(
-            name=u"All products räñgë", includes_all_products=True)
+            name=u"All products räñgë",
+            includes_all_products=True)
     if condition is None:
         condition, __ = models.Condition.objects.get_or_create(
-            range=range, type=models.Condition.COUNT, value=1)
+            range=range,
+            type=models.Condition.COUNT,
+            value=1)
     if benefit is None:
         benefit, __ = models.Benefit.objects.get_or_create(
-            range=range, type=models.Benefit.PERCENTAGE, value=20)
+            range=range,
+            type=models.Benefit.PERCENTAGE,
+            value=20)
     if status is None:
         status = models.ConditionalOffer.OPEN
 

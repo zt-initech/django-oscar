@@ -23,14 +23,12 @@ from oscar.core.compat import get_user_model
 from oscar.core.phonenumber import PhoneNumber
 from oscar.core.utils import slugify
 
-__all__ = ["UserFactory", "CountryFactory", "UserAddressFactory",
-           "BasketFactory", "VoucherFactory", "ProductFactory",
-           "ProductClassFactory", "StockRecordFactory",
+__all__ = ["UserFactory", "CountryFactory", "UserAddressFactory", "BasketFactory",
+           "VoucherFactory", "ProductFactory", "ProductClassFactory", "StockRecordFactory",
            "ProductAttributeFactory", "ProductAttributeValueFactory",
-           "AttributeOptionGroupFactory",
-           "AttributeOptionFactory", "PartnerFactory",
-           "ProductCategoryFactory", "CategoryFactory", "RangeFactory",
-           "PermissionFactory", "OptionFactory", "BasketLineAttributeFactory"]
+           "AttributeOptionGroupFactory", "AttributeOptionFactory", "PartnerFactory",
+           "ProductCategoryFactory", "CategoryFactory", "RangeFactory", "PermissionFactory",
+           "OptionFactory", "BasketLineAttributeFactory"]
 
 Selector = get_class('partner.strategy', 'Selector')
 
@@ -55,7 +53,7 @@ class CountryFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = get_model('address', 'Country')
-        django_get_or_create = ('iso_3166_1_a2',)
+        django_get_or_create = ('iso_3166_1_a2', )
 
 
 class UserAddressFactory(factory.DjangoModelFactory):
@@ -242,7 +240,7 @@ class BillingAddressFactory(factory.DjangoModelFactory):
 class OrderFactory(factory.DjangoModelFactory):
     class Meta:
         model = get_model('order', 'Order')
-        exclude = ('basket',)
+        exclude = ('basket', )
 
     status = settings.OSCAR_INITIAL_ORDER_STATUS
     site_id = settings.SITE_ID
@@ -251,8 +249,7 @@ class OrderFactory(factory.DjangoModelFactory):
 
     shipping_code = 'delivery'
     shipping_incl_tax = D('4.95')
-    shipping_excl_tax = factory.LazyAttribute(
-        lambda o: tax_subtract(o.shipping_incl_tax))
+    shipping_excl_tax = factory.LazyAttribute(lambda o: tax_subtract(o.shipping_incl_tax))
 
     total_incl_tax = factory.LazyAttribute(lambda o: o.basket.total_incl_tax)
     total_excl_tax = factory.LazyAttribute(lambda o: o.basket.total_excl_tax)
@@ -260,9 +257,9 @@ class OrderFactory(factory.DjangoModelFactory):
     guest_email = factory.LazyAttribute(
         lambda o: (
             '%s.%s@example.com' % (
-                o.billing_address.first_name[0],
-                o.billing_address.last_name
-            )).lower())
+                o.billing_address.first_name[0], o.billing_address.last_name
+            )
+        ).lower())
 
     shipping_address = factory.SubFactory(ShippingAddressFactory)
     billing_address = factory.SubFactory(BillingAddressFactory)
@@ -270,8 +267,7 @@ class OrderFactory(factory.DjangoModelFactory):
     @classmethod
     def _create(cls, target_class, *args, **kwargs):
         date_placed = kwargs.pop('date_placed', None)
-        instance = super(OrderFactory, cls)._create(
-            target_class, *args, **kwargs)
+        instance = super(OrderFactory, cls)._create(target_class, *args, **kwargs)
 
         if date_placed:
             instance.date_placed = date_placed
@@ -282,8 +278,7 @@ class OrderLineFactory(factory.DjangoModelFactory):
     order = factory.SubFactory(OrderFactory)
     product = factory.SubFactory(ProductFactory)
     partner_sku = factory.LazyAttribute(lambda l: l.product.upc)
-    stockrecord = factory.LazyAttribute(
-        lambda l: l.product.stockrecords.first())
+    stockrecord = factory.LazyAttribute(lambda l: l.product.stockrecords.first())
     quantity = 1
 
     line_price_incl_tax = factory.LazyAttribute(
@@ -291,19 +286,14 @@ class OrderLineFactory(factory.DjangoModelFactory):
     line_price_excl_tax = factory.LazyAttribute(
         lambda obj: obj.stockrecord.price_excl_tax * obj.quantity)
 
-    line_price_before_discounts_incl_tax = (
-        factory.SelfAttribute('.line_price_incl_tax'))
-    line_price_before_discounts_excl_tax = (
-        factory.SelfAttribute('.line_price_excl_tax'))
+    line_price_before_discounts_incl_tax = (factory.SelfAttribute('.line_price_incl_tax'))
+    line_price_before_discounts_excl_tax = (factory.SelfAttribute('.line_price_excl_tax'))
 
     unit_price_incl_tax = factory.LazyAttribute(
         lambda obj: tax_add(obj.stockrecord.price_excl_tax))
-    unit_cost_price = factory.LazyAttribute(
-        lambda obj: obj.stockrecord.cost_price)
-    unit_price_excl_tax = factory.LazyAttribute(
-        lambda obj: obj.stockrecord.price_excl_tax)
-    unit_retail_price = factory.LazyAttribute(
-        lambda obj: obj.stockrecord.price_retail)
+    unit_cost_price = factory.LazyAttribute(lambda obj: obj.stockrecord.cost_price)
+    unit_price_excl_tax = factory.LazyAttribute(lambda obj: obj.stockrecord.price_excl_tax)
+    unit_retail_price = factory.LazyAttribute(lambda obj: obj.stockrecord.price_retail)
 
     class Meta:
         model = get_model('order', 'Line')

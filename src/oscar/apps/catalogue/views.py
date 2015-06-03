@@ -54,8 +54,7 @@ class ProductDetailView(DetailView):
 
     def redirect_if_necessary(self, current_path, product):
         if self.enforce_parent and product.is_child:
-            return HttpResponsePermanentRedirect(
-                product.parent.get_absolute_url())
+            return HttpResponsePermanentRedirect(product.parent.get_absolute_url())
 
         if self.enforce_paths:
             expected_path = product.get_absolute_url()
@@ -74,21 +73,24 @@ class ProductDetailView(DetailView):
         has_alert = False
         if self.request.user.is_authenticated():
             alerts = ProductAlert.objects.filter(
-                product=self.object, user=self.request.user,
+                product=self.object,
+                user=self.request.user,
                 status=ProductAlert.ACTIVE)
             has_alert = alerts.exists()
         return has_alert
 
     def get_alert_form(self):
-        return ProductAlertForm(
-            user=self.request.user, product=self.object)
+        return ProductAlertForm(user=self.request.user, product=self.object)
 
     def get_reviews(self):
         return self.object.reviews.filter(status=ProductReview.APPROVED)
 
     def send_signal(self, request, response, product):
         self.view_signal.send(
-            sender=self, product=product, user=request.user, request=request,
+            sender=self,
+            product=product,
+            user=request.user,
+            request=request,
             response=response)
 
     def get_template_names(self):
@@ -108,10 +110,11 @@ class ProductDetailView(DetailView):
 
         return [
             '%s/detail-for-upc-%s.html' % (
-                self.template_folder, self.object.upc),
-            '%s/detail-for-class-%s.html' % (
-                self.template_folder, self.object.get_product_class().slug),
-            '%s/detail.html' % (self.template_folder)]
+                self.template_folder, self.object.upc
+            ), '%s/detail-for-class-%s.html' % (
+                self.template_folder, self.object.get_product_class().slug
+            ), '%s/detail.html' % (self.template_folder)
+        ]
 
 
 class CatalogueView(TemplateView):
@@ -137,8 +140,7 @@ class CatalogueView(TemplateView):
     def get_context_data(self, **kwargs):
         ctx = {}
         ctx['summary'] = _("All products")
-        search_context = self.search_handler.get_search_context_data(
-            self.context_object_name)
+        search_context = self.search_handler.get_search_context_data(self.context_object_name)
         ctx.update(search_context)
         return ctx
 
@@ -154,8 +156,7 @@ class ProductCategoryView(TemplateView):
     def get(self, request, *args, **kwargs):
         # Fetch the category; return 404 or redirect as needed
         self.category = self.get_category()
-        potential_redirect = self.redirect_if_necessary(
-            request.path, self.category)
+        potential_redirect = self.redirect_if_necessary(request.path, self.category)
         if potential_redirect is not None:
             return potential_redirect
 
@@ -227,7 +228,6 @@ class ProductCategoryView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(ProductCategoryView, self).get_context_data(**kwargs)
         context['category'] = self.category
-        search_context = self.search_handler.get_search_context_data(
-            self.context_object_name)
+        search_context = self.search_handler.get_search_context_data(self.context_object_name)
         context.update(search_context)
         return context

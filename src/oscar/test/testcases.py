@@ -7,7 +7,6 @@ from purl import URL
 
 from oscar.core.compat import get_user_model
 
-
 User = get_user_model()
 
 
@@ -19,8 +18,7 @@ def add_permissions(user, permissions):
     """
     for permission in permissions:
         app_label, __, codename = permission.partition('.')
-        perm = Permission.objects.get(content_type__app_label=app_label,
-                                      codename=codename)
+        perm = Permission.objects.get(content_type__app_label=app_label, codename=codename)
         user.user_permissions.add(perm)
 
 
@@ -38,8 +36,7 @@ class WebTestCase(WebTest):
         self.user = None
 
         if not self.is_anonymous:
-            self.user = self.create_user(
-                self.username, self.email, self.password)
+            self.user = self.create_user(self.username, self.email, self.password)
             self.user.is_staff = self.is_staff
             add_permissions(self.user, self.permissions)
             self.user.save()
@@ -67,8 +64,7 @@ class WebTestCase(WebTest):
     # Custom assertions
 
     def assertIsRedirect(self, response, expected_url=None):
-        self.assertTrue(response.status_code in (
-            http_client.FOUND, http_client.MOVED_PERMANENTLY))
+        self.assertTrue(response.status_code in (http_client.FOUND, http_client.MOVED_PERMANENTLY))
         if expected_url:
             location = URL.from_string(response['Location'])
             self.assertEqual(expected_url, location.path())
@@ -85,17 +81,14 @@ class WebTestCase(WebTest):
 
     def assertNoAccess(self, response):
         self.assertContext(response)
-        self.assertTrue(response.status_code in (http_client.NOT_FOUND,
-                                                 http_client.FORBIDDEN))
+        self.assertTrue(response.status_code in (http_client.NOT_FOUND, http_client.FORBIDDEN))
 
     def assertIsOk(self, response):
         self.assertEqual(http_client.OK, response.status_code)
 
     def assertContext(self, response):
-        self.assertTrue(response.context is not None,
-                        'No context was returned')
+        self.assertTrue(response.context is not None, 'No context was returned')
 
     def assertInContext(self, response, key):
         self.assertContext(response)
-        self.assertTrue(key in response.context,
-                        "Context should contain a variable '%s'" % key)
+        self.assertTrue(key in response.context, "Context should contain a variable '%s'" % key)

@@ -10,6 +10,7 @@ def profile(fn):
     Inspired by
     https://speakerdeck.com/rwarren/a-brief-intro-to-profiling-in-python
     """
+
     def profiled_fn(*args, **kwargs):
         filepath = "/tmp/%s.profile" % fn.__name__
         prof = cProfile.Profile()
@@ -18,8 +19,7 @@ def profile(fn):
         result = prof.runcall(fn, *args, **kwargs)
         duration = time.time() - start
 
-        print("Function ran in %.6f seconds - output written to %s" % (
-            duration, filepath))
+        print("Function ran in %.6f seconds - output written to %s" % (duration, filepath))
         prof.dump_stats(filepath)
 
         print("Printing stats")
@@ -28,4 +28,5 @@ def profile(fn):
         stats.print_stats()
 
         return result
+
     return profiled_fn

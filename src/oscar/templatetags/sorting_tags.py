@@ -7,12 +7,8 @@ from django.conf import settings
 
 register = template.Library()
 
-DEFAULT_SORT_UP = getattr(
-    settings, 'DEFAULT_SORT_UP',
-    '<i class="icon-chevron-up"></i>')
-DEFAULT_SORT_DOWN = getattr(
-    settings, 'DEFAULT_SORT_DOWN',
-    '<i class="icon-chevron-down"></i>')
+DEFAULT_SORT_UP = getattr(settings, 'DEFAULT_SORT_UP', '<i class="icon-chevron-up"></i>')
+DEFAULT_SORT_DOWN = getattr(settings, 'DEFAULT_SORT_DOWN', '<i class="icon-chevron-down"></i>')
 
 sort_directions = {
     'asc': {'icon': DEFAULT_SORT_UP, 'inverse': 'desc'},
@@ -24,8 +20,7 @@ sort_directions = {
 def anchor(parser, token):
     bits = token.split_contents()
     if len(bits) < 2:
-        raise template.TemplateSyntaxError(
-            "anchor tag takes at least 1 argument")
+        raise template.TemplateSyntaxError("anchor tag takes at least 1 argument")
     try:
         title = bits[2]
     except IndexError:

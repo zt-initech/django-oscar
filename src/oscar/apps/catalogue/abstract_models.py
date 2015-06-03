@@ -45,13 +45,11 @@ class AbstractProductClass(models.Model):
     Not necessarily equivalent to top-level categories but usually will be.
     """
     name = models.CharField(_('Name'), max_length=128)
-    slug = AutoSlugField(_('Slug'), max_length=128, unique=True,
-                         populate_from='name')
+    slug = AutoSlugField(_('Slug'), max_length=128, unique=True, populate_from='name')
 
     #: Some product type don't require shipping (eg digital products) - we use
     #: this field to take some shortcuts in the checkout.
-    requires_shipping = models.BooleanField(_("Requires shipping?"),
-                                            default=True)
+    requires_shipping = models.BooleanField(_("Requires shipping?"), default=True)
 
     #: Digital products generally don't require their stock levels to be
     #: tracked.
@@ -61,8 +59,7 @@ class AbstractProductClass(models.Model):
     #: item class.  For instance, a product class of "SMS message" would always
     #: require a message to be specified before it could be bought.
     #: Note that you can also set options on a per-product level.
-    options = models.ManyToManyField(
-        'catalogue.Option', blank=True, verbose_name=_("Options"))
+    options = models.ManyToManyField('catalogue.Option', blank=True, verbose_name=_("Options"))
 
     class Meta:
         abstract = True
@@ -89,8 +86,11 @@ class AbstractCategory(MP_Node):
     """
     name = models.CharField(_('Name'), max_length=255, db_index=True)
     description = models.TextField(_('Description'), blank=True)
-    image = models.ImageField(_('Image'), upload_to='categories', blank=True,
-                              null=True, max_length=255)
+    image = models.ImageField(_('Image'),
+                              upload_to='categories',
+                              blank=True,
+                              null=True,
+                              max_length=255)
     slug = models.SlugField(_('Slug'), max_length=255, db_index=True)
 
     _slug_separator = '/'
@@ -198,7 +198,8 @@ class AbstractCategory(MP_Node):
         if not url:
             url = reverse(
                 'catalogue:category',
-                kwargs={'category_slug': self.full_slug, 'pk': self.pk})
+                kwargs={'category_slug': self.full_slug,
+                        'pk': self.pk})
             cache.set(cache_key, url)
         return url
 
@@ -222,8 +223,7 @@ class AbstractProductCategory(models.Model):
     Joining model between products and categories. Exists to allow customising.
     """
     product = models.ForeignKey('catalogue.Product', verbose_name=_("Product"))
-    category = models.ForeignKey('catalogue.Category',
-                                 verbose_name=_("Category"))
+    category = models.ForeignKey('catalogue.Category', verbose_name=_("Category"))
 
     class Meta:
         abstract = True
@@ -255,22 +255,29 @@ class AbstractProduct(models.Model):
     """
     STANDALONE, PARENT, CHILD = 'standalone', 'parent', 'child'
     STRUCTURE_CHOICES = (
-        (STANDALONE, _('Stand-alone product')),
-        (PARENT, _('Parent product')),
-        (CHILD, _('Child product'))
-    )
+        (STANDALONE, _('Stand-alone product')), (PARENT, _('Parent product')),
+        (CHILD, _('Child product')))
     structure = models.CharField(
-        _("Product structure"), max_length=10, choices=STRUCTURE_CHOICES,
+        _("Product structure"),
+        max_length=10,
+        choices=STRUCTURE_CHOICES,
         default=STANDALONE)
 
     upc = NullCharField(
-        _("UPC"), max_length=64, blank=True, null=True, unique=True,
+        _("UPC"),
+        max_length=64,
+        blank=True,
+        null=True,
+        unique=True,
         help_text=_("Universal Product Code (UPC) is an identifier for "
                     "a product which is not specific to a particular "
                     " supplier. Eg an ISBN for a book."))
 
     parent = models.ForeignKey(
-        'self', null=True, blank=True, related_name='children',
+        'self',
+        null=True,
+        blank=True,
+        related_name='children',
         verbose_name=_("Parent product"),
         help_text=_("Only choose a parent product if you're creating a child "
                     "product.  For example if this is a size "
@@ -279,16 +286,18 @@ class AbstractProduct(models.Model):
                     " this product)."))
 
     # Title is mandatory for canonical products but optional for child products
-    title = models.CharField(pgettext_lazy(u'Product title', u'Title'),
-                             max_length=255, blank=True)
+    title = models.CharField(pgettext_lazy(u'Product title', u'Title'), max_length=255, blank=True)
     slug = models.SlugField(_('Slug'), max_length=255, unique=False)
     description = models.TextField(_('Description'), blank=True)
 
     #: "Kind" of product, e.g. T-Shirt, Book, etc.
     #: None for child products, they inherit their parent's product class
     product_class = models.ForeignKey(
-        'catalogue.ProductClass', null=True, on_delete=models.PROTECT,
-        verbose_name=_('Product type'), related_name="products",
+        'catalogue.ProductClass',
+        null=True,
+        on_delete=models.PROTECT,
+        verbose_name=_('Product type'),
+        related_name="products",
         help_text=_("Choose what type of product this is"))
     attributes = models.ManyToManyField(
         'catalogue.ProductAttribute',
@@ -298,14 +307,18 @@ class AbstractProduct(models.Model):
                     "have, such as a size, as specified by its class"))
     #: It's possible to have options product class-wide, and per product.
     product_options = models.ManyToManyField(
-        'catalogue.Option', blank=True, verbose_name=_("Product options"),
+        'catalogue.Option',
+        blank=True,
+        verbose_name=_("Product options"),
         help_text=_("Options are values that can be associated with a item "
                     "when it is added to a customer's basket.  This could be "
                     "something like a personalised message to be printed on "
                     "a T-shirt."))
 
     recommended_products = models.ManyToManyField(
-        'catalogue.Product', through='ProductRecommendation', blank=True,
+        'catalogue.Product',
+        through='ProductRecommendation',
+        blank=True,
         verbose_name=_("Recommended products"),
         help_text=_("These are products that are recommended to accompany the "
                     "main product."))
@@ -317,11 +330,11 @@ class AbstractProduct(models.Model):
     date_created = models.DateTimeField(_("Date created"), auto_now_add=True)
 
     # This field is used by Haystack to reindex search
-    date_updated = models.DateTimeField(
-        _("Date updated"), auto_now=True, db_index=True)
+    date_updated = models.DateTimeField(_("Date updated"), auto_now=True, db_index=True)
 
     categories = models.ManyToManyField(
-        'catalogue.Category', through='ProductCategory',
+        'catalogue.Category',
+        through='ProductCategory',
         verbose_name=_("Categories"))
 
     #: Determines if a product may be used in an offer. It is illegal to
@@ -330,7 +343,9 @@ class AbstractProduct(models.Model):
     #: Note that this flag is ignored for child products; they inherit from
     #: the parent product.
     is_discountable = models.BooleanField(
-        _("Is discountable?"), default=True, help_text=_(
+        _("Is discountable?"),
+        default=True,
+        help_text=_(
             "This flag indicates if this product can be used in an offer "
             "or not"))
 
@@ -360,8 +375,7 @@ class AbstractProduct(models.Model):
         """
         Return a product's absolute url
         """
-        return reverse('catalogue:detail',
-                       kwargs={'product_slug': self.slug, 'pk': self.id})
+        return reverse('catalogue:detail', kwargs={'product_slug': self.slug, 'pk': self.id})
 
     def clean(self):
         """
@@ -412,18 +426,14 @@ class AbstractProduct(models.Model):
         if not self.parent_id:
             raise ValidationError(_("A child product needs a parent."))
         if self.parent_id and not self.parent.is_parent:
-            raise ValidationError(
-                _("You can only assign child products to parent products."))
+            raise ValidationError(_("You can only assign child products to parent products."))
         if self.product_class:
-            raise ValidationError(
-                _("A child product can't have a product class."))
+            raise ValidationError(_("A child product can't have a product class."))
         if self.pk and self.categories.exists():
-            raise ValidationError(
-                _("A child product can't have a category assigned."))
+            raise ValidationError(_("A child product can't have a category assigned."))
         # Note that we only forbid options on product level
         if self.pk and self.product_options.exists():
-            raise ValidationError(
-                _("A child product can't have options."))
+            raise ValidationError(_("A child product can't have options."))
 
     def _clean_parent(self):
         """
@@ -431,8 +441,7 @@ class AbstractProduct(models.Model):
         """
         self._clean_standalone()
         if self.has_stockrecords:
-            raise ValidationError(
-                _("A parent product can't have stockrecords."))
+            raise ValidationError(_("A parent product can't have stockrecords."))
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -462,9 +471,7 @@ class AbstractProduct(models.Model):
         if self.is_child:
             reason = _('The specified parent product is a child product.')
         if self.has_stockrecords:
-            reason = _(
-                "One can't add a child product to a product with stock"
-                " records.")
+            reason = _("One can't add a child product to a product with stock" " records.")
         is_valid = reason is None
         if give_reason:
             return is_valid, reason
@@ -547,8 +554,8 @@ class AbstractProduct(models.Model):
 
         children_stock = strategy.select_children_stockrecords(self)
         prices = [
-            strategy.pricing_policy(child, stockrecord)
-            for child, stockrecord in children_stock]
+            strategy.pricing_policy(child, stockrecord) for child, stockrecord in children_stock
+        ]
         raw_prices = sorted([getattr(price, prop) for price in prices])
         return raw_prices[0] if raw_prices else None
 
@@ -562,6 +569,7 @@ class AbstractProduct(models.Model):
         if not title and self.parent_id:
             title = self.parent.title
         return title
+
     get_title.short_description = pgettext_lazy(u"Product title", u"Title")
 
     def get_product_class(self):
@@ -572,6 +580,7 @@ class AbstractProduct(models.Model):
             return self.parent.product_class
         else:
             return self.product_class
+
     get_product_class.short_description = _("Product class")
 
     def get_is_discountable(self):
@@ -592,6 +601,7 @@ class AbstractProduct(models.Model):
             return self.parent.categories
         else:
             return self.categories
+
     get_categories.short_description = _("Categories")
 
     # Images
@@ -622,10 +632,7 @@ class AbstractProduct(models.Model):
             # We return a dict with fields that mirror the key properties of
             # the ProductImage class so this missing image can be used
             # interchangeably in templates.  Strategy pattern ftw!
-            return {
-                'original': self.get_missing_image(),
-                'caption': '',
-                'is_missing': True}
+            return {'original': self.get_missing_image(), 'caption': '', 'is_missing': True}
 
     # Updating methods
 
@@ -635,6 +642,7 @@ class AbstractProduct(models.Model):
         """
         self.rating = self.calculate_rating()
         self.save()
+
     update_rating.alters_data = True
 
     def calculate_rating(self):
@@ -642,9 +650,9 @@ class AbstractProduct(models.Model):
         Calculate rating value
         """
         result = self.reviews.filter(
-            status=self.reviews.model.APPROVED
-        ).aggregate(
-            sum=Sum('score'), count=Count('id'))
+            status=self.reviews.model.APPROVED).aggregate(
+                sum=Sum('score'),
+                count=Count('id'))
         reviews_sum = result['sum'] or 0
         reviews_count = result['count'] or 0
         rating = None
@@ -674,8 +682,7 @@ class AbstractProduct(models.Model):
 
     @cached_property
     def num_approved_reviews(self):
-        return self.reviews.filter(
-            status=self.reviews.model.APPROVED).count()
+        return self.reviews.filter(status=self.reviews.model.APPROVED).count()
 
 
 class AbstractProductRecommendation(models.Model):
@@ -683,12 +690,13 @@ class AbstractProductRecommendation(models.Model):
     'Through' model for product recommendations
     """
     primary = models.ForeignKey(
-        'catalogue.Product', related_name='primary_recommendations',
+        'catalogue.Product',
+        related_name='primary_recommendations',
         verbose_name=_("Primary product"))
-    recommendation = models.ForeignKey(
-        'catalogue.Product', verbose_name=_("Recommended product"))
+    recommendation = models.ForeignKey('catalogue.Product', verbose_name=_("Recommended product"))
     ranking = models.PositiveSmallIntegerField(
-        _('Ranking'), default=0,
+        _('Ranking'),
+        default=0,
         help_text=_('Determines order of the products. A product with a higher'
                     ' value will appear before one with a lower ranking.'))
 
@@ -727,7 +735,9 @@ class ProductAttributesContainer(object):
             return getattr(self, name)
         raise AttributeError(
             _("%(obj)s has no attribute named '%(attr)s'") % {
-                'obj': self.product.get_product_class(), 'attr': name})
+                'obj': self.product.get_product_class(),
+                'attr': name
+            })
 
     def validate_attributes(self):
         for attribute in self.get_all_attributes():
@@ -735,15 +745,14 @@ class ProductAttributesContainer(object):
             if value is None:
                 if attribute.required:
                     raise ValidationError(
-                        _("%(attr)s attribute cannot be blank") %
-                        {'attr': attribute.code})
+                        _("%(attr)s attribute cannot be blank") % {'attr': attribute.code})
             else:
                 try:
                     attribute.validate_value(value)
                 except ValidationError as e:
                     raise ValidationError(
-                        _("%(attr)s attribute %(err)s") %
-                        {'attr': attribute.code, 'err': e})
+                        _("%(attr)s attribute %(err)s") % {'attr': attribute.code,
+                                                           'err': e})
 
     def get_values(self):
         return self.product.attribute_values.all()
@@ -774,11 +783,15 @@ class AbstractProductAttribute(models.Model):
     a 'book' class)
     """
     product_class = models.ForeignKey(
-        'catalogue.ProductClass', related_name='attributes', blank=True,
-        null=True, verbose_name=_("Product type"))
+        'catalogue.ProductClass',
+        related_name='attributes',
+        blank=True,
+        null=True,
+        verbose_name=_("Product type"))
     name = models.CharField(_('Name'), max_length=128)
     code = models.SlugField(
-        _('Code'), max_length=128,
+        _('Code'),
+        max_length=128,
         validators=[RegexValidator(
             regex=r'^[a-zA-Z\-_][0-9a-zA-Z\-_]*$',
             message=_("Code can only contain the letters a-z, A-Z, digits, "
@@ -796,23 +809,19 @@ class AbstractProductAttribute(models.Model):
     FILE = "file"
     IMAGE = "image"
     TYPE_CHOICES = (
-        (TEXT, _("Text")),
-        (INTEGER, _("Integer")),
-        (BOOLEAN, _("True / False")),
-        (FLOAT, _("Float")),
-        (RICHTEXT, _("Rich Text")),
-        (DATE, _("Date")),
-        (OPTION, _("Option")),
-        (ENTITY, _("Entity")),
-        (FILE, _("File")),
-        (IMAGE, _("Image")),
-    )
+        (TEXT, _("Text")), (INTEGER, _("Integer")), (BOOLEAN, _("True / False")),
+        (FLOAT, _("Float")), (RICHTEXT, _("Rich Text")), (DATE, _("Date")), (OPTION, _("Option")),
+        (ENTITY, _("Entity")), (FILE, _("File")), (IMAGE, _("Image")), )
     type = models.CharField(
-        choices=TYPE_CHOICES, default=TYPE_CHOICES[0][0],
-        max_length=20, verbose_name=_("Type"))
+        choices=TYPE_CHOICES,
+        default=TYPE_CHOICES[0][0],
+        max_length=20,
+        verbose_name=_("Type"))
 
     option_group = models.ForeignKey(
-        'catalogue.AttributeOptionGroup', blank=True, null=True,
+        'catalogue.AttributeOptionGroup',
+        blank=True,
+        null=True,
         verbose_name=_("Option Group"),
         help_text=_('Select an option group if using type "Option"'))
     required = models.BooleanField(_('Required'), default=False)
@@ -845,8 +854,7 @@ class AbstractProductAttribute(models.Model):
             delete_file = self.is_file and value is False
             if value is None or value == '' or delete_file:
                 return
-            value_obj = ProductAttributeValue.objects.create(
-                product=product, attribute=self)
+            value_obj = ProductAttributeValue.objects.create(product=product, attribute=self)
 
         if self.is_file:
             # File fields in Django are treated differently, see
@@ -878,6 +886,7 @@ class AbstractProductAttribute(models.Model):
     def _validate_text(self, value):
         if not isinstance(value, six.string_types):
             raise ValidationError(_("Must be str or unicode"))
+
     _validate_richtext = _validate_text
 
     def _validate_float(self, value):
@@ -906,20 +915,19 @@ class AbstractProductAttribute(models.Model):
 
     def _validate_option(self, value):
         if not isinstance(value, get_model('catalogue', 'AttributeOption')):
-            raise ValidationError(
-                _("Must be an AttributeOption model object instance"))
+            raise ValidationError(_("Must be an AttributeOption model object instance"))
         if not value.pk:
             raise ValidationError(_("AttributeOption has not been saved yet"))
-        valid_values = self.option_group.options.values_list(
-            'option', flat=True)
+        valid_values = self.option_group.options.values_list('option', flat=True)
         if value.option not in valid_values:
             raise ValidationError(
-                _("%(enum)s is not a valid choice for %(attr)s") %
-                {'enum': value, 'attr': self})
+                _("%(enum)s is not a valid choice for %(attr)s") % {'enum': value,
+                                                                    'attr': self})
 
     def _validate_file(self, value):
         if value and not isinstance(value, File):
             raise ValidationError(_("Must be a file field"))
+
     _validate_image = _validate_file
 
 
@@ -932,10 +940,10 @@ class AbstractProductAttributeValue(models.Model):
 
     For example: number_of_pages = 295
     """
-    attribute = models.ForeignKey(
-        'catalogue.ProductAttribute', verbose_name=_("Attribute"))
+    attribute = models.ForeignKey('catalogue.ProductAttribute', verbose_name=_("Attribute"))
     product = models.ForeignKey(
-        'catalogue.Product', related_name='attribute_values',
+        'catalogue.Product',
+        related_name='attribute_values',
         verbose_name=_("Product"))
 
     value_text = models.TextField(_('Text'), blank=True, null=True)
@@ -945,21 +953,24 @@ class AbstractProductAttributeValue(models.Model):
     value_richtext = models.TextField(_('Richtext'), blank=True, null=True)
     value_date = models.DateField(_('Date'), blank=True, null=True)
     value_option = models.ForeignKey(
-        'catalogue.AttributeOption', blank=True, null=True,
+        'catalogue.AttributeOption',
+        blank=True,
+        null=True,
         verbose_name=_("Value option"))
     value_file = models.FileField(
-        upload_to=settings.OSCAR_IMAGE_FOLDER, max_length=255,
-        blank=True, null=True)
+        upload_to=settings.OSCAR_IMAGE_FOLDER,
+        max_length=255,
+        blank=True,
+        null=True)
     value_image = models.ImageField(
-        upload_to=settings.OSCAR_IMAGE_FOLDER, max_length=255,
-        blank=True, null=True)
-    value_entity = GenericForeignKey(
-        'entity_content_type', 'entity_object_id')
+        upload_to=settings.OSCAR_IMAGE_FOLDER,
+        max_length=255,
+        blank=True,
+        null=True)
+    value_entity = GenericForeignKey('entity_content_type', 'entity_object_id')
 
-    entity_content_type = models.ForeignKey(
-        ContentType, null=True, blank=True, editable=False)
-    entity_object_id = models.PositiveIntegerField(
-        null=True, blank=True, editable=False)
+    entity_content_type = models.ForeignKey(ContentType, null=True, blank=True, editable=False)
+    entity_object_id = models.PositiveIntegerField(null=True, blank=True, editable=False)
 
     def _get_value(self):
         return getattr(self, 'value_%s' % self.attribute.type)
@@ -967,8 +978,7 @@ class AbstractProductAttributeValue(models.Model):
     def _set_value(self, new_value):
         if self.attribute.is_option and isinstance(new_value, str):
             # Need to look up instance of AttributeOption
-            new_value = self.attribute.option_group.options.get(
-                option=new_value)
+            new_value = self.attribute.option_group.options.get(option=new_value)
         setattr(self, 'value_%s' % self.attribute.type, new_value)
 
     value = property(_get_value, _set_value)
@@ -1059,7 +1069,8 @@ class AbstractAttributeOption(models.Model):
     Examples: In a Language group, English, Greek, French
     """
     group = models.ForeignKey(
-        'catalogue.AttributeOptionGroup', related_name='options',
+        'catalogue.AttributeOptionGroup',
+        related_name='options',
         verbose_name=_("Group"))
     option = models.CharField(_('Option'), max_length=255)
 
@@ -1087,16 +1098,13 @@ class AbstractOption(models.Model):
     when they add the item to their basket.
     """
     name = models.CharField(_("Name"), max_length=128)
-    code = AutoSlugField(_("Code"), max_length=128, unique=True,
-                         populate_from='name')
+    code = AutoSlugField(_("Code"), max_length=128, unique=True, populate_from='name')
 
     REQUIRED, OPTIONAL = ('Required', 'Optional')
     TYPE_CHOICES = (
         (REQUIRED, _("Required - a value for this option must be specified")),
-        (OPTIONAL, _("Optional - a value for this option can be omitted")),
-    )
-    type = models.CharField(_("Status"), max_length=128, default=REQUIRED,
-                            choices=TYPE_CHOICES)
+        (OPTIONAL, _("Optional - a value for this option can be omitted")), )
+    type = models.CharField(_("Status"), max_length=128, default=REQUIRED, choices=TYPE_CHOICES)
 
     class Meta:
         abstract = True
@@ -1113,7 +1121,6 @@ class AbstractOption(models.Model):
 
 
 class MissingProductImage(object):
-
     """
     Mimics a Django file field by having a name property.
 
@@ -1141,13 +1148,11 @@ class MissingProductImage(object):
                     "Please copy/symlink the "
                     "'missing image' image at %s into your MEDIA_ROOT at %s. "
                     "This exception was raised because Oscar was unable to "
-                    "symlink it for you.") % (media_file_path,
-                                              settings.MEDIA_ROOT))
+                    "symlink it for you.") % (media_file_path, settings.MEDIA_ROOT))
             else:
                 logging.info((
                     "Symlinked the 'missing image' image at %s into your "
-                    "MEDIA_ROOT at %s") % (media_file_path,
-                                           settings.MEDIA_ROOT))
+                    "MEDIA_ROOT at %s") % (media_file_path, settings.MEDIA_ROOT))
 
 
 @python_2_unicode_compatible
@@ -1156,14 +1161,19 @@ class AbstractProductImage(models.Model):
     An image of a product
     """
     product = models.ForeignKey(
-        'catalogue.Product', related_name='images', verbose_name=_("Product"))
+        'catalogue.Product',
+        related_name='images',
+        verbose_name=_("Product"))
     original = models.ImageField(
-        _("Original"), upload_to=settings.OSCAR_IMAGE_FOLDER, max_length=255)
+        _("Original"),
+        upload_to=settings.OSCAR_IMAGE_FOLDER,
+        max_length=255)
     caption = models.CharField(_("Caption"), max_length=200, blank=True)
 
     #: Use display_order to determine which is the "primary" image
     display_order = models.PositiveIntegerField(
-        _("Display order"), default=0,
+        _("Display order"),
+        default=0,
         help_text=_("An image with a display order of zero will be the primary"
                     " image for a product"))
     date_created = models.DateTimeField(_("Date created"), auto_now_add=True)

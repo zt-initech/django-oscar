@@ -21,7 +21,6 @@ class SearchInput(Input):
     """
     input_type = 'search'
 
-
 # Build a dict of valid queries
 VALID_FACET_QUERIES = defaultdict(list)
 for facet in settings.OSCAR_SEARCH_FACETS['queries'].values():
@@ -38,7 +37,8 @@ class SearchForm(FacetedSearchForm):
     # Use a tabindex of 1 so that users can hit tab on any page and it will
     # focus on the search widget.
     q = forms.CharField(
-        required=False, label=_('Search'),
+        required=False,
+        label=_('Search'),
         widget=SearchInput({
             "placeholder": _('Search'),
             "tabindex": "1",
@@ -81,8 +81,10 @@ class SearchForm(FacetedSearchForm):
         SORT_BY_MAP[TITLE_Z_TO_A] = '-title'
 
     sort_by = forms.ChoiceField(
-        label=_("Sort by"), choices=SORT_BY_CHOICES,
-        widget=forms.Select(), required=False)
+        label=_("Sort by"),
+        choices=SORT_BY_CHOICES,
+        widget=forms.Select(),
+        required=False)
 
     @property
     def selected_multi_facets(self):
@@ -124,18 +126,14 @@ class SearchForm(FacetedSearchForm):
                 # Query facet - don't wrap value in speech marks and don't
                 # clean value. Query values should have been validated by this
                 # point and so we don't need to escape them.
-                sqs = sqs.narrow(u'%s:(%s)' % (
-                    field, " OR ".join(values)))
+                sqs = sqs.narrow(u'%s:(%s)' % (field, " OR ".join(values)))
             else:
                 # Field facet - clean and quote the values
-                clean_values = [
-                    '"%s"' % sqs.query.clean(val) for val in values]
-                sqs = sqs.narrow(u'%s:(%s)' % (
-                    field, " OR ".join(clean_values)))
+                clean_values = ['"%s"' % sqs.query.clean(val) for val in values]
+                sqs = sqs.narrow(u'%s:(%s)' % (field, " OR ".join(clean_values)))
 
         if self.is_valid() and 'sort_by' in self.cleaned_data:
-            sort_field = self.SORT_BY_MAP.get(
-                self.cleaned_data['sort_by'], None)
+            sort_field = self.SORT_BY_MAP.get(self.cleaned_data['sort_by'], None)
             if sort_field:
                 sqs = sqs.order_by(sort_field)
 

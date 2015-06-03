@@ -8,4 +8,5 @@ def deprecated(f):
             % f.__name__
         warnings.warn(message, DeprecationWarning, stacklevel=2)
         return f(*args, **kwargs)
+
     return _deprecated

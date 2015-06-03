@@ -16,10 +16,8 @@ SourceType = get_model('payment', 'SourceType')
 
 
 class OrderStatsForm(forms.Form):
-    date_from = forms.DateField(
-        required=False, label=pgettext_lazy(u"start date", u"From"))
-    date_to = forms.DateField(
-        required=False, label=pgettext_lazy(u"end date", u"To"))
+    date_from = forms.DateField(required=False, label=pgettext_lazy(u"start date", u"From"))
+    date_to = forms.DateField(required=False, label=pgettext_lazy(u"end date", u"To"))
 
     _filters = _description = None
 
@@ -34,18 +32,20 @@ class OrderStatsForm(forms.Form):
         if date_from and date_to:
             # We want to include end date so we adjust the date we use with the
             # 'range' function.
-            self._filters = {'date_placed__range':
-                             [date_from, date_to + datetime.timedelta(days=1)]}
+            self._filters = {
+                'date_placed__range': [date_from, date_to + datetime.timedelta(days = 1)]
+            }
             self._description = _('Orders placed between %(date_from)s and'
                                   ' %(date_to)s') % {
-                'date_from': date_from,
-                'date_to': date_to}
+                                      'date_from': date_from,
+                                      'date_to': date_to
+                                  }
         elif date_from and not date_to:
             self._filters = {'date_placed__gte': date_from}
-            self._description = _('Orders placed since %s') % (date_from,)
+            self._description = _('Orders placed since %s') % (date_from, )
         elif not date_from and date_to:
             self._filters = {'date_placed__lte': date_to}
-            self._description = _('Orders placed until %s') % (date_to,)
+            self._description = _('Orders placed until %s') % (date_to, )
         else:
             self._filters = {}
             self._description = _('All orders')
@@ -68,25 +68,20 @@ class OrderSearchForm(forms.Form):
     upc = forms.CharField(required=False, label=_("UPC"))
     partner_sku = forms.CharField(required=False, label=_("Partner SKU"))
 
-    status_choices = (('', '---------'),) + tuple([(v, v)
-                                                   for v
-                                                   in Order.all_statuses()])
-    status = forms.ChoiceField(choices=status_choices, label=_("Status"),
-                               required=False)
+    status_choices = (('', '---------'), ) + tuple([(v, v) for v in Order.all_statuses()])
+    status = forms.ChoiceField(choices=status_choices, label=_("Status"), required=False)
 
     date_from = forms.DateField(required=False, label=_("Date from"))
     date_to = forms.DateField(required=False, label=_("Date to"))
 
     voucher = forms.CharField(required=False, label=_("Voucher code"))
 
-    payment_method = forms.ChoiceField(
-        label=_("Payment method"), required=False,
-        choices=())
+    payment_method = forms.ChoiceField(label=_("Payment method"), required=False, choices=())
 
-    format_choices = (('html', _('HTML')),
-                      ('csv', _('CSV')),)
+    format_choices = (('html', _('HTML')), ('csv', _('CSV')), )
     response_format = forms.ChoiceField(widget=forms.RadioSelect,
-                                        required=False, choices=format_choices,
+                                        required=False,
+                                        choices=format_choices,
                                         initial='html',
                                         label=_("Get results as"))
 
@@ -94,7 +89,7 @@ class OrderSearchForm(forms.Form):
         # Ensure that 'response_format' is always set
         if 'data' in kwargs:
             data = kwargs['data']
-            del(kwargs['data'])
+            del (kwargs['data'])
         elif len(args) > 0:
             data = args[0]
             args = args[1:]
@@ -112,12 +107,11 @@ class OrderSearchForm(forms.Form):
         self.fields['payment_method'].choices = self.payment_method_choices()
 
     def payment_method_choices(self):
-        return (('', '---------'),) + tuple(
+        return (('', '---------'), ) + tuple(
             [(src.code, src.name) for src in SourceType.objects.all()])
 
 
 class OrderNoteForm(forms.ModelForm):
-
     class Meta:
         model = OrderNote
         fields = ['message']
@@ -129,14 +123,21 @@ class OrderNoteForm(forms.ModelForm):
 
 
 class ShippingAddressForm(PhoneNumberMixin, AbstractAddressForm):
-
     class Meta:
         model = ShippingAddress
         fields = [
-            'title', 'first_name', 'last_name',
-            'line1', 'line2', 'line3', 'line4',
-            'state', 'postcode', 'country',
-            'phone_number', 'notes',
+            'title',
+            'first_name',
+            'last_name',
+            'line1',
+            'line2',
+            'line3',
+            'line4',
+            'state',
+            'postcode',
+            'country',
+            'phone_number',
+            'notes',
         ]
 
 

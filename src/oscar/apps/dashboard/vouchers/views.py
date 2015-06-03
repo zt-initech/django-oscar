@@ -29,13 +29,13 @@ class VoucherListView(generic.ListView):
 
     def get_queryset(self):
         qs = self.model.objects.all().order_by('-date_created')
-        qs = sort_queryset(qs, self.request,
-                           ['num_basket_additions', 'num_orders',
-                            'date_created'],
-                           '-date_created')
-        self.description_ctx = {'main_filter': _('All vouchers'),
-                                'name_filter': '',
-                                'code_filter': ''}
+        qs = sort_queryset(qs, self.request, ['num_basket_additions', 'num_orders',
+                                              'date_created'], '-date_created')
+        self.description_ctx = {
+            'main_filter': _('All vouchers'),
+            'name_filter': '',
+            'code_filter': ''
+        }
 
         # If form not submitted, return early
         is_form_submitted = 'name' in self.request.GET
@@ -89,27 +89,23 @@ class VoucherCreateView(generic.FormView):
         condition = Condition.objects.create(
             range=form.cleaned_data['benefit_range'],
             type=Condition.COUNT,
-            value=1
-        )
+            value=1)
         benefit = Benefit.objects.create(
             range=form.cleaned_data['benefit_range'],
             type=form.cleaned_data['benefit_type'],
-            value=form.cleaned_data['benefit_value']
-        )
+            value=form.cleaned_data['benefit_value'])
         name = form.cleaned_data['name']
         offer = ConditionalOffer.objects.create(
             name=_("Offer for voucher '%s'") % name,
             offer_type=ConditionalOffer.VOUCHER,
             benefit=benefit,
-            condition=condition,
-        )
+            condition=condition, )
         voucher = Voucher.objects.create(
             name=name,
             code=form.cleaned_data['code'],
             usage=form.cleaned_data['usage'],
             start_datetime=form.cleaned_data['start_datetime'],
-            end_datetime=form.cleaned_data['end_datetime'],
-        )
+            end_datetime=form.cleaned_data['end_datetime'], )
         voucher.offers.add(offer)
         return HttpResponseRedirect(self.get_success_url())
 

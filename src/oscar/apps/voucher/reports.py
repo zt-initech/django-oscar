@@ -4,10 +4,8 @@ from django.utils.translation import ugettext_lazy as _
 from oscar.core.loading import get_class
 
 ReportGenerator = get_class('dashboard.reports.reports', 'ReportGenerator')
-ReportCSVFormatter = get_class(
-    'dashboard.reports.reports', 'ReportCSVFormatter')
-ReportHTMLFormatter = get_class(
-    'dashboard.reports.reports', 'ReportHTMLFormatter')
+ReportCSVFormatter = get_class('dashboard.reports.reports', 'ReportCSVFormatter')
+ReportHTMLFormatter = get_class('dashboard.reports.reports', 'ReportHTMLFormatter')
 Voucher = get_model('voucher', 'Voucher')
 
 
@@ -16,16 +14,12 @@ class VoucherReportCSVFormatter(ReportCSVFormatter):
 
     def generate_csv(self, response, vouchers):
         writer = self.get_csv_writer(response)
-        header_row = [_('Voucher code'),
-                      _('Added to a basket'),
-                      _('Used in an order'),
+        header_row = [_('Voucher code'), _('Added to a basket'), _('Used in an order'),
                       _('Total discount')]
         writer.writerow(header_row)
 
         for voucher in vouchers:
-            row = [voucher.code,
-                   voucher.num_basket_additions,
-                   voucher.num_orders,
+            row = [voucher.code, voucher.num_basket_additions, voucher.num_orders,
                    voucher.total_discount]
             writer.writerow(row)
 
@@ -41,7 +35,8 @@ class VoucherReportGenerator(ReportGenerator):
 
     formatters = {
         'CSV_formatter': VoucherReportCSVFormatter,
-        'HTML_formatter': VoucherReportHTMLFormatter}
+        'HTML_formatter': VoucherReportHTMLFormatter
+    }
 
     def generate(self):
         vouchers = Voucher._default_manager.all()

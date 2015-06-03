@@ -20,10 +20,10 @@ class ProductReviewsApplication(Application):
                 name='reviews-detail'),
             url(r'^add/$', self.create_view.as_view(),
                 name='reviews-add'),
-            url(r'^(?P<pk>\d+)/vote/$',
-                login_required(self.vote_view.as_view()),
+            url(r'^(?P<pk>\d+)/vote/$', login_required(self.vote_view.as_view()),
                 name='reviews-vote'),
-            url(r'^$', self.list_view.as_view(), name='reviews-list'),
+            url(r'^$', self.list_view.as_view(),
+                name='reviews-list'),
         ]
         return self.post_process_urls(urls)
 

@@ -15,17 +15,19 @@ Benefit = get_model('offer', 'Benefit')
 class MetaDataForm(forms.ModelForm):
     class Meta:
         model = ConditionalOffer
-        fields = ('name', 'description',)
+        fields = ('name', 'description', )
 
 
 class RestrictionsForm(forms.ModelForm):
 
     start_datetime = forms.DateTimeField(
         widget=widgets.DateTimePickerInput(),
-        label=_("Start date"), required=False)
+        label=_("Start date"),
+        required=False)
     end_datetime = forms.DateTimeField(
         widget=widgets.DateTimePickerInput(),
-        label=_("End date"), required=False)
+        label=_("End date"),
+        required=False)
 
     def __init__(self, *args, **kwargs):
         super(RestrictionsForm, self).__init__(*args, **kwargs)
@@ -34,30 +36,25 @@ class RestrictionsForm(forms.ModelForm):
 
     class Meta:
         model = ConditionalOffer
-        fields = ('start_datetime', 'end_datetime',
-                  'max_basket_applications', 'max_user_applications',
-                  'max_global_applications', 'max_discount')
+        fields = ('start_datetime', 'end_datetime', 'max_basket_applications',
+                  'max_user_applications', 'max_global_applications', 'max_discount')
 
     def clean(self):
         cleaned_data = super(RestrictionsForm, self).clean()
         start = cleaned_data['start_datetime']
         end = cleaned_data['end_datetime']
         if start and end and end < start:
-            raise forms.ValidationError(_(
-                "The end date must be after the start date"))
+            raise forms.ValidationError(_("The end date must be after the start date"))
         return cleaned_data
 
 
 class ConditionForm(forms.ModelForm):
-    custom_condition = forms.ChoiceField(
-        required=False,
-        label=_("Custom condition"), choices=())
+    custom_condition = forms.ChoiceField(required=False, label=_("Custom condition"), choices=())
 
     def __init__(self, *args, **kwargs):
         super(ConditionForm, self).__init__(*args, **kwargs)
 
-        custom_conditions = Condition.objects.all().exclude(
-            proxy_class=None)
+        custom_conditions = Condition.objects.all().exclude(proxy_class=None)
         if len(custom_conditions) > 0:
             # Initialise custom_condition field
             choices = [(c.id, six.text_type(c)) for c in custom_conditions]
@@ -88,8 +85,7 @@ class ConditionForm(forms.ModelForm):
 
         if not data['custom_condition']:
             if not data.get('range', None):
-                raise forms.ValidationError(
-                    _("A range is required"))
+                raise forms.ValidationError(_("A range is required"))
 
         return data
 
@@ -97,21 +93,17 @@ class ConditionForm(forms.ModelForm):
         # We don't save a new model if a custom condition has been chosen,
         # we simply return the instance that has been chosen
         if self.cleaned_data['custom_condition']:
-            return Condition.objects.get(
-                id=self.cleaned_data['custom_condition'])
+            return Condition.objects.get(id=self.cleaned_data['custom_condition'])
         return super(ConditionForm, self).save(*args, **kwargs)
 
 
 class BenefitForm(forms.ModelForm):
-    custom_benefit = forms.ChoiceField(
-        required=False,
-        label=_("Custom incentive"), choices=())
+    custom_benefit = forms.ChoiceField(required=False, label=_("Custom incentive"), choices=())
 
     def __init__(self, *args, **kwargs):
         super(BenefitForm, self).__init__(*args, **kwargs)
 
-        custom_benefits = Benefit.objects.all().exclude(
-            proxy_class=None)
+        custom_benefits = Benefit.objects.all().exclude(proxy_class=None)
         if len(custom_benefits) > 0:
             # Initialise custom_benefit field
             choices = [(c.id, six.text_type(c)) for c in custom_benefits]
@@ -151,8 +143,7 @@ class BenefitForm(forms.ModelForm):
         # We don't save a new model if a custom benefit has been chosen,
         # we simply return the instance that has been chosen
         if self.cleaned_data['custom_benefit']:
-            return Benefit.objects.get(
-                id=self.cleaned_data['custom_benefit'])
+            return Benefit.objects.get(id=self.cleaned_data['custom_benefit'])
         return super(BenefitForm, self).save(*args, **kwargs)
 
 

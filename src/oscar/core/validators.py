@@ -7,7 +7,6 @@ from django.utils.translation import ugettext_lazy as _
 
 
 class ExtendedURLValidator(validators.URLValidator):
-
     def __init__(self, *args, **kwargs):
         # 'verify_exists' has been removed in Django 1.5 and so we no longer
         # pass it up to the core validator class
@@ -59,7 +58,6 @@ class ExtendedURLValidator(validators.URLValidator):
 
 
 class URLDoesNotExistValidator(ExtendedURLValidator):
-
     def __call__(self, value):
         """
         Validate that the URLdoes not already exist.
@@ -78,15 +76,13 @@ class URLDoesNotExistValidator(ExtendedURLValidator):
         except ValidationError:
             # Page exists - that is what we want
             return
-        raise ValidationError(
-            _('Specified page already exists!'), code='invalid')
+        raise ValidationError(_('Specified page already exists!'), code='invalid')
 
 
 def non_whitespace(value):
     stripped = value.strip()
     if not stripped:
-        raise ValidationError(
-            _("This field is required"))
+        raise ValidationError(_("This field is required"))
     return stripped
 
 
@@ -94,39 +90,11 @@ class CommonPasswordValidator(validators.BaseValidator):
     # See
     # http://www.smartplanet.com/blog/business-brains/top-20-most-common-passwords-of-all-time-revealed-8216123456-8216princess-8216qwerty/4519  # noqa
     forbidden_passwords = [
-        'password',
-        '1234',
-        '12345'
-        '123456',
-        '123456y',
-        '123456789',
-        'iloveyou',
-        'princess',
-        'monkey',
-        'rockyou',
-        'babygirl',
-        'monkey',
-        'qwerty',
-        '654321',
-        'dragon',
-        'pussy',
-        'baseball',
-        'football',
-        'letmein',
-        'monkey',
-        '696969',
-        'abc123',
-        'qwe123',
-        'qweasd',
-        'mustang',
-        'michael',
-        'shadow',
-        'master',
-        'jennifer',
-        '111111',
-        '2000',
-        'jordan',
-        'superman'
+        'password', '1234', '12345'
+        '123456', '123456y', '123456789', 'iloveyou', 'princess', 'monkey', 'rockyou', 'babygirl',
+        'monkey', 'qwerty', '654321', 'dragon', 'pussy', 'baseball', 'football', 'letmein',
+        'monkey', '696969', 'abc123', 'qwe123', 'qweasd', 'mustang', 'michael', 'shadow', 'master',
+        'jennifer', '111111', '2000', 'jordan', 'superman'
         'harley'
     ]
     message = _("Please choose a less common password")
@@ -145,9 +113,5 @@ class CommonPasswordValidator(validators.BaseValidator):
         if self.limit_value is None:
             return self.forbidden_passwords
 
-
 # List all requirements for password, site wide
-password_validators = [
-    validators.MinLengthValidator(6),
-    CommonPasswordValidator(),
-]
+password_validators = [validators.MinLengthValidator(6), CommonPasswordValidator(), ]

@@ -18,7 +18,6 @@ from oscar.models.fields import AutoSlugField
 
 
 class UserManager(auth_models.BaseUserManager):
-
     def create_user(self, email, password=None, **extra_fields):
         """
         Creates and saves a User with the given username, email and
@@ -29,9 +28,12 @@ class UserManager(auth_models.BaseUserManager):
             raise ValueError('The given email must be set')
         email = UserManager.normalize_email(email)
         user = self.model(
-            email=email, is_staff=False, is_active=True,
+            email=email,
+            is_staff=False,
+            is_active=True,
             is_superuser=False,
-            last_login=now, date_joined=now, **extra_fields)
+            last_login=now,
+            date_joined=now, **extra_fields)
 
         user.set_password(password)
         user.save(using=self._db)
@@ -46,8 +48,7 @@ class UserManager(auth_models.BaseUserManager):
         return u
 
 
-class AbstractUser(auth_models.AbstractBaseUser,
-                   auth_models.PermissionsMixin):
+class AbstractUser(auth_models.AbstractBaseUser, auth_models.PermissionsMixin):
     """
     An abstract base user suitable for use in Oscar projects.
 
@@ -55,20 +56,19 @@ class AbstractUser(auth_models.AbstractBaseUser,
     username field
     """
     email = models.EmailField(_('email address'), unique=True)
-    first_name = models.CharField(
-        _('First name'), max_length=255, blank=True)
-    last_name = models.CharField(
-        _('Last name'), max_length=255, blank=True)
+    first_name = models.CharField(_('First name'), max_length=255, blank=True)
+    last_name = models.CharField(_('Last name'), max_length=255, blank=True)
     is_staff = models.BooleanField(
-        _('Staff status'), default=False,
+        _('Staff status'),
+        default=False,
         help_text=_('Designates whether the user can log into this admin '
                     'site.'))
     is_active = models.BooleanField(
-        _('Active'), default=True,
+        _('Active'),
+        default=True,
         help_text=_('Designates whether this user should be treated as '
                     'active. Unselect this instead of deleting accounts.'))
-    date_joined = models.DateTimeField(_('date joined'),
-                                       default=timezone.now)
+    date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
 
     objects = UserManager()
 
@@ -92,8 +92,7 @@ class AbstractUser(auth_models.AbstractBaseUser,
         newly registered user.
         """
         ProductAlert = self.alerts.model
-        alerts = ProductAlert.objects.filter(
-            email=self.email, status=ProductAlert.ACTIVE)
+        alerts = ProductAlert.objects.filter(email=self.email, status=ProductAlert.ACTIVE)
         alerts.update(user=self, key=None, email=None)
 
     def save(self, *args, **kwargs):
@@ -111,8 +110,7 @@ class AbstractEmail(models.Model):
     This is a record of all emails sent to a customer.
     Normally, we only record order-related emails.
     """
-    user = models.ForeignKey(AUTH_USER_MODEL, related_name='emails',
-                             verbose_name=_("User"))
+    user = models.ForeignKey(AUTH_USER_MODEL, related_name='emails', verbose_name=_("User"))
     subject = models.TextField(_('Subject'), max_length=255)
     body_text = models.TextField(_("Body Text"))
     body_html = models.TextField(_("Body HTML"), blank=True)
@@ -126,7 +124,9 @@ class AbstractEmail(models.Model):
 
     def __str__(self):
         return _(u"Email to %(user)s with subject '%(subject)s'") % {
-            'user': self.user.get_username(), 'subject': self.subject}
+            'user': self.user.get_username(),
+            'subject': self.subject
+        }
 
 
 @python_2_unicode_compatible
@@ -139,26 +139,31 @@ class AbstractCommunicationEventType(models.Model):
     # e.g. PASSWORD_RESET. AutoSlugField uppercases the code for us because
     # it's a useful convention that's been enforced in previous Oscar versions
     code = AutoSlugField(
-        _('Code'), max_length=128, unique=True, populate_from='name',
-        separator=six.u("_"), uppercase=True, editable=True,
+        _('Code'),
+        max_length=128,
+        unique=True,
+        populate_from='name',
+        separator=six.u("_"),
+        uppercase=True,
+        editable=True,
         help_text=_("Code used for looking up this event programmatically"))
 
     #: Name is the friendly description of an event for use in the admin
     name = models.CharField(
-        _('Name'), max_length=255,
+        _('Name'),
+        max_length=255,
         help_text=_("This is just used for organisational purposes"))
 
     # We allow communication types to be categorised
     # For backwards-compatibility, the choice values are quite verbose
     ORDER_RELATED = 'Order related'
     USER_RELATED = 'User related'
-    CATEGORY_CHOICES = (
-        (ORDER_RELATED, _('Order related')),
-        (USER_RELATED, _('User related'))
-    )
+    CATEGORY_CHOICES = ((ORDER_RELATED, _('Order related')), (USER_RELATED, _('User related')))
 
     category = models.CharField(
-        _('Category'), max_length=255, default=ORDER_RELATED,
+        _('Category'),
+        max_length=255,
+        default=ORDER_RELATED,
         choices=CATEGORY_CHOICES)
 
     # Template content for emails
@@ -166,16 +171,22 @@ class AbstractCommunicationEventType(models.Model):
     # instructs Oscar to look for a file-based template, '' is just an empty
     # template.
     email_subject_template = models.CharField(
-        _('Email Subject Template'), max_length=255, blank=True, null=True)
-    email_body_template = models.TextField(
-        _('Email Body Template'), blank=True, null=True)
+        _('Email Subject Template'),
+        max_length=255,
+        blank=True,
+        null=True)
+    email_body_template = models.TextField(_('Email Body Template'), blank=True, null=True)
     email_body_html_template = models.TextField(
-        _('Email Body HTML Template'), blank=True, null=True,
+        _('Email Body HTML Template'),
+        blank=True,
+        null=True,
         help_text=_("HTML template"))
 
     # Template content for SMS messages
-    sms_template = models.CharField(_('SMS Template'), max_length=170,
-                                    blank=True, null=True,
+    sms_template = models.CharField(_('SMS Template'),
+                                    max_length=170,
+                                    blank=True,
+                                    null=True,
                                     help_text=_("SMS template"))
 
     date_created = models.DateTimeField(_("Date Created"), auto_now_add=True)
@@ -205,10 +216,12 @@ class AbstractCommunicationEventType(models.Model):
         code = self.code.lower()
 
         # Build a dict of message name to Template instances
-        templates = {'subject': 'email_subject_template',
-                     'body': 'email_body_template',
-                     'html': 'email_body_html_template',
-                     'sms': 'sms_template'}
+        templates = {
+            'subject': 'email_subject_template',
+            'body': 'email_body_template',
+            'html': 'email_body_html_template',
+            'sms': 'sms_template'
+        }
         for name, attr_name in templates.items():
             field = getattr(self, attr_name, None)
             if field is not None:
@@ -225,8 +238,7 @@ class AbstractCommunicationEventType(models.Model):
         # Pass base URL for serving images within HTML emails
         if ctx is None:
             ctx = {}
-        ctx['static_base_url'] = getattr(
-            settings, 'OSCAR_STATIC_BASE_URL', None)
+        ctx['static_base_url'] = getattr(settings, 'OSCAR_STATIC_BASE_URL', None)
 
         messages = {}
         for name, template in templates.items():
@@ -250,8 +262,7 @@ class AbstractCommunicationEventType(models.Model):
 
 @python_2_unicode_compatible
 class AbstractNotification(models.Model):
-    recipient = models.ForeignKey(AUTH_USER_MODEL,
-                                  related_name='notifications', db_index=True)
+    recipient = models.ForeignKey(AUTH_USER_MODEL, related_name='notifications', db_index=True)
 
     # Not all notifications will have a sender.
     sender = models.ForeignKey(AUTH_USER_MODEL, null=True)
@@ -265,11 +276,8 @@ class AbstractNotification(models.Model):
     category = models.CharField(max_length=255, blank=True)
 
     INBOX, ARCHIVE = 'Inbox', 'Archive'
-    choices = (
-        (INBOX, _('Inbox')),
-        (ARCHIVE, _('Archive')))
-    location = models.CharField(max_length=32, choices=choices,
-                                default=INBOX)
+    choices = ((INBOX, _('Inbox')), (ARCHIVE, _('Archive')))
+    location = models.CharField(max_length=32, choices=choices, default=INBOX)
 
     date_sent = models.DateTimeField(auto_now_add=True)
     date_read = models.DateTimeField(blank=True, null=True)
@@ -277,7 +285,7 @@ class AbstractNotification(models.Model):
     class Meta:
         abstract = True
         app_label = 'customer'
-        ordering = ('-date_sent',)
+        ordering = ('-date_sent', )
         verbose_name = _('Notification')
         verbose_name_plural = _('Notifications')
 
@@ -287,6 +295,7 @@ class AbstractNotification(models.Model):
     def archive(self):
         self.location = self.ARCHIVE
         self.save()
+
     archive.alters_data = True
 
     @property
@@ -303,8 +312,11 @@ class AbstractProductAlert(models.Model):
     # A user is only required if the notification is created by a
     # registered user, anonymous users will only have an email address
     # attached to the notification
-    user = models.ForeignKey(AUTH_USER_MODEL, db_index=True, blank=True,
-                             null=True, related_name="alerts",
+    user = models.ForeignKey(AUTH_USER_MODEL,
+                             db_index=True,
+                             blank=True,
+                             null=True,
+                             related_name="alerts",
                              verbose_name=_('User'))
     email = models.EmailField(_("Email"), db_index=True, blank=True)
 
@@ -317,22 +329,15 @@ class AbstractProductAlert(models.Model):
     # and unsubscription key are generated when an instance is saved for
     # the first time and can be used to confirm and unsubscribe the
     # notifications.
-    UNCONFIRMED, ACTIVE, CANCELLED, CLOSED = (
-        'Unconfirmed', 'Active', 'Cancelled', 'Closed')
+    UNCONFIRMED, ACTIVE, CANCELLED, CLOSED = ('Unconfirmed', 'Active', 'Cancelled', 'Closed')
     STATUS_CHOICES = (
-        (UNCONFIRMED, _('Not yet confirmed')),
-        (ACTIVE, _('Active')),
-        (CANCELLED, _('Cancelled')),
-        (CLOSED, _('Closed')),
-    )
-    status = models.CharField(_("Status"), max_length=20,
-                              choices=STATUS_CHOICES, default=ACTIVE)
+        (UNCONFIRMED, _('Not yet confirmed')), (ACTIVE, _('Active')), (CANCELLED, _('Cancelled')),
+        (CLOSED, _('Closed')), )
+    status = models.CharField(_("Status"), max_length=20, choices=STATUS_CHOICES, default=ACTIVE)
 
     date_created = models.DateTimeField(_("Date created"), auto_now_add=True)
-    date_confirmed = models.DateTimeField(_("Date confirmed"), blank=True,
-                                          null=True)
-    date_cancelled = models.DateTimeField(_("Date cancelled"), blank=True,
-                                          null=True)
+    date_confirmed = models.DateTimeField(_("Date confirmed"), blank=True, null=True)
+    date_cancelled = models.DateTimeField(_("Date cancelled"), blank=True, null=True)
     date_closed = models.DateTimeField(_("Date closed"), blank=True, null=True)
 
     class Meta:
@@ -365,18 +370,21 @@ class AbstractProductAlert(models.Model):
         self.status = self.ACTIVE
         self.date_confirmed = timezone.now()
         self.save()
+
     confirm.alters_data = True
 
     def cancel(self):
         self.status = self.CANCELLED
         self.date_cancelled = timezone.now()
         self.save()
+
     cancel.alters_data = True
 
     def close(self):
         self.status = self.CLOSED
         self.date_closed = timezone.now()
         self.save()
+
     close.alters_data = True
 
     def get_email_address(self):
@@ -412,5 +420,4 @@ class AbstractProductAlert(models.Model):
         return reverse('customer:alerts-confirm', kwargs={'key': self.key})
 
     def get_cancel_url(self):
-        return reverse('customer:alerts-cancel-by-key', kwargs={'key':
-                                                                self.key})
+        return reverse('customer:alerts-cancel-by-key', kwargs={'key': self.key})

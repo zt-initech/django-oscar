@@ -12,8 +12,7 @@ from django.conf import settings
 from oscar.core.utils import safe_referrer
 from oscar.views.generic import PostActionMixin
 from oscar.apps.customer.utils import get_password_reset_url
-from oscar.core.loading import (
-    get_class, get_profile_class, get_classes, get_model)
+from oscar.core.loading import (get_class, get_profile_class, get_classes, get_model)
 from oscar.core.compat import get_user_model
 from . import signals
 
@@ -21,8 +20,7 @@ PageTitleMixin, RegisterUserMixin = get_classes(
     'customer.mixins', ['PageTitleMixin', 'RegisterUserMixin'])
 Dispatcher = get_class('customer.utils', 'Dispatcher')
 EmailAuthenticationForm, EmailUserCreationForm, OrderSearchForm = get_classes(
-    'customer.forms', ['EmailAuthenticationForm', 'EmailUserCreationForm',
-                       'OrderSearchForm'])
+    'customer.forms', ['EmailAuthenticationForm', 'EmailUserCreationForm', 'OrderSearchForm'])
 PasswordChangeForm = get_class('customer.forms', 'PasswordChangeForm')
 ProfileForm, ConfirmPasswordForm = get_classes(
     'customer.forms', ['ProfileForm', 'ConfirmPasswordForm'])
@@ -36,7 +34,6 @@ ProductAlert = get_model('customer', 'ProductAlert')
 CommunicationEventType = get_model('customer', 'CommunicationEventType')
 
 User = get_user_model()
-
 
 # =======
 # Account
@@ -65,8 +62,7 @@ class AccountRegistrationView(RegisterUserMixin, generic.FormView):
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated():
             return redirect(settings.LOGIN_REDIRECT_URL)
-        return super(AccountRegistrationView, self).get(
-            request, *args, **kwargs)
+        return super(AccountRegistrationView, self).get(request, *args, **kwargs)
 
     def get_logged_in_redirect(self):
         return reverse('customer:summary')
@@ -81,8 +77,7 @@ class AccountRegistrationView(RegisterUserMixin, generic.FormView):
         return kwargs
 
     def get_context_data(self, *args, **kwargs):
-        ctx = super(AccountRegistrationView, self).get_context_data(
-            *args, **kwargs)
+        ctx = super(AccountRegistrationView, self).get_context_data(*args, **kwargs)
         ctx['cancel_url'] = safe_referrer(self.request, '')
         return ctx
 
@@ -105,8 +100,7 @@ class AccountAuthView(RegisterUserMixin, generic.TemplateView):
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated():
             return redirect(settings.LOGIN_REDIRECT_URL)
-        return super(AccountAuthView, self).get(
-            request, *args, **kwargs)
+        return super(AccountAuthView, self).get(request, *args, **kwargs)
 
     def get_context_data(self, *args, **kwargs):
         ctx = super(AccountAuthView, self).get_context_data(*args, **kwargs)
@@ -127,21 +121,15 @@ class AccountAuthView(RegisterUserMixin, generic.TemplateView):
     # LOGIN
 
     def get_login_form(self, bind_data=False):
-        return self.login_form_class(
-            **self.get_login_form_kwargs(bind_data))
+        return self.login_form_class(**self.get_login_form_kwargs(bind_data))
 
     def get_login_form_kwargs(self, bind_data=False):
         kwargs = {}
         kwargs['host'] = self.request.get_host()
         kwargs['prefix'] = self.login_prefix
-        kwargs['initial'] = {
-            'redirect_url': self.request.GET.get(self.redirect_field_name, ''),
-        }
+        kwargs['initial'] = {'redirect_url': self.request.GET.get(self.redirect_field_name, ''), }
         if bind_data and self.request.method in ('POST', 'PUT'):
-            kwargs.update({
-                'data': self.request.POST,
-                'files': self.request.FILES,
-            })
+            kwargs.update({'data': self.request.POST, 'files': self.request.FILES, })
         return kwargs
 
     def validate_login_form(self):
@@ -158,7 +146,9 @@ class AccountAuthView(RegisterUserMixin, generic.TemplateView):
             # request handling). We use a custom signal as we want to track the
             # session key before calling login (which cycles the session ID).
             signals.user_logged_in.send_robust(
-                sender=self, request=self.request, user=user,
+                sender=self,
+                request=self.request,
+                user=user,
                 old_session_key=old_session_key)
 
             msg = self.get_login_success_message(form)
@@ -187,21 +177,15 @@ class AccountAuthView(RegisterUserMixin, generic.TemplateView):
     # REGISTRATION
 
     def get_registration_form(self, bind_data=False):
-        return self.registration_form_class(
-            **self.get_registration_form_kwargs(bind_data))
+        return self.registration_form_class(**self.get_registration_form_kwargs(bind_data))
 
     def get_registration_form_kwargs(self, bind_data=False):
         kwargs = {}
         kwargs['host'] = self.request.get_host()
         kwargs['prefix'] = self.registration_prefix
-        kwargs['initial'] = {
-            'redirect_url': self.request.GET.get(self.redirect_field_name, ''),
-        }
+        kwargs['initial'] = {'redirect_url': self.request.GET.get(self.redirect_field_name, ''), }
         if bind_data and self.request.method in ('POST', 'PUT'):
-            kwargs.update({
-                'data': self.request.POST,
-                'files': self.request.FILES,
-            })
+            kwargs.update({'data': self.request.POST, 'files': self.request.FILES, })
         return kwargs
 
     def validate_registration_form(self):
@@ -241,7 +225,6 @@ class LogoutView(generic.RedirectView):
 
         return response
 
-
 # =============
 # Profile
 # =============
@@ -262,8 +245,7 @@ class ProfileView(PageTitleMixin, generic.TemplateView):
 
         # Check for custom user model
         for field_name in User._meta.additional_fields:
-            field_data.append(
-                self.get_model_field_data(user, field_name))
+            field_data.append(self.get_model_field_data(user, field_name))
 
         # Check for profile class
         profile_class = get_profile_class()
@@ -277,8 +259,7 @@ class ProfileView(PageTitleMixin, generic.TemplateView):
             for field_name in field_names:
                 if field_name in ('user', 'id'):
                     continue
-                field_data.append(
-                    self.get_model_field_data(profile, field_name))
+                field_data.append(self.get_model_field_data(profile, field_name))
 
         return field_data
 
@@ -291,10 +272,7 @@ class ProfileView(PageTitleMixin, generic.TemplateView):
             value = getattr(model_class, 'get_%s_display' % field_name)()
         else:
             value = getattr(model_class, field_name)
-        return {
-            'name': getattr(field, 'verbose_name'),
-            'value': value,
-        }
+        return {'name': getattr(field, 'verbose_name'), 'value': value, }
 
 
 class ProfileUpdateView(PageTitleMixin, generic.FormView):
@@ -336,7 +314,8 @@ class ProfileUpdateView(PageTitleMixin, generic.FormView):
                 'new_email': new_email,
             }
             msgs = CommunicationEventType.objects.get_and_render(
-                code=self.communication_type_code, context=ctx)
+                code=self.communication_type_code,
+                context=ctx)
             Dispatcher().dispatch_user_messages(old_user, msgs)
 
         messages.success(self.request, _("Profile updated"))
@@ -358,8 +337,7 @@ class ProfileDeleteView(PageTitleMixin, generic.FormView):
     def form_valid(self, form):
         self.request.user.delete()
         messages.success(
-            self.request,
-            _("Your profile has now been deleted. Thanks for using the site."))
+            self.request, _("Your profile has now been deleted. Thanks for using the site."))
         return redirect(self.get_success_url())
 
 
@@ -386,15 +364,16 @@ class ChangePasswordView(PageTitleMixin, generic.FormView):
             'reset_url': get_password_reset_url(self.request.user),
         }
         msgs = CommunicationEventType.objects.get_and_render(
-            code=self.communication_type_code, context=ctx)
+            code=self.communication_type_code,
+            context=ctx)
         Dispatcher().dispatch_user_messages(self.request.user, msgs)
 
         return redirect(self.get_success_url())
 
-
 # =============
 # Email history
 # =============
+
 
 class EmailHistoryView(PageTitleMixin, generic.ListView):
     context_object_name = "emails"
@@ -414,17 +393,16 @@ class EmailDetailView(PageTitleMixin, generic.DetailView):
     active_tab = 'emails'
 
     def get_object(self, queryset=None):
-        return get_object_or_404(Email, user=self.request.user,
-                                 id=self.kwargs['email_id'])
+        return get_object_or_404(Email, user=self.request.user, id=self.kwargs['email_id'])
 
     def get_page_title(self):
         """Append email subject to page title"""
         return u'%s: %s' % (_('Email'), self.object.subject)
 
-
 # =============
 # Order history
 # =============
+
 
 class OrderHistoryView(PageTitleMixin, generic.ListView):
     """
@@ -449,16 +427,13 @@ class OrderHistoryView(PageTitleMixin, generic.ListView):
 
             # If the user has just entered an order number, try and look it up
             # and redirect immediately to the order detail page.
-            if data['order_number'] and not (data['date_to'] or
-                                             data['date_from']):
+            if data['order_number'] and not (data['date_to'] or data['date_from']):
                 try:
-                    order = Order.objects.get(
-                        number=data['order_number'], user=self.request.user)
+                    order = Order.objects.get(number=data['order_number'], user=self.request.user)
                 except Order.DoesNotExist:
                     pass
                 else:
-                    return redirect(
-                        'customer:order', order_number=order.number)
+                    return redirect('customer:order', order_number=order.number)
         else:
             self.form = self.form_class()
         return super(OrderHistoryView, self).get(request, *args, **kwargs)
@@ -489,7 +464,8 @@ class OrderDetailView(PageTitleMixin, PostActionMixin, generic.DetailView):
         return u'%s #%s' % (_('Order'), self.object.number)
 
     def get_object(self, queryset=None):
-        return get_object_or_404(self.model, user=self.request.user,
+        return get_object_or_404(self.model,
+                                 user=self.request.user,
                                  number=self.kwargs['order_number'])
 
     def do_reorder(self, order):  # noqa (too complex (10))
@@ -504,8 +480,7 @@ class OrderDetailView(PageTitleMixin, PostActionMixin, generic.DetailView):
         lines_to_add = []
         warnings = []
         for line in order.lines.all():
-            is_available, reason = line.is_available_to_reorder(
-                basket, self.request.strategy)
+            is_available, reason = line.is_available_to_reorder(basket, self.request.strategy)
             if is_available:
                 lines_to_add.append(line)
             else:
@@ -514,8 +489,7 @@ class OrderDetailView(PageTitleMixin, PostActionMixin, generic.DetailView):
         # Check whether the number of items in the basket won't exceed the
         # maximum.
         total_quantity = sum([line.quantity for line in lines_to_add])
-        is_quantity_allowed, reason = basket.is_quantity_allowed(
-            total_quantity)
+        is_quantity_allowed, reason = basket.is_quantity_allowed(total_quantity)
         if not is_quantity_allowed:
             messages.warning(self.request, reason)
             self.response = redirect('customer:order-list')
@@ -529,37 +503,33 @@ class OrderDetailView(PageTitleMixin, PostActionMixin, generic.DetailView):
             options = []
             for attribute in line.attributes.all():
                 if attribute.option:
-                    options.append({
-                        'option': attribute.option,
-                        'value': attribute.value})
+                    options.append({'option': attribute.option, 'value': attribute.value})
             basket.add_product(line.product, line.quantity, options)
 
         if len(lines_to_add) > 0:
             self.response = redirect('basket:summary')
             messages.info(
-                self.request,
-                _("All available lines from order %(number)s "
-                  "have been added to your basket") % {'number': order.number})
+                self.request, _("All available lines from order %(number)s "
+                                "have been added to your basket") % {'number': order.number})
         else:
             self.response = redirect('customer:order-list')
             messages.warning(
                 self.request,
                 _("It is not possible to re-order order %(number)s "
-                  "as none of its lines are available to purchase") %
-                {'number': order.number})
+                  "as none of its lines are available to purchase") % {'number': order.number})
 
 
 class OrderLineView(PostActionMixin, generic.DetailView):
     """Customer order line"""
 
     def get_object(self, queryset=None):
-        order = get_object_or_404(Order, user=self.request.user,
+        order = get_object_or_404(Order,
+                                  user=self.request.user,
                                   number=self.kwargs['order_number'])
         return order.lines.get(id=self.kwargs['line_id'])
 
     def do_reorder(self, line):
-        self.response = redirect(
-            'customer:order', int(self.kwargs['order_number']))
+        self.response = redirect('customer:order', int(self.kwargs['order_number']))
         basket = self.request.basket
 
         line_available_to_reorder, reason = line.is_available_to_reorder(
@@ -577,14 +547,15 @@ class OrderLineView(PostActionMixin, generic.DetailView):
         options = []
         for attribute in line.attributes.all():
             if attribute.option:
-                options.append({'option': attribute.option,
-                                'value': attribute.value})
+                options.append({'option': attribute.option, 'value': attribute.value})
         basket.add_product(line.product, line.quantity, options)
 
         if line.quantity > 1:
             msg = _("%(qty)d copies of '%(product)s' have been added to your"
                     " basket") % {
-                'qty': line.quantity, 'product': line.product}
+                        'qty': line.quantity,
+                        'product': line.product
+                    }
         else:
             msg = _("'%s' has been added to your basket") % line.product
 
@@ -597,16 +568,15 @@ class AnonymousOrderDetailView(generic.DetailView):
 
     def get_object(self, queryset=None):
         # Check URL hash matches that for order to prevent spoof attacks
-        order = get_object_or_404(self.model, user=None,
-                                  number=self.kwargs['order_number'])
+        order = get_object_or_404(self.model, user=None, number=self.kwargs['order_number'])
         if self.kwargs['hash'] != order.verification_hash():
             raise http.Http404()
         return order
 
-
 # ------------
 # Address book
 # ------------
+
 
 class AddressListView(PageTitleMixin, generic.ListView):
     """Customer address book"""
@@ -640,8 +610,7 @@ class AddressCreateView(PageTitleMixin, generic.CreateView):
         return ctx
 
     def get_success_url(self):
-        messages.success(self.request,
-                         _("Address '%s' created") % self.object.summary)
+        messages.success(self.request, _("Address '%s' created") % self.object.summary)
         return super(AddressCreateView, self).get_success_url()
 
 
@@ -667,8 +636,7 @@ class AddressUpdateView(PageTitleMixin, generic.UpdateView):
         return self.request.user.addresses.all()
 
     def get_success_url(self):
-        messages.success(self.request,
-                         _("Address '%s' updated") % self.object.summary)
+        messages.success(self.request, _("Address '%s' updated") % self.object.summary)
         return super(AddressUpdateView, self).get_success_url()
 
 
@@ -684,8 +652,7 @@ class AddressDeleteView(PageTitleMixin, generic.DeleteView):
         return UserAddress._default_manager.filter(user=self.request.user)
 
     def get_success_url(self):
-        messages.success(self.request,
-                         _("Address '%s' deleted") % self.object.summary)
+        messages.success(self.request, _("Address '%s' deleted") % self.object.summary)
         return super(AddressDeleteView, self).get_success_url()
 
 
@@ -697,8 +664,7 @@ class AddressChangeStatusView(generic.RedirectView):
     permanent = False
 
     def get(self, request, pk=None, action=None, *args, **kwargs):
-        address = get_object_or_404(UserAddress, user=self.request.user,
-                                    pk=pk)
+        address = get_object_or_404(UserAddress, user=self.request.user, pk=pk)
         #  We don't want the user to set an address as the default shipping
         #  address, though they should be able to set it as their billing
         #  address.
@@ -709,5 +675,4 @@ class AddressChangeStatusView(generic.RedirectView):
         else:
             messages.error(request, _('We do not ship to this country'))
         address.save()
-        return super(AddressChangeStatusView, self).get(
-            request, *args, **kwargs)
+        return super(AddressChangeStatusView, self).get(request, *args, **kwargs)

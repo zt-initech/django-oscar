@@ -21,10 +21,9 @@ OrderDiscount = get_model('order', 'OrderDiscount')
 Benefit = get_model('offer', 'Benefit')
 MetaDataForm, ConditionForm, BenefitForm, RestrictionsForm, OfferSearchForm \
     = get_classes('dashboard.offers.forms',
-                  ['MetaDataForm', 'ConditionForm', 'BenefitForm',
-                   'RestrictionsForm', 'OfferSearchForm'])
-OrderDiscountCSVFormatter = get_class(
-    'dashboard.offers.reports', 'OrderDiscountCSVFormatter')
+                                                                                                ['MetaDataForm', 'ConditionForm', 'BenefitForm',
+                                                                                                 'RestrictionsForm', 'OfferSearchForm'])
+OrderDiscountCSVFormatter = get_class('dashboard.offers.reports', 'OrderDiscountCSVFormatter')
 
 
 class OfferListView(ListView):
@@ -34,11 +33,9 @@ class OfferListView(ListView):
     form_class = OfferSearchForm
 
     def get_queryset(self):
-        qs = self.model._default_manager.exclude(
-            offer_type=ConditionalOffer.VOUCHER)
-        qs = sort_queryset(qs, self.request,
-                           ['name', 'start_datetime', 'end_datetime',
-                            'num_applications', 'total_discount'])
+        qs = self.model._default_manager.exclude(offer_type=ConditionalOffer.VOUCHER)
+        qs = sort_queryset(qs, self.request, ['name', 'start_datetime', 'end_datetime',
+                                              'num_applications', 'total_discount'])
 
         self.description = _("All offers")
 
@@ -87,10 +84,10 @@ class OfferWizardStepView(FormView):
         if not self.is_previous_step_complete(request):
             messages.warning(
                 request, _("%s step not complete") % (
-                    self.previous_view.step_name.title(),))
+                    self.previous_view.step_name.title(),
+                ))
             return HttpResponseRedirect(self.get_back_url())
-        return super(OfferWizardStepView, self).dispatch(request, *args,
-                                                         **kwargs)
+        return super(OfferWizardStepView, self).dispatch(request, *args, **kwargs)
 
     def is_previous_step_complete(self, request):
         if not self.previous_view:
@@ -177,8 +174,7 @@ class OfferWizardStepView(FormView):
             form_kwargs['instance'] = self.get_instance()
         session_kwargs = self._fetch_form_kwargs()
         form_kwargs.update(session_kwargs)
-        parent_kwargs = super(OfferWizardStepView, self).get_form_kwargs(
-            *args, **kwargs)
+        parent_kwargs = super(OfferWizardStepView, self).get_form_kwargs(*args, **kwargs)
         form_kwargs.update(parent_kwargs)
         return form_kwargs
 
@@ -194,8 +190,7 @@ class OfferWizardStepView(FormView):
         if not self.previous_view:
             return None
         if self.update:
-            return reverse(self.previous_view.url_name,
-                           kwargs={'pk': self.kwargs['pk']})
+            return reverse(self.previous_view.url_name, kwargs={'pk': self.kwargs['pk']})
         return reverse(self.previous_view.url_name)
 
     def get_title(self):
@@ -235,13 +230,11 @@ class OfferWizardStepView(FormView):
             msg = _("Offer '%s' created!") % offer.name
         messages.success(self.request, msg)
 
-        return HttpResponseRedirect(reverse(
-            'dashboard:offer-detail', kwargs={'pk': offer.pk}))
+        return HttpResponseRedirect(reverse('dashboard:offer-detail', kwargs={'pk': offer.pk}))
 
     def get_success_url(self):
         if self.update:
-            return reverse(self.success_url_name,
-                           kwargs={'pk': self.kwargs['pk']})
+            return reverse(self.success_url_name, kwargs={'pk': self.kwargs['pk']})
         return reverse(self.success_url_name)
 
     @classmethod
@@ -345,19 +338,20 @@ class OfferDetailView(ListView):
             self.offer.suspend()
             messages.success(self.request, _("Offer suspended"))
         return HttpResponseRedirect(
-            reverse('dashboard:offer-detail', kwargs={'pk': self.offer.pk}))
+            reverse('dashboard:offer-detail',
+                    kwargs={'pk': self.offer.pk}))
 
     def unsuspend(self):
         if not self.offer.is_suspended:
             messages.error(
-                self.request,
-                _("Offer cannot be reinstated as it is not currently "
-                  "suspended"))
+                self.request, _("Offer cannot be reinstated as it is not currently "
+                                "suspended"))
         else:
             self.offer.unsuspend()
             messages.success(self.request, _("Offer reinstated"))
         return HttpResponseRedirect(
-            reverse('dashboard:offer-detail', kwargs={'pk': self.offer.pk}))
+            reverse('dashboard:offer-detail',
+                    kwargs={'pk': self.offer.pk}))
 
     def get_queryset(self):
         return self.model.objects.filter(offer_id=self.offer.pk)
@@ -370,6 +364,5 @@ class OfferDetailView(ListView):
     def render_to_response(self, context):
         if self.request.GET.get('format') == 'csv':
             formatter = OrderDiscountCSVFormatter()
-            return formatter.generate_response(context['order_discounts'],
-                                               offer=self.offer)
+            return formatter.generate_response(context['order_discounts'], offer=self.offer)
         return super(OfferDetailView, self).render_to_response(context)

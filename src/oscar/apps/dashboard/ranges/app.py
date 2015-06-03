@@ -17,8 +17,10 @@ class RangeDashboardApplication(Application):
 
     def get_urls(self):
         urlpatterns = [
-            url(r'^$', self.list_view.as_view(), name='range-list'),
-            url(r'^create/$', self.create_view.as_view(), name='range-create'),
+            url(r'^$', self.list_view.as_view(),
+                name='range-list'),
+            url(r'^create/$', self.create_view.as_view(),
+                name='range-create'),
             url(r'^(?P<pk>\d+)/$', self.update_view.as_view(),
                 name='range-update'),
             url(r'^(?P<pk>\d+)/delete/$', self.delete_view.as_view(),

@@ -11,7 +11,8 @@ strategy = Selector().strategy()
 class ProductIndex(indexes.SearchIndex, indexes.Indexable):
     # Search text
     text = indexes.EdgeNgramField(
-        document=True, use_template=True,
+        document=True,
+        use_template=True,
         template_name='oscar/search/indexes/product/item_text.txt')
 
     upc = indexes.CharField(model_attr="upc", null=True)

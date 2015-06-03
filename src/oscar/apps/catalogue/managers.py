@@ -2,7 +2,6 @@ from django.db import models
 
 
 class ProductQuerySet(models.query.QuerySet):
-
     def base_queryset(self):
         """
         Applies select_related and prefetch_related for commonly related
@@ -10,10 +9,10 @@ class ProductQuerySet(models.query.QuerySet):
         """
         return self.select_related('product_class')\
             .prefetch_related('children',
-                              'product_options',
-                              'product_class__options',
-                              'stockrecords',
-                              'images',
+                                                                                   'product_options',
+                                                                                   'product_class__options',
+                                                                                   'stockrecords',
+                                                                                   'images',
                               )
 
     def browsable(self):

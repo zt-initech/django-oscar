@@ -18,9 +18,7 @@ ProductImage = get_model('catalogue', 'ProductImage')
 ProductRecommendation = get_model('catalogue', 'ProductRecommendation')
 ProductSelect = get_class('dashboard.catalogue.widgets', 'ProductSelect')
 
-CategoryForm = movenodeform_factory(
-    Category,
-    fields=['name', 'description', 'image'])
+CategoryForm = movenodeform_factory(Category, fields=['name', 'description', 'image'])
 
 
 class ProductClassSelectForm(forms.Form):
@@ -45,8 +43,7 @@ class ProductClassSelectForm(forms.Form):
 
 class ProductSearchForm(forms.Form):
     upc = forms.CharField(max_length=16, required=False, label=_('UPC'))
-    title = forms.CharField(
-        max_length=255, required=False, label=_('Product title'))
+    title = forms.CharField(max_length=255, required=False, label=_('Product title'))
 
     def clean(self):
         cleaned_data = super(ProductSearchForm, self).clean()
@@ -56,7 +53,6 @@ class ProductSearchForm(forms.Form):
 
 
 class StockRecordForm(forms.ModelForm):
-
     def __init__(self, product_class, user, *args, **kwargs):
         # The user kwarg is not used by stock StockRecordForm. We pass it
         # anyway in case one wishes to customise the partner queryset
@@ -74,18 +70,21 @@ class StockRecordForm(forms.ModelForm):
     class Meta:
         model = StockRecord
         fields = [
-            'partner', 'partner_sku',
-            'price_currency', 'price_excl_tax', 'price_retail', 'cost_price',
-            'num_in_stock', 'low_stock_threshold',
+            'partner',
+            'partner_sku',
+            'price_currency',
+            'price_excl_tax',
+            'price_retail',
+            'cost_price',
+            'num_in_stock',
+            'low_stock_threshold',
         ]
 
 
-BaseStockRecordFormSet = inlineformset_factory(
-    Product, StockRecord, form=StockRecordForm, extra=1)
+BaseStockRecordFormSet = inlineformset_factory(Product, StockRecord, form=StockRecordForm, extra=1)
 
 
 class StockRecordFormSet(BaseStockRecordFormSet):
-
     def __init__(self, product_class, user, *args, **kwargs):
         self.user = user
         self.require_user_stockrecord = not user.is_staff
@@ -107,8 +106,7 @@ class StockRecordFormSet(BaseStockRecordFormSet):
         if self.require_user_stockrecord:
             try:
                 user_partner = self.user.partners.get()
-            except (exceptions.ObjectDoesNotExist,
-                    exceptions.MultipleObjectsReturned):
+            except (exceptions.ObjectDoesNotExist, exceptions.MultipleObjectsReturned):
                 pass
             else:
                 partner_field = self.forms[0].fields.get('partner', None)
@@ -118,8 +116,7 @@ class StockRecordFormSet(BaseStockRecordFormSet):
     def _construct_form(self, i, **kwargs):
         kwargs['product_class'] = self.product_class
         kwargs['user'] = self.user
-        return super(StockRecordFormSet, self)._construct_form(
-            i, **kwargs)
+        return super(StockRecordFormSet, self)._construct_form(i, **kwargs)
 
     def clean(self):
         """
@@ -139,8 +136,7 @@ class StockRecordFormSet(BaseStockRecordFormSet):
 
 
 def _attr_text_field(attribute):
-    return forms.CharField(label=attribute.name,
-                           required=attribute.required)
+    return forms.CharField(label=attribute.name, required=attribute.required)
 
 
 def _attr_textarea_field(attribute):
@@ -150,18 +146,15 @@ def _attr_textarea_field(attribute):
 
 
 def _attr_integer_field(attribute):
-    return forms.IntegerField(label=attribute.name,
-                              required=attribute.required)
+    return forms.IntegerField(label=attribute.name, required=attribute.required)
 
 
 def _attr_boolean_field(attribute):
-    return forms.BooleanField(label=attribute.name,
-                              required=attribute.required)
+    return forms.BooleanField(label=attribute.name, required=attribute.required)
 
 
 def _attr_float_field(attribute):
-    return forms.FloatField(label=attribute.name,
-                            required=attribute.required)
+    return forms.FloatField(label=attribute.name, required=attribute.required)
 
 
 def _attr_date_field(attribute):
@@ -193,18 +186,15 @@ def _attr_entity_field(attribute):
 
 
 def _attr_numeric_field(attribute):
-    return forms.FloatField(label=attribute.name,
-                            required=attribute.required)
+    return forms.FloatField(label=attribute.name, required=attribute.required)
 
 
 def _attr_file_field(attribute):
-    return forms.FileField(
-        label=attribute.name, required=attribute.required)
+    return forms.FileField(label=attribute.name, required=attribute.required)
 
 
 def _attr_image_field(attribute):
-    return forms.ImageField(
-        label=attribute.name, required=attribute.required)
+    return forms.ImageField(label=attribute.name, required=attribute.required)
 
 
 class ProductForm(forms.ModelForm):
@@ -225,11 +215,8 @@ class ProductForm(forms.ModelForm):
 
     class Meta:
         model = Product
-        fields = [
-            'title', 'upc', 'description', 'is_discountable', 'structure']
-        widgets = {
-            'structure': forms.HiddenInput()
-        }
+        fields = ['title', 'upc', 'description', 'is_discountable', 'structure']
+        widgets = {'structure': forms.HiddenInput()}
 
     def __init__(self, product_class, data=None, parent=None, *args, **kwargs):
         self.set_initial(product_class, parent, kwargs)
@@ -249,8 +236,7 @@ class ProductForm(forms.ModelForm):
         self.add_attribute_fields(product_class, self.instance.is_parent)
 
         if 'title' in self.fields:
-            self.fields['title'].widget = forms.TextInput(
-                attrs={'autocomplete': 'off'})
+            self.fields['title'].widget = forms.TextInput(attrs={'autocomplete': 'off'})
 
     def set_initial(self, product_class, parent, kwargs):
         """
@@ -274,8 +260,7 @@ class ProductForm(forms.ModelForm):
             return
         for attribute in product_class.attributes.all():
             try:
-                value = instance.attribute_values.get(
-                    attribute=attribute).value
+                value = instance.attribute_values.get(attribute=attribute).value
             except exceptions.ObjectDoesNotExist:
                 pass
             else:
@@ -329,19 +314,19 @@ class StockAlertSearchForm(forms.Form):
 
 
 class ProductCategoryForm(forms.ModelForm):
-
     class Meta:
         model = ProductCategory
         fields = ('category', )
 
 
 BaseProductCategoryFormSet = inlineformset_factory(
-    Product, ProductCategory, form=ProductCategoryForm, extra=1,
+    Product, ProductCategory,
+    form=ProductCategoryForm,
+    extra=1,
     can_delete=True)
 
 
 class ProductCategoryFormSet(BaseProductCategoryFormSet):
-
     def __init__(self, product_class, user, *args, **kwargs):
         # This function just exists to drop the extra arguments
         super(ProductCategoryFormSet, self).__init__(*args, **kwargs)
@@ -352,31 +337,26 @@ class ProductCategoryFormSet(BaseProductCategoryFormSet):
                 _("Stand-alone and parent products "
                   "must have at least one category"))
         if self.instance.is_child and self.get_num_categories() > 0:
-            raise forms.ValidationError(
-                _("A child product should not have categories"))
+            raise forms.ValidationError(_("A child product should not have categories"))
 
     def get_num_categories(self):
         num_categories = 0
         for i in range(0, self.total_form_count()):
             form = self.forms[i]
-            if (hasattr(form, 'cleaned_data')
-                    and form.cleaned_data.get('category', None)
-                    and not form.cleaned_data.get('DELETE', False)):
+            if (hasattr(form, 'cleaned_data') and form.cleaned_data.get('category', None) and
+                not form.cleaned_data.get('DELETE', False)):
                 num_categories += 1
         return num_categories
 
 
 class ProductImageForm(forms.ModelForm):
-
     class Meta:
         model = ProductImage
         fields = ['product', 'original', 'caption']
         # use ImageInput widget to create HTML displaying the
         # actual uploaded image and providing the upload dialog
         # when clicking on the actual image.
-        widgets = {
-            'original': ImageInput(),
-        }
+        widgets = {'original': ImageInput(), }
 
     def save(self, *args, **kwargs):
         # We infer the display order of the image based on the order of the
@@ -392,45 +372,42 @@ class ProductImageForm(forms.ModelForm):
 
 
 BaseProductImageFormSet = inlineformset_factory(
-    Product, ProductImage, form=ProductImageForm, extra=2)
+    Product, ProductImage,
+    form=ProductImageForm,
+    extra=2)
 
 
 class ProductImageFormSet(BaseProductImageFormSet):
-
     def __init__(self, product_class, user, *args, **kwargs):
         super(ProductImageFormSet, self).__init__(*args, **kwargs)
 
 
 class ProductRecommendationForm(forms.ModelForm):
-
     class Meta:
         model = ProductRecommendation
         fields = ['primary', 'recommendation', 'ranking']
-        widgets = {
-            'recommendation': ProductSelect,
-        }
+        widgets = {'recommendation': ProductSelect, }
 
 
 BaseProductRecommendationFormSet = inlineformset_factory(
-    Product, ProductRecommendation, form=ProductRecommendationForm,
-    extra=5, fk_name="primary")
+    Product, ProductRecommendation,
+    form=ProductRecommendationForm,
+    extra=5,
+    fk_name="primary")
 
 
 class ProductRecommendationFormSet(BaseProductRecommendationFormSet):
-
     def __init__(self, product_class, user, *args, **kwargs):
         super(ProductRecommendationFormSet, self).__init__(*args, **kwargs)
 
 
 class ProductClassForm(forms.ModelForm):
-
     class Meta:
         model = ProductClass
         fields = ['name', 'requires_shipping', 'track_stock', 'options']
 
 
 class ProductAttributesForm(forms.ModelForm):
-
     def __init__(self, *args, **kwargs):
         super(ProductAttributesForm, self).__init__(*args, **kwargs)
 
@@ -453,7 +430,7 @@ class ProductAttributesForm(forms.ModelForm):
         model = ProductAttribute
         fields = ["name", "code", "type", "option_group", "required"]
 
-ProductAttributesFormSet = inlineformset_factory(ProductClass,
-                                                 ProductAttribute,
+
+ProductAttributesFormSet = inlineformset_factory(ProductClass, ProductAttribute,
                                                  form=ProductAttributesForm,
                                                  extra=3)

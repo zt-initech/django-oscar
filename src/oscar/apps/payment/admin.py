@@ -8,8 +8,8 @@ Bankcard = get_model('payment', 'Bankcard')
 
 
 class SourceAdmin(admin.ModelAdmin):
-    list_display = ('order', 'source_type', 'amount_allocated',
-                    'amount_debited', 'balance', 'reference')
+    list_display = ('order', 'source_type', 'amount_allocated', 'amount_debited', 'balance',
+                    'reference')
 
 
 class BankcardAdmin(admin.ModelAdmin):

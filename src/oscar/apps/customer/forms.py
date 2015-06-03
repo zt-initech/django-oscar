@@ -16,7 +16,6 @@ from oscar.core.compat import get_user_model, existing_user_fields
 from oscar.apps.customer.utils import get_password_reset_url, normalise_email
 from oscar.core.validators import password_validators
 
-
 Dispatcher = get_class('customer.utils', 'Dispatcher')
 CommunicationEventType = get_model('customer', 'communicationeventtype')
 ProductAlert = get_model('customer', 'ProductAlert')
@@ -29,8 +28,7 @@ def generate_username():
         letters = string.ascii_letters
     except AttributeError:
         letters = string.letters
-    uname = ''.join([random.choice(letters + string.digits + '_')
-                     for i in range(30)])
+    uname = ''.join([random.choice(letters + string.digits + '_') for i in range(30)])
     try:
         User.objects.get(username=uname)
         return generate_username()
@@ -44,8 +42,7 @@ class PasswordResetForm(auth_forms.PasswordResetForm):
     """
     communication_type_code = "PASSWORD_RESET"
 
-    def save(self, domain_override=None, use_https=False, request=None,
-             **kwargs):
+    def save(self, domain_override=None, use_https=False, request=None, **kwargs):
         """
         Generates a one-use only link for resetting password and sends to the
         user.
@@ -54,25 +51,21 @@ class PasswordResetForm(auth_forms.PasswordResetForm):
         if domain_override is not None:
             site.domain = site.name = domain_override
         email = self.cleaned_data['email']
-        active_users = User._default_manager.filter(
-            email__iexact=email, is_active=True)
+        active_users = User._default_manager.filter(email__iexact=email, is_active=True)
         for user in active_users:
             reset_url = self.get_reset_url(site, request, user, use_https)
-            ctx = {
-                'user': user,
-                'site': site,
-                'reset_url': reset_url}
+            ctx = {'user': user, 'site': site, 'reset_url': reset_url}
             messages = CommunicationEventType.objects.get_and_render(
-                code=self.communication_type_code, context=ctx)
+                code=self.communication_type_code,
+                context=ctx)
             Dispatcher().dispatch_user_messages(user, messages)
 
     def get_reset_url(self, site, request, user, use_https):
         # the request argument isn't used currently, but implementors might
         # need it to determine the correct subdomain
         reset_url = "%s://%s%s" % (
-            'https' if use_https else 'http',
-            site.domain,
-            get_password_reset_url(user))
+            'https' if use_https else 'http', site.domain, get_password_reset_url(user)
+        )
 
         return reset_url
 
@@ -98,8 +91,7 @@ class EmailAuthenticationForm(AuthenticationForm):
     auth backend.
     """
     username = forms.EmailField(label=_('Email address'))
-    redirect_url = forms.CharField(
-        widget=forms.HiddenInput, required=False)
+    redirect_url = forms.CharField(widget=forms.HiddenInput, required=False)
 
     def __init__(self, host, *args, **kwargs):
         self.host = host
@@ -126,24 +118,22 @@ class ConfirmPasswordForm(forms.Form):
     def clean_password(self):
         password = self.cleaned_data['password']
         if not self.user.check_password(password):
-            raise forms.ValidationError(
-                _("The entered password is not valid!"))
+            raise forms.ValidationError(_("The entered password is not valid!"))
         return password
 
 
 class EmailUserCreationForm(forms.ModelForm):
     email = forms.EmailField(label=_('Email address'))
     password1 = forms.CharField(
-        label=_('Password'), widget=forms.PasswordInput,
+        label=_('Password'),
+        widget=forms.PasswordInput,
         validators=password_validators)
-    password2 = forms.CharField(
-        label=_('Confirm password'), widget=forms.PasswordInput)
-    redirect_url = forms.CharField(
-        widget=forms.HiddenInput, required=False)
+    password2 = forms.CharField(label=_('Confirm password'), widget=forms.PasswordInput)
+    redirect_url = forms.CharField(widget=forms.HiddenInput, required=False)
 
     class Meta:
         model = User
-        fields = ('email',)
+        fields = ('email', )
 
     def __init__(self, host=None, *args, **kwargs):
         self.host = host
@@ -155,16 +145,14 @@ class EmailUserCreationForm(forms.ModelForm):
         """
         email = normalise_email(self.cleaned_data['email'])
         if User._default_manager.filter(email__iexact=email).exists():
-            raise forms.ValidationError(
-                _("A user with that email address already exists"))
+            raise forms.ValidationError(_("A user with that email address already exists"))
         return email
 
     def clean_password2(self):
         password1 = self.cleaned_data.get('password1', '')
         password2 = self.cleaned_data.get('password2', '')
         if password1 != password2:
-            raise forms.ValidationError(
-                _("The two password fields didn't match."))
+            raise forms.ValidationError(_("The two password fields didn't match."))
         return password2
 
     def clean_redirect_url(self):
@@ -185,16 +173,13 @@ class EmailUserCreationForm(forms.ModelForm):
 
 
 class OrderSearchForm(forms.Form):
-    date_from = forms.DateField(
-        required=False, label=pgettext_lazy("start date", "From"))
-    date_to = forms.DateField(
-        required=False, label=pgettext_lazy("end date", "To"))
+    date_from = forms.DateField(required=False, label=pgettext_lazy("start date", "From"))
+    date_to = forms.DateField(required=False, label=pgettext_lazy("end date", "To"))
     order_number = forms.CharField(required=False, label=_("Order number"))
 
     def clean(self):
-        if self.is_valid() and not any([self.cleaned_data['date_from'],
-                                        self.cleaned_data['date_to'],
-                                        self.cleaned_data['order_number']]):
+        if self.is_valid() and not any([self.cleaned_data['date_from'], self.cleaned_data['date_to'
+                                                          ], self.cleaned_data['order_number']]):
             raise forms.ValidationError(_("At least one field is required."))
         return super(OrderSearchForm, self).clean()
 
@@ -218,8 +203,7 @@ class OrderSearchForm(forms.Form):
                          '%(date_to)s and order number containing '
                          '%(order_number)s')
             else:
-                desc = _('Orders placed between %(date_from)s and '
-                         '%(date_to)s')
+                desc = _('Orders placed between %(date_from)s and ' '%(date_to)s')
         elif date_from:
             if order_number:
                 desc = _('Orders placed since %(date_from)s and '
@@ -236,11 +220,7 @@ class OrderSearchForm(forms.Form):
             desc = _('Orders with order number containing %(order_number)s')
         else:
             return None
-        params = {
-            'date_from': date_from,
-            'date_to': date_to,
-            'order_number': order_number,
-        }
+        params = {'date_from': date_from, 'date_to': date_to, 'order_number': order_number, }
         return desc % params
 
     def get_filters(self):
@@ -260,7 +240,6 @@ class OrderSearchForm(forms.Form):
 
 
 class UserForm(forms.ModelForm):
-
     def __init__(self, user, *args, **kwargs):
         self.user = user
         kwargs['instance'] = user
@@ -276,10 +255,8 @@ class UserForm(forms.ModelForm):
         level in ``django.contrib.auth.models.User``.
         """
         email = normalise_email(self.cleaned_data['email'])
-        if User._default_manager.filter(
-                email__iexact=email).exclude(id=self.user.id).exists():
-            raise ValidationError(
-                _("A user with this email address already exists"))
+        if User._default_manager.filter(email__iexact=email).exclude(id=self.user.id).exists():
+            raise ValidationError(_("A user with this email address already exists"))
         # Save the email unaltered
         return email
 
@@ -292,7 +269,6 @@ Profile = get_profile_class()
 if Profile:  # noqa (too complex (12))
 
     class UserAndProfileForm(forms.ModelForm):
-
         def __init__(self, user, *args, **kwargs):
             try:
                 instance = Profile.objects.get(user=user)
@@ -318,8 +294,7 @@ if Profile:  # noqa (too complex (12))
             self.user_field_names = user_field_names
 
             # Add additional user form fields
-            additional_fields = forms.fields_for_model(
-                User, fields=user_field_names)
+            additional_fields = forms.fields_for_model(User, fields=user_field_names)
             self.fields.update(additional_fields)
 
             # Ensure email is required and initialised correctly
@@ -334,7 +309,7 @@ if Profile:  # noqa (too complex (12))
 
         class Meta:
             model = Profile
-            exclude = ('user',)
+            exclude = ('user', )
 
         def clean_email(self):
             email = normalise_email(self.cleaned_data['email'])
@@ -342,8 +317,7 @@ if Profile:  # noqa (too complex (12))
             users_with_email = User._default_manager.filter(
                 email__iexact=email).exclude(id=self.instance.user.id)
             if users_with_email.exists():
-                raise ValidationError(
-                    _("A user with this email address already exists"))
+                raise ValidationError(_("A user with this email address already exists"))
             return email
 
         def save(self, *args, **kwargs):
@@ -362,7 +336,8 @@ else:
 
 
 class ProductAlertForm(forms.ModelForm):
-    email = forms.EmailField(required=True, label=_(u'Send notification to'),
+    email = forms.EmailField(required=True,
+                             label=_(u'Send notification to'),
                              widget=forms.TextInput(attrs={
                                  'placeholder': _('Enter your email')
                              }))
@@ -392,7 +367,8 @@ class ProductAlertForm(forms.ModelForm):
         if email:
             try:
                 ProductAlert.objects.get(
-                    product=self.product, email__iexact=email,
+                    product=self.product,
+                    email__iexact=email,
                     status=ProductAlert.ACTIVE)
             except ProductAlert.DoesNotExist:
                 pass
@@ -407,8 +383,7 @@ class ProductAlertForm(forms.ModelForm):
             except ProductAlert.DoesNotExist:
                 pass
             else:
-                raise forms.ValidationError(_(
-                    "You already have an active alert for this product"))
+                raise forms.ValidationError(_("You already have an active alert for this product"))
         return cleaned_data
 
     class Meta:

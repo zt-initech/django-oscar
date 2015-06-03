@@ -22,11 +22,7 @@ class AbstractAddress(models.Model):
     """
     MR, MISS, MRS, MS, DR = ('Mr', 'Miss', 'Mrs', 'Ms', 'Dr')
     TITLE_CHOICES = (
-        (MR, _("Mr")),
-        (MISS, _("Miss")),
-        (MRS, _("Mrs")),
-        (MS, _("Ms")),
-        (DR, _("Dr")),
+        (MR, _("Mr")), (MISS, _("Miss")), (MRS, _("Mrs")), (MS, _("Ms")), (DR, _("Dr")),
     )
 
     POSTCODE_REQUIRED = 'postcode' in settings.OSCAR_REQUIRED_ADDRESS_FIELDS
@@ -216,27 +212,27 @@ class AbstractAddress(models.Model):
 
     title = models.CharField(
         pgettext_lazy(u"Treatment Pronouns for the customer", u"Title"),
-        max_length=64, choices=TITLE_CHOICES, blank=True)
+        max_length=64,
+        choices=TITLE_CHOICES,
+        blank=True)
     first_name = models.CharField(_("First name"), max_length=255, blank=True)
     last_name = models.CharField(_("Last name"), max_length=255, blank=True)
 
     # We use quite a few lines of an address as they are often quite long and
     # it's easier to just hide the unnecessary ones than add extra ones.
     line1 = models.CharField(_("First line of address"), max_length=255)
-    line2 = models.CharField(
-        _("Second line of address"), max_length=255, blank=True)
-    line3 = models.CharField(
-        _("Third line of address"), max_length=255, blank=True)
+    line2 = models.CharField(_("Second line of address"), max_length=255, blank=True)
+    line3 = models.CharField(_("Third line of address"), max_length=255, blank=True)
     line4 = models.CharField(_("City"), max_length=255, blank=True)
     state = models.CharField(_("State/County"), max_length=255, blank=True)
-    postcode = UppercaseCharField(
-        _("Post/Zip-code"), max_length=64, blank=True)
+    postcode = UppercaseCharField(_("Post/Zip-code"), max_length=64, blank=True)
     country = models.ForeignKey('address.Country', verbose_name=_("Country"))
 
     #: A field only used for searching addresses - this contains all the
     #: relevant fields.  This is effectively a poor man's Solr text field.
     search_text = models.TextField(
-        _("Search text - used only for searching addresses"), editable=False)
+        _("Search text - used only for searching addresses"),
+        editable=False)
 
     def __str__(self):
         return self.summary
@@ -254,8 +250,8 @@ class AbstractAddress(models.Model):
 
     def clean(self):
         # Strip all whitespace
-        for field in ['first_name', 'last_name', 'line1', 'line2', 'line3',
-                      'line4', 'state', 'postcode']:
+        for field in ['first_name', 'last_name', 'line1', 'line2', 'line3', 'line4', 'state',
+                      'postcode']:
             if self.__dict__[field]:
                 self.__dict__[field] = self.__dict__[field].strip()
 
@@ -285,14 +281,12 @@ class AbstractAddress(models.Model):
                 msg = _("The postcode '%(postcode)s' is not valid "
                         "for %(country)s") \
                     % {'postcode': self.postcode,
-                       'country': self.country}
-                raise exceptions.ValidationError(
-                    {'postcode': [msg]})
+                                                                    'country': self.country}
+                raise exceptions.ValidationError({'postcode': [msg]})
 
     def _update_search_text(self):
         search_fields = filter(
-            bool, [self.first_name, self.last_name,
-                   self.line1, self.line2, self.line3, self.line4,
+            bool, [self.first_name, self.last_name, self.line1, self.line2, self.line3, self.line4,
                    self.state, self.postcode, self.country.name])
         self.search_text = ' '.join(search_fields)
 
@@ -316,9 +310,7 @@ class AbstractAddress(models.Model):
         """
         Name (including title)
         """
-        return self.join_fields(
-            ('title', 'first_name', 'last_name'),
-            separator=u" ")
+        return self.join_fields(('title', 'first_name', 'last_name'), separator=u" ")
 
     @property
     def name(self):
@@ -355,8 +347,7 @@ class AbstractAddress(models.Model):
         This is used to convert a user address to a shipping address
         as part of the checkout process.
         """
-        destination_field_names = [
-            field.name for field in address_model._meta.fields]
+        destination_field_names = [field.name for field in address_model._meta.fields]
         for field_name in [field.name for field in self._meta.fields]:
             if field_name in destination_field_names and field_name != 'id':
                 setattr(address_model, field_name, getattr(self, field_name))
@@ -366,8 +357,7 @@ class AbstractAddress(models.Model):
         Return the non-empty components of the address, but merging the
         title, first_name and last_name into a single line.
         """
-        fields = [self.line1, self.line2, self.line3,
-                  self.line4, self.state, self.postcode]
+        fields = [self.line1, self.line2, self.line3, self.line4, self.state, self.postcode]
         if include_salutation:
             fields = [self.salutation] + fields
         fields = [f.strip() for f in fields if f]
@@ -386,12 +376,9 @@ class AbstractCountry(models.Model):
     The field names are a bit awkward, but kept for backwards compatibility.
     pycountry's syntax of alpha2, alpha3, name and official_name seems sane.
     """
-    iso_3166_1_a2 = models.CharField(
-        _('ISO 3166-1 alpha-2'), max_length=2, primary_key=True)
-    iso_3166_1_a3 = models.CharField(
-        _('ISO 3166-1 alpha-3'), max_length=3, blank=True)
-    iso_3166_1_numeric = models.CharField(
-        _('ISO 3166-1 numeric'), blank=True, max_length=3)
+    iso_3166_1_a2 = models.CharField(_('ISO 3166-1 alpha-2'), max_length=2, primary_key=True)
+    iso_3166_1_a3 = models.CharField(_('ISO 3166-1 alpha-3'), max_length=3, blank=True)
+    iso_3166_1_numeric = models.CharField(_('ISO 3166-1 numeric'), blank=True, max_length=3)
 
     #: The commonly used name; e.g. 'United Kingdom'
     printable_name = models.CharField(_('Country name'), max_length=128)
@@ -400,18 +387,22 @@ class AbstractCountry(models.Model):
     name = models.CharField(_('Official name'), max_length=128)
 
     display_order = models.PositiveSmallIntegerField(
-        _("Display order"), default=0, db_index=True,
+        _("Display order"),
+        default=0,
+        db_index=True,
         help_text=_('Higher the number, higher the country in the list.'))
 
     is_shipping_country = models.BooleanField(
-        _("Is shipping country"), default=False, db_index=True)
+        _("Is shipping country"),
+        default=False,
+        db_index=True)
 
     class Meta:
         abstract = True
         app_label = 'address'
         verbose_name = _('Country')
         verbose_name_plural = _('Countries')
-        ordering = ('-display_order', 'printable_name',)
+        ordering = ('-display_order', 'printable_name', )
 
     def __str__(self):
         return self.printable_name or self.name
@@ -453,10 +444,12 @@ class AbstractShippingAddress(AbstractAddress):
     """
 
     phone_number = PhoneNumberField(
-        _("Phone number"), blank=True,
+        _("Phone number"),
+        blank=True,
         help_text=_("In case we need to call you about your order"))
     notes = models.TextField(
-        blank=True, verbose_name=_('Instructions'),
+        blank=True,
+        verbose_name=_('Instructions'),
         help_text=_("Tell us anything we should know when delivering "
                     "your order."))
 
@@ -489,16 +482,13 @@ class AbstractUserAddress(AbstractShippingAddress):
     model, we allow users the ability to add/edit/delete from their address
     book without affecting orders already placed.
     """
-    user = models.ForeignKey(
-        AUTH_USER_MODEL, related_name='addresses', verbose_name=_("User"))
+    user = models.ForeignKey(AUTH_USER_MODEL, related_name='addresses', verbose_name=_("User"))
 
     #: Whether this address is the default for shipping
-    is_default_for_shipping = models.BooleanField(
-        _("Default shipping address?"), default=False)
+    is_default_for_shipping = models.BooleanField(_("Default shipping address?"), default=False)
 
     #: Whether this address should be the default for billing.
-    is_default_for_billing = models.BooleanField(
-        _("Default billing address?"), default=False)
+    is_default_for_billing = models.BooleanField(_("Default billing address?"), default=False)
 
     #: We keep track of the number of times an address has been used
     #: as a shipping address so we can show the most popular ones
@@ -507,8 +497,7 @@ class AbstractUserAddress(AbstractShippingAddress):
 
     #: A hash is kept to try and avoid duplicate addresses being added
     #: to the address book.
-    hash = models.CharField(_("Address Hash"), max_length=255, db_index=True,
-                            editable=False)
+    hash = models.CharField(_("Address Hash"), max_length=255, db_index=True, editable=False)
     date_created = models.DateTimeField(_("Date Created"), auto_now_add=True)
 
     def save(self, *args, **kwargs):
@@ -544,15 +533,14 @@ class AbstractUserAddress(AbstractShippingAddress):
 
     def validate_unique(self, exclude=None):
         super(AbstractAddress, self).validate_unique(exclude)
-        qs = self.__class__.objects.filter(
-            user=self.user,
-            hash=self.generate_hash())
+        qs = self.__class__.objects.filter(user=self.user, hash=self.generate_hash())
         if self.id:
             qs = qs.exclude(id=self.id)
         if qs.exists():
             raise exceptions.ValidationError({
                 '__all__': [_("This address is already in your address"
-                              " book")]})
+                              " book")]
+            })
 
 
 class AbstractBillingAddress(AbstractAddress):
@@ -579,7 +567,8 @@ class AbstractPartnerAddress(AbstractAddress):
     A partner can have one or more addresses. This can be useful e.g. when
     determining US tax which depends on the origin of the shipment.
     """
-    partner = models.ForeignKey('partner.Partner', related_name='addresses',
+    partner = models.ForeignKey('partner.Partner',
+                                related_name='addresses',
                                 verbose_name=_('Partner'))
 
     class Meta:

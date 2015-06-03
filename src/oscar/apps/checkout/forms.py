@@ -14,14 +14,12 @@ Country = get_model('address', 'Country')
 
 
 class ShippingAddressForm(PhoneNumberMixin, AbstractAddressForm):
-
     def __init__(self, *args, **kwargs):
         super(ShippingAddressForm, self).__init__(*args, **kwargs)
         self.adjust_country_field()
 
     def adjust_country_field(self):
-        countries = Country._default_manager.filter(
-            is_shipping_country=True)
+        countries = Country._default_manager.filter(is_shipping_country=True)
 
         # No need to show country dropdown if there is only one option
         if len(countries) == 1:
@@ -34,10 +32,18 @@ class ShippingAddressForm(PhoneNumberMixin, AbstractAddressForm):
     class Meta:
         model = get_model('order', 'shippingaddress')
         fields = [
-            'title', 'first_name', 'last_name',
-            'line1', 'line2', 'line3', 'line4',
-            'state', 'postcode', 'country',
-            'phone_number', 'notes',
+            'title',
+            'first_name',
+            'last_name',
+            'line1',
+            'line2',
+            'line3',
+            'line4',
+            'state',
+            'postcode',
+            'country',
+            'phone_number',
+            'notes',
         ]
 
 
@@ -45,12 +51,12 @@ class GatewayForm(AuthenticationForm):
     username = forms.EmailField(label=_("My email address is"))
     GUEST, NEW, EXISTING = 'anonymous', 'new', 'existing'
     CHOICES = (
-        (GUEST, _('I am a new customer and want to checkout as a guest')),
-        (NEW, _('I am a new customer and want to create an account '
-                'before checking out')),
-        (EXISTING, _('I am a returning customer, and my password is')))
-    options = forms.ChoiceField(widget=forms.widgets.RadioSelect,
-                                choices=CHOICES, initial=GUEST)
+        (GUEST, _('I am a new customer and want to checkout as a guest')), (
+            NEW, _('I am a new customer and want to create an account '
+                   'before checking out')
+        ), (EXISTING, _('I am a returning customer, and my password is'))
+    )
+    options = forms.ChoiceField(widget=forms.widgets.RadioSelect, choices=CHOICES, initial=GUEST)
 
     def clean_username(self):
         return normalise_email(self.cleaned_data['username'])
@@ -72,6 +78,5 @@ class GatewayForm(AuthenticationForm):
 
     def is_new_account_checkout(self):
         return self.cleaned_data.get('options', None) == self.NEW
-
 
 # The BillingAddress form is in oscar.apps.payment.forms

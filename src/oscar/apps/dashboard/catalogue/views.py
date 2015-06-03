@@ -25,20 +25,20 @@ from oscar.views.generic import ObjectLookupView
  ProductRecommendationFormSet,
  ProductAttributesFormSet) \
     = get_classes('dashboard.catalogue.forms',
-                  ('ProductForm',
-                   'ProductClassSelectForm',
-                   'ProductSearchForm',
-                   'ProductClassForm',
-                   'CategoryForm',
-                   'StockRecordFormSet',
-                   'StockAlertSearchForm',
-                   'ProductCategoryFormSet',
-                   'ProductImageFormSet',
-                   'ProductRecommendationFormSet',
-                   'ProductAttributesFormSet'))
+                                               ('ProductForm',
+                                                'ProductClassSelectForm',
+                                                'ProductSearchForm',
+                                                'ProductClassForm',
+                                                'CategoryForm',
+                                                'StockRecordFormSet',
+                                                'StockAlertSearchForm',
+                                                'ProductCategoryFormSet',
+                                                'ProductImageFormSet',
+                                                'ProductRecommendationFormSet',
+                                                'ProductAttributesFormSet'))
 ProductTable, CategoryTable \
     = get_classes('dashboard.catalogue.tables',
-                  ('ProductTable', 'CategoryTable'))
+                                                ('ProductTable', 'CategoryTable'))
 Product = get_model('catalogue', 'Product')
 Category = get_model('catalogue', 'Category')
 ProductImage = get_model('catalogue', 'ProductImage')
@@ -128,13 +128,15 @@ class ProductListView(SingleTableMixin, generic.TemplateView):
             # If there's an exact match, return it, otherwise return results
             # that contain the UPC
             matches_upc = Product.objects.filter(upc=data['upc'])
-            qs_match = queryset.filter(Q(id=matches_upc.values('id')) | Q(id=matches_upc.values('parent_id')))
+            qs_match = queryset.filter(
+                Q(id=matches_upc.values('id')) | Q(id=matches_upc.values('parent_id')))
 
             if qs_match.exists():
                 queryset = qs_match
             else:
                 matches_upc = Product.objects.filter(upc__icontains=data['upc'])
-                queryset = queryset.filter(Q(id=matches_upc.values('id')) | Q(id=matches_upc.values('parent_id')))
+                queryset = queryset.filter(Q(id=matches_upc.values('id')) | Q(
+                    id=matches_upc.values('parent_id')))
 
         if data.get('title'):
             queryset = queryset.filter(title__icontains=data['title'])
@@ -193,14 +195,15 @@ class ProductCreateUpdateView(generic.UpdateView):
 
     def __init__(self, *args, **kwargs):
         super(ProductCreateUpdateView, self).__init__(*args, **kwargs)
-        self.formsets = {'category_formset': self.category_formset,
-                         'image_formset': self.image_formset,
-                         'recommended_formset': self.recommendations_formset,
-                         'stockrecord_formset': self.stockrecord_formset}
+        self.formsets = {
+            'category_formset': self.category_formset,
+            'image_formset': self.image_formset,
+            'recommended_formset': self.recommendations_formset,
+            'stockrecord_formset': self.stockrecord_formset
+        }
 
     def dispatch(self, request, *args, **kwargs):
-        resp = super(ProductCreateUpdateView, self).dispatch(
-            request, *args, **kwargs)
+        resp = super(ProductCreateUpdateView, self).dispatch(request, *args, **kwargs)
         return self.check_objects_or_redirect() or resp
 
     def check_objects_or_redirect(self):
@@ -241,8 +244,7 @@ class ProductCreateUpdateView(generic.UpdateView):
                 # A product class needs to be specified when creating a
                 # standalone product.
                 product_class_slug = self.kwargs.get('product_class_slug')
-                self.product_class = get_object_or_404(
-                    ProductClass, slug=product_class_slug)
+                self.product_class = get_object_or_404(ProductClass, slug=product_class_slug)
             else:
                 self.parent = get_object_or_404(Product, pk=parent_pk)
                 self.product_class = self.parent.product_class
@@ -262,8 +264,7 @@ class ProductCreateUpdateView(generic.UpdateView):
 
         for ctx_name, formset_class in self.formsets.items():
             if ctx_name not in ctx:
-                ctx[ctx_name] = formset_class(self.product_class,
-                                              self.request.user,
+                ctx[ctx_name] = formset_class(self.product_class, self.request.user,
                                               instance=self.object)
         return ctx
 
@@ -271,16 +272,19 @@ class ProductCreateUpdateView(generic.UpdateView):
         if self.creating:
             if self.parent is None:
                 return _('Create new %(product_class)s product') % {
-                    'product_class': self.product_class.name}
+                    'product_class': self.product_class.name
+                }
             else:
                 return _('Create new variant of %(parent_product)s') % {
-                    'parent_product': self.parent.title}
+                    'parent_product': self.parent.title
+                }
         else:
             if self.object.title or not self.parent:
                 return self.object.title
             else:
                 return _('Editing variant of %(parent_product)s') % {
-                    'parent_product': self.parent.title}
+                    'parent_product': self.parent.title
+                }
 
     def get_form_kwargs(self):
         kwargs = super(ProductCreateUpdateView, self).get_form_kwargs()
@@ -300,14 +304,11 @@ class ProductCreateUpdateView(generic.UpdateView):
 
         formsets = {}
         for ctx_name, formset_class in self.formsets.items():
-            formsets[ctx_name] = formset_class(self.product_class,
-                                               self.request.user,
-                                               self.request.POST,
-                                               self.request.FILES,
-                                               instance=self.object)
+            formsets[ctx_name] = formset_class(
+                self.product_class, self.request.user, self.request.POST, self.request.FILES,
+                instance=self.object)
 
-        is_valid = form.is_valid() and all([formset.is_valid()
-                                            for formset in formsets.values()])
+        is_valid = form.is_valid() and all([formset.is_valid() for formset in formsets.values()])
 
         cross_form_validation_result = self.clean(form, formsets)
         if is_valid and cross_form_validation_result:
@@ -369,9 +370,8 @@ class ProductCreateUpdateView(generic.UpdateView):
             self.object.delete()
             self.object = None
 
-        messages.error(self.request,
-                       _("Your submitted data was not valid - please "
-                         "correct the errors below"))
+        messages.error(self.request, _("Your submitted data was not valid - please "
+                                       "correct the errors below"))
         ctx = self.get_context_data(form=form, **formsets)
         return self.render_to_response(ctx)
 
@@ -390,8 +390,7 @@ class ProductCreateUpdateView(generic.UpdateView):
           to a new product creation page
         """
         msg = render_to_string(
-            'dashboard/catalogue/messages/product_saved.html',
-            {
+            'dashboard/catalogue/messages/product_saved.html', {
                 'product': self.object,
                 'creating': self.creating,
                 'request': self.request
@@ -400,8 +399,7 @@ class ProductCreateUpdateView(generic.UpdateView):
 
         action = self.request.POST.get('action')
         if action == 'continue':
-            url = reverse(
-                'dashboard:catalogue-product', kwargs={"pk": self.object.id})
+            url = reverse('dashboard:catalogue-product', kwargs={"pk": self.object.id})
         elif action == 'create-another-child' and self.parent:
             url = reverse(
                 'dashboard:catalogue-product-create-child',
@@ -482,9 +480,7 @@ class ProductDeleteView(generic.DeleteView):
         if self.object.is_child:
             msg = _("Deleted product variant '%s'") % self.object.get_title()
             messages.success(self.request, msg)
-            return reverse(
-                'dashboard:catalogue-product',
-                kwargs={'pk': self.object.parent_id})
+            return reverse('dashboard:catalogue-product', kwargs={'pk': self.object.parent_id})
         else:
             msg = _("Deleted product '%s'") % self.object.title
             messages.success(self.request, msg)
@@ -541,22 +537,19 @@ class CategoryDetailListView(SingleTableMixin, generic.DetailView):
         return self.object.get_children()
 
     def get_context_data(self, *args, **kwargs):
-        ctx = super(CategoryDetailListView, self).get_context_data(*args,
-                                                                   **kwargs)
+        ctx = super(CategoryDetailListView, self).get_context_data(*args, **kwargs)
         ctx['child_categories'] = self.object.get_children()
         ctx['ancestors'] = self.object.get_ancestors_and_self()
         return ctx
 
 
 class CategoryListMixin(object):
-
     def get_success_url(self):
         parent = self.object.get_parent()
         if parent is None:
             return reverse("dashboard:catalogue-category-list")
         else:
-            return reverse("dashboard:catalogue-category-detail-list",
-                           args=(parent.pk,))
+            return reverse("dashboard:catalogue-category-detail-list", args=(parent.pk, ))
 
 
 class CategoryCreateView(CategoryListMixin, generic.CreateView):
@@ -617,8 +610,7 @@ class ProductLookupView(ObjectLookupView):
         return self.model.browsable.all()
 
     def lookup_filter(self, qs, term):
-        return qs.filter(Q(title__icontains=term)
-                         | Q(parent__title__icontains=term))
+        return qs.filter(Q(title__icontains=term) | Q(parent__title__icontains=term))
 
 
 class ProductClassCreateUpdateView(generic.UpdateView):
@@ -639,7 +631,8 @@ class ProductClassCreateUpdateView(generic.UpdateView):
             self.object = form.save(commit=False)
 
         attributes_formset = self.product_attributes_formset(
-            self.request.POST, self.request.FILES, instance=self.object)
+            self.request.POST, self.request.FILES,
+            instance=self.object)
 
         is_valid = form.is_valid() and attributes_formset.is_valid()
 
@@ -655,23 +648,18 @@ class ProductClassCreateUpdateView(generic.UpdateView):
         return HttpResponseRedirect(self.get_success_url())
 
     def forms_invalid(self, form, attributes_formset):
-        messages.error(self.request,
-                       _("Your submitted data was not valid - please "
-                         "correct the errors below"
-                         ))
-        ctx = self.get_context_data(form=form,
-                                    attributes_formset=attributes_formset)
+        messages.error(self.request, _("Your submitted data was not valid - please "
+                                       "correct the errors below"))
+        ctx = self.get_context_data(form=form, attributes_formset=attributes_formset)
         return self.render_to_response(ctx)
 
     form_valid = form_invalid = process_all_forms
 
     def get_context_data(self, *args, **kwargs):
-        ctx = super(ProductClassCreateUpdateView, self).get_context_data(
-            *args, **kwargs)
+        ctx = super(ProductClassCreateUpdateView, self).get_context_data(*args, **kwargs)
 
         if "attributes_formset" not in ctx:
-            ctx["attributes_formset"] = self.product_attributes_formset(
-                instance=self.object)
+            ctx["attributes_formset"] = self.product_attributes_formset(instance=self.object)
 
         ctx["title"] = self.get_title()
 
@@ -715,8 +703,7 @@ class ProductClassListView(generic.ListView):
     model = ProductClass
 
     def get_context_data(self, *args, **kwargs):
-        ctx = super(ProductClassListView, self).get_context_data(*args,
-                                                                 **kwargs)
+        ctx = super(ProductClassListView, self).get_context_data(*args, **kwargs)
         ctx['title'] = _("Product Types")
         return ctx
 
@@ -727,8 +714,7 @@ class ProductClassDeleteView(generic.DeleteView):
     form_class = ProductClassForm
 
     def get_context_data(self, *args, **kwargs):
-        ctx = super(ProductClassDeleteView, self).get_context_data(*args,
-                                                                   **kwargs)
+        ctx = super(ProductClassDeleteView, self).get_context_data(*args, **kwargs)
         ctx['title'] = _("Delete product type '%s'") % self.object.name
         product_count = self.object.products.count()
 
@@ -736,8 +722,7 @@ class ProductClassDeleteView(generic.DeleteView):
             ctx['disallow'] = True
             ctx['title'] = _("Unable to delete '%s'") % self.object.name
             messages.error(self.request,
-                           _("%i products are still assigned to this type") %
-                           product_count)
+                           _("%i products are still assigned to this type") % product_count)
         return ctx
 
     def get_success_url(self):

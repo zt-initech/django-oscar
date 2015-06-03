@@ -2,8 +2,7 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save
 
 from oscar.core.loading import get_classes
-StockRecord, StockAlert = get_classes('partner.models', ['StockRecord',
-                                                         'StockAlert'])
+StockRecord, StockAlert = get_classes('partner.models', ['StockRecord', 'StockAlert'])
 
 
 @receiver(post_save, sender=StockRecord)
@@ -15,8 +14,7 @@ def update_stock_alerts(sender, instance, created, **kwargs):
         return
     stockrecord = instance
     try:
-        alert = StockAlert.objects.get(stockrecord=stockrecord,
-                                       status=StockAlert.OPEN)
+        alert = StockAlert.objects.get(stockrecord=stockrecord, status=StockAlert.OPEN)
     except StockAlert.DoesNotExist:
         alert = None
 

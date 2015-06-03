@@ -10,8 +10,7 @@ MultiImage = get_class('promotions.models', 'MultiImage')
 
 
 def get_promotion_classes():
-    return (RawHTML, Image, SingleProduct, AutomaticProductList,
-            HandPickedProductList, MultiImage)
+    return (RawHTML, Image, SingleProduct, AutomaticProductList, HandPickedProductList, MultiImage)
 
 
 PROMOTION_CLASSES = get_promotion_classes()

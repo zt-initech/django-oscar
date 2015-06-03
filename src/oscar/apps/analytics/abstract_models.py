@@ -16,15 +16,14 @@ class AbstractProductRecord(models.Model):
     """
 
     product = models.OneToOneField(
-        'catalogue.Product', verbose_name=_("Product"),
+        'catalogue.Product',
+        verbose_name=_("Product"),
         related_name='stats')
 
     # Data used for generating a score
     num_views = models.PositiveIntegerField(_('Views'), default=0)
-    num_basket_additions = models.PositiveIntegerField(
-        _('Basket Additions'), default=0)
-    num_purchases = models.PositiveIntegerField(
-        _('Purchases'), default=0, db_index=True)
+    num_basket_additions = models.PositiveIntegerField(_('Basket Additions'), default=0)
+    num_purchases = models.PositiveIntegerField(_('Purchases'), default=0, db_index=True)
 
     # Product score - used within search
     score = models.FloatField(_('Score'), default=0.00)
@@ -48,22 +47,18 @@ class AbstractUserRecord(models.Model):
     user = models.OneToOneField(AUTH_USER_MODEL, verbose_name=_("User"))
 
     # Browsing stats
-    num_product_views = models.PositiveIntegerField(
-        _('Product Views'), default=0)
-    num_basket_additions = models.PositiveIntegerField(
-        _('Basket Additions'), default=0)
+    num_product_views = models.PositiveIntegerField(_('Product Views'), default=0)
+    num_basket_additions = models.PositiveIntegerField(_('Basket Additions'), default=0)
 
     # Order stats
-    num_orders = models.PositiveIntegerField(
-        _('Orders'), default=0, db_index=True)
-    num_order_lines = models.PositiveIntegerField(
-        _('Order Lines'), default=0, db_index=True)
-    num_order_items = models.PositiveIntegerField(
-        _('Order Items'), default=0, db_index=True)
-    total_spent = models.DecimalField(_('Total Spent'), decimal_places=2,
-                                      max_digits=12, default=Decimal('0.00'))
-    date_last_order = models.DateTimeField(
-        _('Last Order Date'), blank=True, null=True)
+    num_orders = models.PositiveIntegerField(_('Orders'), default=0, db_index=True)
+    num_order_lines = models.PositiveIntegerField(_('Order Lines'), default=0, db_index=True)
+    num_order_items = models.PositiveIntegerField(_('Order Items'), default=0, db_index=True)
+    total_spent = models.DecimalField(_('Total Spent'),
+                                      decimal_places=2,
+                                      max_digits=12,
+                                      default=Decimal('0.00'))
+    date_last_order = models.DateTimeField(_('Last Order Date'), blank=True, null=True)
 
     class Meta:
         abstract = True
@@ -86,8 +81,7 @@ class AbstractUserProductView(models.Model):
         verbose_name_plural = _('User product views')
 
     def __str__(self):
-        return _("%(user)s viewed '%(product)s'") % {
-            'user': self.user, 'product': self.product}
+        return _("%(user)s viewed '%(product)s'") % {'user': self.user, 'product': self.product}
 
 
 @python_2_unicode_compatible
@@ -104,6 +98,4 @@ class AbstractUserSearch(models.Model):
         verbose_name_plural = _("User search queries")
 
     def __str__(self):
-        return _("%(user)s searched for '%(query)s'") % {
-            'user': self.user,
-            'query': self.query}
+        return _("%(user)s searched for '%(query)s'") % {'user': self.user, 'query': self.query}

@@ -41,7 +41,6 @@ class Base(object):
         """
         return False, _("unavailable")
 
-
 # Common availability policies
 
 
@@ -86,8 +85,7 @@ class StockRequired(Base):
         if self.num_available == 0:
             return False, _("no stock available")
         if quantity > self.num_available:
-            msg = _("a maximum of %(max)d can be bought") % {
-                'max': self.num_available}
+            msg = _("a maximum of %(max)d can be bought") % {'max': self.num_available}
             return False, msg
         return True, ""
 

@@ -30,9 +30,8 @@ class UpdateView(generic.UpdateView):
     slug_field = 'code'
 
     def form_invalid(self, form):
-        messages.error(self.request,
-                       _("The submitted form was not valid, please correct "
-                         "the errors and resubmit"))
+        messages.error(self.request, _("The submitted form was not valid, please correct "
+                                       "the errors and resubmit"))
         return super(UpdateView, self).form_invalid(form)
 
     def form_valid(self, form):
@@ -44,8 +43,7 @@ class UpdateView(generic.UpdateView):
         return super(UpdateView, self).form_valid(form)
 
     def get_messages_context(self, form):
-        ctx = {'user': self.request.user,
-               'site': get_current_site(self.request)}
+        ctx = {'user': self.request.user, 'site': get_current_site(self.request)}
         ctx.update(form.get_preview_context())
         return ctx
 
@@ -80,7 +78,6 @@ class UpdateView(generic.UpdateView):
         email = form.cleaned_data['preview_email']
         dispatch = Dispatcher()
         dispatch.send_email_messages(email, msgs)
-        messages.success(self.request,
-                         _("A preview email has been sent to %s") % email)
+        messages.success(self.request, _("A preview email has been sent to %s") % email)
 
         return self.render_to_response(ctx)

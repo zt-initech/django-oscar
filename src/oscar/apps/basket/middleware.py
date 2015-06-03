@@ -66,26 +66,23 @@ class BasketMiddleware(object):
             return response
 
         # If the basket was never initialized we can safely return
-        if (isinstance(request.basket, SimpleLazyObject)
-                and request.basket._wrapped is empty):
+        if (isinstance(request.basket, SimpleLazyObject) and request.basket._wrapped is empty):
             return response
 
         cookie_key = self.get_cookie_key(request)
         # Check if we need to set a cookie. If the cookies is already available
         # but is set in the cookies_to_delete list then we need to re-set it.
-        has_basket_cookie = (
-            cookie_key in request.COOKIES
-            and cookie_key not in cookies_to_delete)
+        has_basket_cookie = (cookie_key in request.COOKIES and cookie_key not in cookies_to_delete)
 
         # If a basket has had products added to it, but the user is anonymous
         # then we need to assign it to a cookie
-        if (request.basket.id and not request.user.is_authenticated()
-                and not has_basket_cookie):
+        if (request.basket.id and not request.user.is_authenticated() and not has_basket_cookie):
             cookie = self.get_basket_hash(request.basket.id)
             response.set_cookie(
                 cookie_key, cookie,
                 max_age=settings.OSCAR_BASKET_COOKIE_LIFETIME,
-                secure=settings.OSCAR_BASKET_COOKIE_SECURE, httponly=True)
+                secure=settings.OSCAR_BASKET_COOKIE_SECURE,
+                httponly=True)
         return response
 
     def get_cookie_key(self, request):
@@ -184,8 +181,7 @@ class BasketMiddleware(object):
             basket_hash = request.COOKIES[cookie_key]
             try:
                 basket_id = Signer().unsign(basket_hash)
-                basket = Basket.objects.get(pk=basket_id, owner=None,
-                                            status=Basket.OPEN)
+                basket = Basket.objects.get(pk=basket_id, owner=None, status=Basket.OPEN)
             except (BadSignature, Basket.DoesNotExist):
                 request.cookies_to_delete.append(cookie_key)
         return basket

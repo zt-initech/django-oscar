@@ -32,8 +32,8 @@ OSCAR_MISSING_IMAGE_URL = 'image_not_found.jpg'
 OSCAR_UPLOAD_ROOT = '/tmp'
 
 # Address settings
-OSCAR_REQUIRED_ADDRESS_FIELDS = ('first_name', 'last_name', 'line1',
-                                 'line4', 'postcode', 'country')
+OSCAR_REQUIRED_ADDRESS_FIELDS = ('first_name', 'last_name', 'line1', 'line4', 'postcode',
+                                 'country')
 
 # Product list settings
 OSCAR_PRODUCTS_PER_PAGE = 20
@@ -43,15 +43,12 @@ OSCAR_ALLOW_ANON_CHECKOUT = False
 
 # Promotions
 COUNTDOWN, LIST, SINGLE_PRODUCT, TABBED_BLOCK = (
-    'Countdown', 'List', 'SingleProduct', 'TabbedBlock')
-OSCAR_PROMOTION_MERCHANDISING_BLOCK_TYPES = (
-    (COUNTDOWN, "Vertical list"),
-    (LIST, "Horizontal list"),
-    (TABBED_BLOCK, "Tabbed block"),
-    (SINGLE_PRODUCT, "Single product"),
+    'Countdown', 'List', 'SingleProduct', 'TabbedBlock'
 )
-OSCAR_PROMOTION_POSITIONS = (('page', 'Page'),
-                             ('right', 'Right-hand sidebar'),
+OSCAR_PROMOTION_MERCHANDISING_BLOCK_TYPES = (
+    (COUNTDOWN, "Vertical list"), (LIST, "Horizontal list"), (TABBED_BLOCK, "Tabbed block"),
+    (SINGLE_PRODUCT, "Single product"), )
+OSCAR_PROMOTION_POSITIONS = (('page', 'Page'), ('right', 'Right-hand sidebar'),
                              ('left', 'Left-hand sidebar'))
 
 # Reviews
@@ -220,23 +217,21 @@ OSCAR_SEARCH_FACETS = {
         # 'options': {'missing': 'true'}
     ]),
     'queries': OrderedDict([
-        ('price_range',
-         {
-             'name': _('Price range'),
-             'field': 'price',
-             'queries': [
-                 # This is a list of (name, query) tuples where the name will
-                 # be displayed on the front-end.
-                 (_('0 to 20'), u'[0 TO 20]'),
-                 (_('20 to 40'), u'[20 TO 40]'),
-                 (_('40 to 60'), u'[40 TO 60]'),
-                 (_('60+'), u'[60 TO *]'),
-             ]
-         }),
+        ('price_range', {
+            'name': _('Price range'),
+            'field': 'price',
+            'queries': [
+                # This is a list of (name, query) tuples where the name will
+                # be displayed on the front-end.
+                (_('0 to 20'), u'[0 TO 20]'),
+                (_('20 to 40'), u'[20 TO 40]'),
+                (_('40 to 60'), u'[40 TO 60]'),
+                (_('60+'), u'[60 TO *]'),
+            ]
+        }),
     ]),
 }
 
 OSCAR_PRODUCT_SEARCH_HANDLER = None
 
-OSCAR_SETTINGS = dict(
-    [(k, v) for k, v in locals().items() if k.startswith('OSCAR_')])
+OSCAR_SETTINGS = dict([(k, v) for k, v in locals().items() if k.startswith('OSCAR_')])

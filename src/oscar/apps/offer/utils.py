@@ -17,7 +17,6 @@ class OfferApplicationError(Exception):
 
 
 class Applicator(object):
-
     def apply(self, basket, user=None, request=None):
         """
         Apply all relevant offers to the given basket.
@@ -63,7 +62,8 @@ class Applicator(object):
 
         return list(sorted(chain(
             session_offers, basket_offers, user_offers, site_offers),
-            key=lambda o: o.priority, reverse=True))
+                           key=lambda o: o.priority,
+                           reverse=True))
 
     def get_site_offers(self):
         """
@@ -71,9 +71,7 @@ class Applicator(object):
         """
         cutoff = now()
         date_based = Q(
-            Q(start_datetime__lte=cutoff),
-            Q(end_datetime__gte=cutoff) | Q(end_datetime=None),
-        )
+            Q(start_datetime__lte=cutoff), Q(end_datetime__gte=cutoff) | Q(end_datetime=None), )
 
         nondate_based = Q(start_datetime=None, end_datetime=None)
 

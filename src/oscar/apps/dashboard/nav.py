@@ -11,8 +11,12 @@ class Node(object):
     A node in the dashboard navigation menu
     """
 
-    def __init__(self, label, url_name=None, url_args=None, url_kwargs=None,
-                 access_fn=None, icon=None):
+    def __init__(self, label,
+                 url_name=None,
+                 url_args=None,
+                 url_kwargs=None,
+                 access_fn=None,
+                 icon=None):
         self.label = label
         self.icon = icon
         self.url_name = url_name
@@ -27,8 +31,7 @@ class Node(object):
 
     @property
     def url(self):
-        return reverse(self.url_name, args=self.url_args,
-                       kwargs=self.url_kwargs)
+        return reverse(self.url_name, args=self.url_args, kwargs=self.url_kwargs)
 
     def add_child(self, node):
         self.children.append(node)
@@ -41,10 +44,12 @@ class Node(object):
         if not self.is_visible(user):
             return None
         node = Node(
-            label=self.label, url_name=self.url_name, url_args=self.url_args,
-            url_kwargs=self.url_kwargs, access_fn=self.access_fn,
-            icon=self.icon
-        )
+            label=self.label,
+            url_name=self.url_name,
+            url_args=self.url_args,
+            url_kwargs=self.url_kwargs,
+            access_fn=self.access_fn,
+            icon=self.icon)
         for child in self.children:
             if child.is_visible(user):
                 node.add_child(child)

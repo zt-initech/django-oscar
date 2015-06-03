@@ -16,8 +16,7 @@ def create_range(range_class):
     range, including setting the class path for the custom proxy class.
     """
     if not hasattr(range_class, 'name'):
-        raise exceptions.ValidationError(
-            "A custom range must have a name attribute")
+        raise exceptions.ValidationError("A custom range must have a name attribute")
 
     # Ensure range name is text (not ugettext wrapper)
     if range_class.name.__class__.__name__ == '__proxy__':
@@ -25,8 +24,7 @@ def create_range(range_class):
             "Custom ranges must have text names (not ugettext proxies)")
 
     try:
-        return Range.objects.create(
-            name=range_class.name, proxy_class=_class_path(range_class))
+        return Range.objects.create(name=range_class.name, proxy_class=_class_path(range_class))
     except IntegrityError:
         raise ValueError("The passed range already exists in the database.")
 
@@ -35,8 +33,7 @@ def create_condition(condition_class, **kwargs):
     """
     Create a custom condition instance
     """
-    return Condition.objects.create(
-        proxy_class=_class_path(condition_class), **kwargs)
+    return Condition.objects.create(proxy_class=_class_path(condition_class), **kwargs)
 
 
 def create_benefit(benefit_class, **kwargs):
@@ -46,7 +43,5 @@ def create_benefit(benefit_class, **kwargs):
     # The custom benefit_class must override __str__ and description to
     # avoid a recursion error
     if benefit_class.description is Benefit.description:
-        raise RuntimeError("Your custom benefit must implement its own "
-                           "'description' property")
-    return Benefit.objects.create(
-        proxy_class=_class_path(benefit_class), **kwargs)
+        raise RuntimeError("Your custom benefit must implement its own " "'description' property")
+    return Benefit.objects.create(proxy_class=_class_path(benefit_class), **kwargs)

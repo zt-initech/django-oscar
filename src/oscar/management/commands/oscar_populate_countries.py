@@ -18,8 +18,7 @@ class Command(BaseCommand):
             action='store_false',
             dest='is_shipping',
             default=True,
-            help="Don't mark countries for shipping"),
-    )
+            help="Don't mark countries for shipping"), )
 
     def handle(self, *args, **options):
         try:
@@ -41,8 +40,8 @@ class Command(BaseCommand):
                 iso_3166_1_numeric=country.numeric,
                 printable_name=country.name,
                 name=getattr(country, 'official_name', ''),
-                is_shipping_country=options['is_shipping'])
-            for country in pycountry.countries]
+                is_shipping_country=options['is_shipping']) for country in pycountry.countries
+        ]
 
         Country.objects.bulk_create(countries)
         self.stdout.write("Successfully added %s countries." % len(countries))

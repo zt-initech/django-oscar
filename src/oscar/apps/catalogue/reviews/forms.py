@@ -24,10 +24,9 @@ class ProductReviewForm(forms.ModelForm):
 
 
 class VoteForm(forms.ModelForm):
-
     class Meta:
         model = Vote
-        fields = ('delta',)
+        fields = ('delta', )
 
     def __init__(self, review, user, *args, **kwargs):
         super(VoteForm, self).__init__(*args, **kwargs)
@@ -46,13 +45,9 @@ class VoteForm(forms.ModelForm):
 class SortReviewsForm(forms.Form):
     SORT_BY_SCORE = 'score'
     SORT_BY_RECENCY = 'recency'
-    SORT_REVIEWS_BY_CHOICES = (
-        (SORT_BY_SCORE, _('Score')),
-        (SORT_BY_RECENCY, _('Recency')),
-    )
+    SORT_REVIEWS_BY_CHOICES = ((SORT_BY_SCORE, _('Score')), (SORT_BY_RECENCY, _('Recency')), )
 
     sort_by = forms.ChoiceField(
         choices=SORT_REVIEWS_BY_CHOICES,
         label=_('Sort by'),
-        initial=SORT_BY_SCORE,
-    )
+        initial=SORT_BY_SCORE, )

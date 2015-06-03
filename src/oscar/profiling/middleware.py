@@ -22,6 +22,7 @@ def profile_this(fn):
         stats.print_stats()
 
         return ret
+
     return profiled_fn
 
 
@@ -53,8 +54,7 @@ class BaseMiddleware(object):
         # We profile the view call - note that this misses the rest of Django's
         # request processing (eg middleware etc)
         if self.show_profile(request):
-            return self.profile.runcall(
-                callback, request, *callback_args, **callback_kwargs)
+            return self.profile.runcall(callback, request, *callback_args, **callback_kwargs)
 
     def process_response(self, request, response):
         if self.show_profile(request):

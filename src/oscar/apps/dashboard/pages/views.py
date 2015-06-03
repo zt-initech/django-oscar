@@ -13,7 +13,6 @@ from oscar.core.utils import slugify
 from oscar.core.validators import URLDoesNotExistValidator
 from oscar.apps.dashboard.pages import forms
 
-
 FlatPage = get_model('flatpages', 'FlatPage')
 Site = get_model('sites', 'Site')
 
@@ -34,10 +33,7 @@ class PageListView(ListView):
         search term is specified in the search form, it will be used
         to filter the queryset.
         """
-        self.desc_ctx = {
-            'main_filter': _('All pages'),
-            'title_filter': '',
-        }
+        self.desc_ctx = {'main_filter': _('All pages'), 'title_filter': '', }
         queryset = self.model.objects.all().order_by('title')
 
         self.form = self.form_class(self.request.GET)
@@ -105,8 +101,7 @@ class PageCreateView(generic.CreateView):
         return self.render_to_response(ctx)
 
     def get_success_url(self, page):
-        msg = render_to_string('oscar/dashboard/pages/messages/saved.html',
-                               {'page': page})
+        msg = render_to_string('oscar/dashboard/pages/messages/saved.html', {'page': page})
         messages.success(self.request, msg, extra_tags='safe noicon')
         return reverse('dashboard:page-list')
 
@@ -134,8 +129,7 @@ class PageUpdateView(generic.UpdateView):
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
-        msg = render_to_string('oscar/dashboard/pages/messages/saved.html',
-                               {'page': self.object})
+        msg = render_to_string('oscar/dashboard/pages/messages/saved.html', {'page': self.object})
         messages.success(self.request, msg, extra_tags='safe noicon')
         return reverse('dashboard:page-list')
 
@@ -145,6 +139,5 @@ class PageDeleteView(generic.DeleteView):
     model = FlatPage
 
     def get_success_url(self):
-        messages.success(
-            self.request, _("Deleted page '%s'") % self.object.title)
+        messages.success(self.request, _("Deleted page '%s'") % self.object.title)
         return reverse('dashboard:page-list')

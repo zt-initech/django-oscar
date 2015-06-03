@@ -9,13 +9,10 @@ from oscar.apps.catalogue.categories import create_from_breadcrumbs
 from oscar.core.loading import get_class, get_classes
 from oscar.core.compat import UnicodeCSVReader
 
-
 ImportingError = get_class('partner.exceptions', 'ImportingError')
-Partner, StockRecord = get_classes('partner.models', ['Partner',
-                                                      'StockRecord'])
+Partner, StockRecord = get_classes('partner.models', ['Partner', 'StockRecord'])
 ProductClass, Product, Category, ProductCategory = get_classes(
-    'catalogue.models', ('ProductClass', 'Product', 'Category',
-                         'ProductCategory'))
+    'catalogue.models', ('ProductClass', 'Product', 'Category', 'ProductCategory'))
 
 
 class CatalogueImporter(object):
@@ -51,17 +48,17 @@ class CatalogueImporter(object):
     @atomic
     def _import(self, file_path):
         u"""Imports given file"""
-        stats = {'new_items': 0,
-                 'updated_items': 0}
+        stats = {'new_items': 0, 'updated_items': 0}
         row_number = 0
         with UnicodeCSVReader(
-                file_path, delimiter=self._delimiter,
-                quotechar='"', escapechar='\\') as reader:
+            file_path,
+            delimiter=self._delimiter,
+            quotechar='"',
+            escapechar='\\') as reader:
             for row in reader:
                 row_number += 1
                 self._import_row(row_number, row, stats)
-        msg = "New items: %d, updated items: %d" % (stats['new_items'],
-                                                    stats['updated_items'])
+        msg = "New items: %d, updated items: %d" % (stats['new_items'], stats['updated_items'])
         self.logger.info(msg)
 
     def _import_row(self, row_number, row, stats):
@@ -74,8 +71,7 @@ class CatalogueImporter(object):
             # With stock data
             self._create_stockrecord(item, *row[5:9], stats=stats)
 
-    def _create_item(self, product_class, category_str, upc, title,
-                     description, stats):
+    def _create_item(self, product_class, category_str, upc, title, description, stats):
         # Ignore any entries that are NULL
         if description == 'NULL':
             description = ''
@@ -101,11 +97,10 @@ class CatalogueImporter(object):
 
         return item
 
-    def _create_stockrecord(self, item, partner_name, partner_sku,
-                            price_excl_tax, num_in_stock, stats):
+    def _create_stockrecord(self, item, partner_name, partner_sku, price_excl_tax, num_in_stock,
+                            stats):
         # Create partner and stock record
-        partner, _ = Partner.objects.get_or_create(
-            name=partner_name)
+        partner, _ = Partner.objects.get_or_create(name=partner_name)
         try:
             stock = StockRecord.objects.get(partner_sku=partner_sku)
         except StockRecord.DoesNotExist:
@@ -120,7 +115,6 @@ class CatalogueImporter(object):
 
 
 class Validator(object):
-
     def validate(self, file_path):
         self._exists(file_path)
         self._is_file(file_path)
@@ -156,8 +150,7 @@ class DemoSiteImporter(object):
 
     @atomic
     def handle(self, product_class_name, filepath):
-        product_class = ProductClass.objects.get(
-            name=product_class_name)
+        product_class = ProductClass.objects.get(name=product_class_name)
 
         attribute_codes = []
         with UnicodeCSVReader(filepath) as reader:
@@ -168,8 +161,7 @@ class DemoSiteImporter(object):
                 self.create_product(product_class, attribute_codes, row)
 
     def create_product(self, product_class, attribute_codes, row):  # noqa
-        (ptype, upc, title, description,
-         category, partner, sku, price, stock) = row[0:9]
+        (ptype, upc, title, description, category, partner, sku, price, stock) = row[0:9]
 
         # Create product
         is_child = ptype.lower() == 'variant'
@@ -201,8 +193,7 @@ class DemoSiteImporter(object):
         if not product.is_parent:
             for code, value in zip(attribute_codes, row[9:]):
                 # Need to check if the attribute requires an Option instance
-                attr = product_class.attributes.get(
-                    code=code)
+                attr = product_class.attributes.get(code=code)
                 if attr.is_option:
                     value = attr.option_group.options.get(option=value)
                 if attr.type == 'date':
@@ -218,8 +209,7 @@ class DemoSiteImporter(object):
         # Category information
         if category:
             leaf = create_from_breadcrumbs(category)
-            ProductCategory.objects.get_or_create(
-                product=product, category=leaf)
+            ProductCategory.objects.get_or_create(product=product, category=leaf)
 
         # Stock record
         if partner:

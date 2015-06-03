@@ -8,8 +8,7 @@ from oscar.core.loading import get_class, get_classes
 from oscar.apps.search.signals import user_search
 
 UserSearch, UserRecord, ProductRecord, UserProductView = get_classes(
-    'analytics.models', ['UserSearch', 'UserRecord', 'ProductRecord',
-                         'UserProductView'])
+    'analytics.models', ['UserSearch', 'UserRecord', 'ProductRecord', 'UserProductView'])
 product_viewed = get_classes('catalogue.signals', ['product_viewed'])
 basket_addition = get_class('basket.signals', 'basket_addition')
 order_placed = get_class('order.signals', 'order_placed')
@@ -38,16 +37,13 @@ def _update_counter(model, field_name, filter_kwargs, increment=1):
     except IntegrityError:
         # get_or_create sometimes fails due to MySQL's weird transactions, fail
         # silently
-        logger.error(
-            "IntegrityError when updating analytics counter for %s", model)
+        logger.error("IntegrityError when updating analytics counter for %s", model)
 
 
 def _record_products_in_order(order):
     # surely there's a way to do this without causing a query for each line?
     for line in order.lines.all():
-        _update_counter(
-            ProductRecord, 'num_purchases',
-            {'product': line.product}, line.quantity)
+        _update_counter(ProductRecord, 'num_purchases', {'product': line.product}, line.quantity)
 
 
 def _record_user_order(user, order):
@@ -61,16 +57,17 @@ def _record_user_order(user, order):
             date_last_order=order.date_placed)
         if not affected:
             UserRecord.objects.create(
-                user=user, num_orders=1, num_order_lines=order.num_lines,
+                user=user,
+                num_orders=1,
+                num_order_lines=order.num_lines,
                 num_order_items=order.num_items,
                 total_spent=order.total_incl_tax,
                 date_last_order=order.date_placed)
     except IntegrityError:
-        logger.error(
-            "IntegrityError in analytics when recording a user order.")
-
+        logger.error("IntegrityError in analytics when recording a user order.")
 
 # Receivers
+
 
 @receiver(product_viewed)
 def receive_product_view(sender, product, user, **kwargs):
@@ -92,8 +89,7 @@ def receive_product_search(sender, query, user, **kwargs):
 def receive_basket_addition(sender, product, user, **kwargs):
     if kwargs.get('raw', False):
         return
-    _update_counter(
-        ProductRecord, 'num_basket_additions', {'product': product})
+    _update_counter(ProductRecord, 'num_basket_additions', {'product': product})
     if user and user.is_authenticated():
         _update_counter(UserRecord, 'num_basket_additions', {'user': user})
 

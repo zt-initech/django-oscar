@@ -5,7 +5,6 @@ import shutil
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -25,12 +24,10 @@ class Command(BaseCommand):
         else:
             destination = folder
         if os.path.exists(destination):
-            raise CommandError(
-                "The folder %s already exists - aborting!" % destination)
+            raise CommandError("The folder %s already exists - aborting!" % destination)
 
-        source = os.path.realpath(
-            os.path.join(os.path.dirname(__file__), '../../static'))
-        print("Copying Oscar's static files to %s" % (destination,))
+        source = os.path.realpath(os.path.join(os.path.dirname(__file__), '../../static'))
+        print("Copying Oscar's static files to %s" % (destination, ))
         shutil.copytree(source, destination)
 
         # Check if this new folder is in STATICFILES_DIRS

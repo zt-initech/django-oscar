@@ -16,7 +16,8 @@ class VoucherDashboardApplication(Application):
 
     def get_urls(self):
         urls = [
-            url(r'^$', self.list_view.as_view(), name='voucher-list'),
+            url(r'^$', self.list_view.as_view(),
+                name='voucher-list'),
             url(r'^create/$', self.create_view.as_view(),
                 name='voucher-create'),
             url(r'^update/(?P<pk>\d+)/$', self.update_view.as_view(),

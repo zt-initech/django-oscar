@@ -25,8 +25,7 @@ class ProductAlertListView(PageTitleMixin, generic.ListView):
     def get_queryset(self):
         return ProductAlert.objects.select_related().filter(
             user=self.request.user,
-            date_closed=None,
-        )
+            date_closed=None, )
 
 
 class ProductAlertCreateView(generic.CreateView):
@@ -50,8 +49,7 @@ class ProductAlertCreateView(generic.CreateView):
 
     def post(self, request, *args, **kwargs):
         self.product = get_object_or_404(Product, pk=self.kwargs['pk'])
-        return super(ProductAlertCreateView, self).post(request, *args,
-                                                        **kwargs)
+        return super(ProductAlertCreateView, self).post(request, *args, **kwargs)
 
     def get_form_kwargs(self):
         kwargs = super(ProductAlertCreateView, self).get_form_kwargs()
@@ -81,16 +79,14 @@ class ProductAlertConfirmView(generic.RedirectView):
     def get(self, request, *args, **kwargs):
         self.alert = get_object_or_404(ProductAlert, key=kwargs['key'])
         self.update_alert()
-        return super(ProductAlertConfirmView, self).get(request, *args,
-                                                        **kwargs)
+        return super(ProductAlertConfirmView, self).get(request, *args, **kwargs)
 
     def update_alert(self):
         if self.alert.can_be_confirmed:
             self.alert.confirm()
             messages.success(self.request, _("Your stock alert is now active"))
         else:
-            messages.error(self.request, _("Your stock alert cannot be"
-                                           " confirmed"))
+            messages.error(self.request, _("Your stock alert cannot be" " confirmed"))
 
     def get_redirect_url(self, **kwargs):
         return self.alert.product.get_absolute_url()
@@ -111,24 +107,18 @@ class ProductAlertCancelView(generic.RedirectView):
         if 'key' in kwargs:
             self.alert = get_object_or_404(ProductAlert, key=kwargs['key'])
         elif 'pk' in kwargs and request.user.is_authenticated():
-            self.alert = get_object_or_404(ProductAlert,
-                                           user=self.request.user,
-                                           pk=kwargs['pk'])
+            self.alert = get_object_or_404(ProductAlert, user=self.request.user, pk=kwargs['pk'])
         else:
             raise Http404
         self.update_alert()
-        return super(ProductAlertCancelView, self).get(request, *args,
-                                                       **kwargs)
+        return super(ProductAlertCancelView, self).get(request, *args, **kwargs)
 
     def update_alert(self):
         if self.alert.can_be_cancelled:
             self.alert.cancel()
-            messages.success(self.request, _("Your stock alert has been"
-                                             " cancelled"))
+            messages.success(self.request, _("Your stock alert has been" " cancelled"))
         else:
-            messages.error(self.request, _("Your stock alert cannot be"
-                                           " cancelled"))
+            messages.error(self.request, _("Your stock alert cannot be" " cancelled"))
 
     def get_redirect_url(self, **kwargs):
-        return self.request.GET.get('next',
-                                    self.alert.product.get_absolute_url())
+        return self.request.GET.get('next', self.alert.product.get_absolute_url())

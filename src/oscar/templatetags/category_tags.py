@@ -39,9 +39,8 @@ def get_annotated_list(depth=None, parent=None):
         if prev_depth is not None and node_depth < prev_depth:
             info['num_to_close'] = list(range(0, prev_depth - node_depth))
 
-        info = {'num_to_close': [],
-                'level': node_depth - start_depth}
-        annotated_categories.append((node, info,))
+        info = {'num_to_close': [], 'level': node_depth - start_depth}
+        annotated_categories.append((node, info, ))
         prev_depth = node_depth
 
     if prev_depth is not None:

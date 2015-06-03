@@ -6,8 +6,7 @@ from django.utils import six
 from django.utils.http import is_safe_url
 from django.utils.timezone import get_current_timezone, is_naive, make_aware
 from django.conf import settings
-from django.template.defaultfilters import (date as date_filter,
-                                            slugify as django_slugify)
+from django.template.defaultfilters import (date as date_filter, slugify as django_slugify)
 from django.utils.module_loading import import_string
 
 from unidecode import unidecode
@@ -55,6 +54,7 @@ def compose(*functions):
 
     This is useful for combining decorators.
     """
+
     def _composed(*args):
         for fn in functions:
             try:
@@ -63,6 +63,7 @@ def compose(*functions):
                 # args must be scalar so we don't try to expand it
                 args = fn(args)
         return args
+
     return _composed
 
 
@@ -78,8 +79,7 @@ def format_datetime(dt, format=None):
     """
     if is_naive(dt):
         localtime = make_aware(dt, get_current_timezone())
-        logging.warning(
-            "oscar.core.utils.format_datetime received native datetime")
+        logging.warning("oscar.core.utils.format_datetime received native datetime")
     else:
         localtime = dt.astimezone(get_current_timezone())
     return date_filter(localtime, format)

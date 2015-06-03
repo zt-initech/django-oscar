@@ -41,8 +41,7 @@ class EmailBackend(ModelBackend):
         # we just enforce that they don't share the same password.
         # We make a case-insensitive match when looking for emails.
         matching_users = User.objects.filter(email__iexact=clean_email)
-        authenticated_users = [
-            user for user in matching_users if user.check_password(password)]
+        authenticated_users = [user for user in matching_users if user.check_password(password)]
         if len(authenticated_users) == 1:
             # Happy path
             return authenticated_users[0]
@@ -58,11 +57,9 @@ class EmailBackend(ModelBackend):
 
 # Deprecated since Oscar 1.0 because of the spelling.
 class Emailbackend(EmailBackend):
-
     def __init__(self):
         warnings.warn(
             "Oscar's auth backend EmailBackend has been renamed in Oscar 1.0 "
             " and you're using the old name of Emailbackend. Please rename "
-            " all references; most likely in the AUTH_BACKENDS setting.",
-            DeprecationWarning)
+            " all references; most likely in the AUTH_BACKENDS setting.", DeprecationWarning)
         super(Emailbackend, self).__init__()

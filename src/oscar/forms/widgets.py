@@ -39,8 +39,7 @@ class ImageInput(FileInput):
             # can't display images that aren't stored
             image_url = ''
         else:
-            image_url = final_attrs['value'] = force_text(
-                self._format_value(value))
+            image_url = final_attrs['value'] = force_text(self._format_value(value))
 
         return render_to_string(self.template_name, Context({
             'input_attrs': flatatt(final_attrs),
@@ -50,7 +49,6 @@ class ImageInput(FileInput):
 
 
 class WYSIWYGTextArea(forms.Textarea):
-
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('attrs', {})
         kwargs['attrs'].setdefault('class', '')
@@ -77,12 +75,7 @@ def datetime_format_to_js_time_format(format):
     except IndexError:
         pass
     converted = format
-    replacements = {
-        '%H': 'hh',
-        '%I': 'HH',
-        '%M': 'ii',
-        '%S': 'ss',
-    }
+    replacements = {'%H': 'hh', '%I': 'HH', '%M': 'ii', '%S': 'ss', }
     for search, replace in replacements.items():
         converted = converted.replace(search, replace)
     return converted.strip()
@@ -166,13 +159,12 @@ class TimePickerInput(DateTimeWidgetMixin, forms.TimeInput):
 
     def render(self, name, value, attrs=None):
         format = self.get_format()
-        input = super(TimePickerInput, self).render(
-            name, value, self.gett_attrs(attrs, format))
+        input = super(TimePickerInput, self).render(name, value, self.gett_attrs(attrs, format))
 
-        attrs = {'data-oscarWidget': 'time',
-                 'data-timeFormat':
-                 datetime_format_to_js_time_format(format),
-                 }
+        attrs = {
+            'data-oscarWidget': 'time',
+            'data-timeFormat': datetime_format_to_js_time_format(format),
+        }
 
         div = format_html('<div class="input-append date"{}>', flatatt(attrs))
         return mark_safe('{div}'
@@ -180,8 +172,8 @@ class TimePickerInput(DateTimeWidgetMixin, forms.TimeInput):
                          ' <span class="add-on">'
                          '  <i class="icon-time"></i>'
                          ' </span>'
-                         '</div>'
-                         .format(div=div, input=input))
+                         '</div>'.format(div=div,
+                                         input=input))
 
 
 class DatePickerInput(DateTimeWidgetMixin, forms.DateInput):
@@ -193,13 +185,12 @@ class DatePickerInput(DateTimeWidgetMixin, forms.DateInput):
 
     def render(self, name, value, attrs=None):
         format = self.get_format()
-        input = super(DatePickerInput, self).render(
-            name, value, self.gett_attrs(attrs, format))
+        input = super(DatePickerInput, self).render(name, value, self.gett_attrs(attrs, format))
 
-        attrs = {'data-oscarWidget': 'date',
-                 'data-dateFormat':
-                 datetime_format_to_js_date_format(format),
-                 }
+        attrs = {
+            'data-oscarWidget': 'date',
+            'data-dateFormat': datetime_format_to_js_date_format(format),
+        }
 
         div = format_html('<div class="input-append date"{}>', flatatt(attrs))
         return mark_safe('{div}'
@@ -207,8 +198,8 @@ class DatePickerInput(DateTimeWidgetMixin, forms.DateInput):
                          ' <span class="add-on">'
                          '  <i class="icon-calendar"></i>'
                          ' </span>'
-                         '</div>'
-                         .format(div=div, input=input))
+                         '</div>'.format(div=div,
+                                         input=input))
 
 
 class DateTimePickerInput(DateTimeWidgetMixin, forms.DateTimeInput):
@@ -237,10 +228,11 @@ class DateTimePickerInput(DateTimeWidgetMixin, forms.DateTimeInput):
         input = super(DateTimePickerInput, self).render(
             name, value, self.gett_attrs(attrs, format))
 
-        attrs = {'data-oscarWidget': 'datetime',
-                 'data-datetimeFormat':
-                 datetime_format_to_js_datetime_format(format),
-                 }
+        attrs = {
+            'data-oscarWidget': 'datetime',
+            'data-datetimeFormat': datetime_format_to_js_datetime_format(
+                format),
+        }
 
         div = format_html('<div class="input-append date"{}>', flatatt(attrs))
         return mark_safe('{div}'
@@ -248,8 +240,8 @@ class DateTimePickerInput(DateTimeWidgetMixin, forms.DateTimeInput):
                          ' <span class="add-on">'
                          '  <i class="icon-calendar"></i>'
                          ' </span>'
-                         '</div>'
-                         .format(div=div, input=input))
+                         '</div>'.format(div=div,
+                                         input=input))
 
 
 class AdvancedSelect(forms.Select):
@@ -275,9 +267,7 @@ class AdvancedSelect(forms.Select):
                 selected_choices.remove(option_value)
         else:
             selected_html = ''
-        return format_html(u'<option value="{0}"{1}>{2}</option>',
-                           option_value,
-                           selected_html,
+        return format_html(u'<option value="{0}"{1}>{2}</option>', option_value, selected_html,
                            force_text(option_label))
 
 
@@ -296,8 +286,7 @@ class RemoteSelect(forms.Widget):
         if 'lookup_url' in kwargs:
             self.lookup_url = kwargs.pop('lookup_url')
         if self.lookup_url is None:
-            raise ValueError(
-                "RemoteSelect requires a lookup ULR")
+            raise ValueError("RemoteSelect requires a lookup ULR")
         super(RemoteSelect, self).__init__(*args, **kwargs)
 
     def format_value(self, value):

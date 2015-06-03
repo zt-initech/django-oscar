@@ -11,8 +11,9 @@ class Command(BaseCommand):
     help = 'For creating product catalogues based on a CSV file'
 
     option_list = BaseCommand.option_list + (
-        make_option('--class', dest='product_class',
-                    help='Product class'),)
+        make_option('--class',
+                    dest='product_class',
+                    help='Product class'), )
 
     def handle(self, *args, **options):
         logger = self._get_logger()

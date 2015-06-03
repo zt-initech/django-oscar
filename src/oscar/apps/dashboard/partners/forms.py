@@ -13,24 +13,25 @@ PartnerAddress = get_model('partner', 'PartnerAddress')
 
 
 class PartnerSearchForm(forms.Form):
-    name = forms.CharField(
-        required=False, label=pgettext_lazy(u"Partner's name", u"Name"))
+    name = forms.CharField(required=False, label=pgettext_lazy(u"Partner's name", u"Name"))
 
 
 class PartnerCreateForm(forms.ModelForm):
     class Meta:
         model = Partner
-        fields = ('name',)
+        fields = ('name', )
+
 
 ROLE_CHOICES = (
-    ('staff', _('Full dashboard access')),
-    ('limited', _('Limited dashboard access')),
+    ('staff', _('Full dashboard access')), ('limited', _('Limited dashboard access')),
 )
 
 
 class NewUserForm(EmailUserCreationForm):
-    role = forms.ChoiceField(choices=ROLE_CHOICES, widget=forms.RadioSelect,
-                             label=_('User role'), initial='limited')
+    role = forms.ChoiceField(choices=ROLE_CHOICES,
+                             widget=forms.RadioSelect,
+                             label=_('User role'),
+                             initial='limited')
 
     def __init__(self, partner, *args, **kwargs):
         self.partner = partner
@@ -44,7 +45,8 @@ class NewUserForm(EmailUserCreationForm):
         self.partner.users.add(user)
         if role == 'limited':
             dashboard_access_perm = Permission.objects.get(
-                codename='dashboard_access', content_type__app_label='partner')
+                codename='dashboard_access',
+                content_type__app_label='partner')
             user.user_permissions.add(dashboard_access_perm)
         return user
 
@@ -61,8 +63,7 @@ class ExistingUserForm(forms.ModelForm):
     * doesn't regenerate username
     * doesn't allow changing email till #668 is resolved
     """
-    role = forms.ChoiceField(choices=ROLE_CHOICES, widget=forms.RadioSelect,
-                             label=_('User role'))
+    role = forms.ChoiceField(choices=ROLE_CHOICES, widget=forms.RadioSelect, label=_('User role'))
     password1 = forms.CharField(
         label=_('Password'),
         widget=forms.PasswordInput,
@@ -78,8 +79,7 @@ class ExistingUserForm(forms.ModelForm):
         password2 = self.cleaned_data.get('password2', '')
 
         if password1 != password2:
-            raise forms.ValidationError(
-                _("The two password fields didn't match."))
+            raise forms.ValidationError(_("The two password fields didn't match."))
         return password2
 
     def __init__(self, *args, **kwargs):
@@ -97,9 +97,9 @@ class ExistingUserForm(forms.ModelForm):
         user.save()
 
         dashboard_perm = Permission.objects.get(
-            codename='dashboard_access', content_type__app_label='partner')
-        user_has_perm = user.user_permissions.filter(
-            pk=dashboard_perm.pk).exists()
+            codename='dashboard_access',
+            content_type__app_label='partner')
+        user_has_perm = user.user_permissions.filter(pk=dashboard_perm.pk).exists()
         if role == 'limited' and not user_has_perm:
             user.user_permissions.add(dashboard_perm)
         elif role == 'staff' and user_has_perm:
@@ -108,21 +108,17 @@ class ExistingUserForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = existing_user_fields(
-            ['first_name', 'last_name']) + ['password1', 'password2']
+        fields = existing_user_fields(['first_name', 'last_name']) + ['password1', 'password2']
 
 
 class UserEmailForm(forms.Form):
     # We use a CharField so that a partial email address can be entered
-    email = forms.CharField(
-        label=_("Email address"), max_length=100)
+    email = forms.CharField(label=_("Email address"), max_length=100)
 
 
 class PartnerAddressForm(forms.ModelForm):
-    name = forms.CharField(
-        required=False, label=pgettext_lazy(u"Partner's name", u"Name"))
+    name = forms.CharField(required=False, label=pgettext_lazy(u"Partner's name", u"Name"))
 
     class Meta:
-        fields = ('name', 'line1', 'line2', 'line3', 'line4',
-                  'state', 'postcode', 'country')
+        fields = ('name', 'line1', 'line2', 'line3', 'line4', 'state', 'postcode', 'country')
         model = PartnerAddress

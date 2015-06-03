@@ -9,9 +9,7 @@ from oscar.core import customisation
 
 class Command(BaseCommand):
     args = '<app label> <destination folder>'
-    help = (
-        "Create a local version of one of Oscar's app so it can "
-        "be customised")
+    help = ("Create a local version of one of Oscar's app so it can " "be customised")
 
     def handle(self, *args, **options):
         # Check that the app hasn't already been forked

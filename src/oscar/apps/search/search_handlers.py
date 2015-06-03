@@ -6,7 +6,6 @@ from haystack import connections
 from oscar.core.loading import get_class
 from . import facets
 
-
 FacetMunger = get_class('search.facets', 'FacetMunger')
 
 
@@ -47,13 +46,11 @@ class SearchHandler(object):
 
         # Triggers the search.
         search_queryset = self.get_search_queryset()
-        self.search_form = self.get_search_form(
-            request_data, search_queryset)
+        self.search_form = self.get_search_form(request_data, search_queryset)
         self.results = self.get_search_results(self.search_form)
         # If below raises an UnicodeDecodeError, you're running pysolr < 3.2
         # with Solr 4.
-        self.paginator, self.page = self.paginate_queryset(
-            self.results, request_data)
+        self.paginator, self.page = self.paginate_queryset(self.results, request_data)
 
     # Search related methods
 
@@ -101,8 +98,7 @@ class SearchHandler(object):
             if page == 'last':
                 page_number = paginator.num_pages
             else:
-                raise InvalidPage(_(
-                    "Page is not 'last', nor can it be converted to an int."))
+                raise InvalidPage(_("Page is not 'last', nor can it be converted to an int."))
         # This can also raise an InvalidPage exception.
         return paginator, paginator.page(page_number)
 
@@ -168,9 +164,7 @@ class SearchHandler(object):
 
     def get_facet_munger(self):
         return FacetMunger(
-            self.full_path,
-            self.search_form.selected_multi_facets,
-            self.results.facet_counts())
+            self.full_path, self.search_form.selected_multi_facets, self.results.facet_counts())
 
     def get_search_context_data(self, context_object_name=None):
         """

@@ -9,8 +9,8 @@ from oscar.core.loading import get_classes, get_class
 
 HandPickedProductList, RawHTML, SingleProduct, PagePromotion, OrderedProduct \
     = get_classes('promotions.models',
-                  ['HandPickedProductList', 'RawHTML', 'SingleProduct',
-                   'PagePromotion', 'OrderedProduct'])
+                                                                                                 ['HandPickedProductList', 'RawHTML', 'SingleProduct',
+                                                                                                  'PagePromotion', 'OrderedProduct'])
 ProductSelect = get_class('dashboard.catalogue.widgets', 'ProductSelect')
 
 
@@ -18,8 +18,7 @@ class PromotionTypeSelectForm(forms.Form):
     choices = []
     for klass in PROMOTION_CLASSES:
         choices.append((klass.classname(), klass._meta.verbose_name))
-    promotion_type = forms.ChoiceField(choices=tuple(choices),
-                                       label=_("Promotion type"))
+    promotion_type = forms.ChoiceField(choices=tuple(choices), label=_("Promotion type"))
 
 
 class RawHTMLForm(forms.ModelForm):
@@ -49,13 +48,13 @@ class OrderedProductForm(forms.ModelForm):
     class Meta:
         model = OrderedProduct
         fields = ['list', 'product', 'display_order']
-        widgets = {
-            'product': ProductSelect,
-        }
+        widgets = {'product': ProductSelect, }
 
 
 OrderedProductFormSet = inlineformset_factory(
-    HandPickedProductList, OrderedProduct, form=OrderedProductForm, extra=2)
+    HandPickedProductList, OrderedProduct,
+    form=OrderedProductForm,
+    extra=2)
 
 
 class PagePromotionForm(forms.ModelForm):
@@ -75,8 +74,7 @@ class PagePromotionForm(forms.ModelForm):
             return page_url
 
         if page_url.startswith('http'):
-            raise forms.ValidationError(
-                _("Content blocks can only be linked to internal URLs"))
+            raise forms.ValidationError(_("Content blocks can only be linked to internal URLs"))
 
         if page_url.startswith('/') and not page_url.endswith('/'):
             page_url += '/'

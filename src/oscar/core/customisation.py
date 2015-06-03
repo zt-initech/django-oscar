@@ -10,8 +10,7 @@ import oscar
 
 def create_local_app_folder(local_app_path):
     if exists(local_app_path):
-        raise ValueError(
-            "There is already a '%s' folder! Aborting!" % local_app_path)
+        raise ValueError("There is already a '%s' folder! Aborting!" % local_app_path)
     for folder in subfolders(local_app_path):
         if not exists(folder):
             os.mkdir(folder)
@@ -43,10 +42,10 @@ def inherit_app_config(local_app_path, app_package, app_label):
     create_file(
         join(local_app_path, '__init__.py'),
         "default_app_config = '{app_package}.config.{config_name}'\n".format(
-            app_package=app_package, config_name=config_name))
+            app_package=app_package,
+            config_name=config_name))
     create_file(
-        join(local_app_path, 'config.py'),
-        "from oscar.apps.{app_label} import config\n\n\n"
+        join(local_app_path, 'config.py'), "from oscar.apps.{app_label} import config\n\n\n"
         "class {config_name}(config.{config_name}):\n"
         "    name = '{app_package}'\n".format(
             app_package=app_package,
@@ -107,8 +106,7 @@ def fork_app(label, folder_path, logger=None):
     msg = (
         "The final step is to add '%s' to INSTALLED_APPS "
         "(replacing the equivalent Oscar app). This can be "
-        "achieved using Oscar's get_core_apps function - e.g.:"
-    ) % app_package
+        "achieved using Oscar's get_core_apps function - e.g.:") % app_package
     snippet = (
         "  # settings.py\n"
         "  ...\n"
@@ -118,10 +116,8 @@ def fork_app(label, folder_path, logger=None):
         "  ]\n"
         "  from oscar import get_core_apps\n"
         "  INSTALLED_APPS = INSTALLED_APPS + get_core_apps(\n"
-        "      ['%s'])"
-    ) % app_package
-    record = "\n%s\n\n%s" % (
-        "\n".join(textwrap.wrap(msg)), snippet)
+        "      ['%s'])") % app_package
+    record = "\n%s\n\n%s" % ("\n".join(textwrap.wrap(msg)), snippet)
     logger.info(record)
 
 

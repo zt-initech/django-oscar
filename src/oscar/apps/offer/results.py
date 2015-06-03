@@ -11,6 +11,7 @@ class OfferApplications(object):
     * The result instance
     * The number of times the offer was successfully applied
     """
+
     def __init__(self):
         self.applications = {}
 
@@ -29,7 +30,8 @@ class OfferApplications(object):
                 'description': result.description,
                 'voucher': offer.get_voucher(),
                 'freq': 0,
-                'discount': D('0.00')}
+                'discount': D('0.00')
+            }
         self.applications[offer.id]['discount'] += result.discount
         self.applications[offer.id]['freq'] += 1
 
@@ -102,5 +104,4 @@ class OfferApplications(object):
         """
         Return a dict of offers that were successfully applied
         """
-        return dict([(a['offer'].id, a['offer']) for a in
-                     self.applications.values()])
+        return dict([(a['offer'].id, a['offer']) for a in self.applications.values()])

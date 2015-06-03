@@ -53,9 +53,7 @@ class Free(Base):
     def calculate(self, basket):
         # If the charge is free then tax must be free (musn't it?) and so we
         # immediately set the tax to zero
-        return prices.Price(
-            currency=basket.currency,
-            excl_tax=D('0.00'), tax=D('0.00'))
+        return prices.Price(currency=basket.currency, excl_tax=D('0.00'), tax=D('0.00'))
 
 
 class NoShippingRequired(Free):
@@ -135,9 +133,7 @@ class TaxExclusiveOfferDiscount(OfferDiscount):
         base_charge = self.method.calculate(basket)
         discount = self.offer.shipping_discount(base_charge.excl_tax)
         excl_tax = base_charge.excl_tax - discount
-        return prices.Price(
-            currency=base_charge.currency,
-            excl_tax=excl_tax)
+        return prices.Price(currency=base_charge.currency, excl_tax=excl_tax)
 
     def discount(self, basket):
         base_charge = self.method.calculate(basket)
@@ -154,9 +150,7 @@ class TaxInclusiveOfferDiscount(OfferDiscount):
         discount = self.offer.shipping_discount(base_charge.incl_tax)
         incl_tax = base_charge.incl_tax - discount
         excl_tax = self.calculate_excl_tax(base_charge, incl_tax)
-        return prices.Price(
-            currency=base_charge.currency,
-            excl_tax=excl_tax, incl_tax=incl_tax)
+        return prices.Price(currency=base_charge.currency, excl_tax=excl_tax, incl_tax=incl_tax)
 
     def calculate_excl_tax(self, base_charge, incl_tax):
         """
@@ -166,8 +160,7 @@ class TaxInclusiveOfferDiscount(OfferDiscount):
             return D('0.00')
         # We assume we can linearly scale down the excl tax price before
         # discount.
-        excl_tax = base_charge.excl_tax * (
-            incl_tax / base_charge.incl_tax)
+        excl_tax = base_charge.excl_tax * (incl_tax / base_charge.incl_tax)
         return excl_tax.quantize(D('0.01'))
 
     def discount(self, basket):

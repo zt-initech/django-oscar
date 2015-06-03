@@ -19,6 +19,4 @@ class OrderTotalCalculator(object):
             incl_tax = basket.total_incl_tax + shipping_charge.incl_tax
         else:
             incl_tax = None
-        return prices.Price(
-            currency=basket.currency,
-            excl_tax=excl_tax, incl_tax=incl_tax)
+        return prices.Price(currency=basket.currency, excl_tax=excl_tax, incl_tax=incl_tax)

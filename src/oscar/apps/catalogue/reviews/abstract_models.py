@@ -21,7 +21,9 @@ class AbstractProductReview(models.Model):
 
     # Note we keep the review even if the product is deleted
     product = models.ForeignKey(
-        'catalogue.Product', related_name='reviews', null=True,
+        'catalogue.Product',
+        related_name='reviews',
+        null=True,
         on_delete=models.SET_NULL)
 
     # Scores are between 0 and 5
@@ -30,38 +32,37 @@ class AbstractProductReview(models.Model):
 
     title = models.CharField(
         verbose_name=pgettext_lazy(u"Product review title", u"Title"),
-        max_length=255, validators=[validators.non_whitespace])
+        max_length=255,
+        validators=[validators.non_whitespace])
 
     body = models.TextField(_("Body"))
 
     # User information.
-    user = models.ForeignKey(
-        AUTH_USER_MODEL, related_name='reviews', null=True, blank=True)
+    user = models.ForeignKey(AUTH_USER_MODEL, related_name='reviews', null=True, blank=True)
 
     # Fields to be completed if user is anonymous
     name = models.CharField(
         pgettext_lazy(u"Anonymous reviewer name", u"Name"),
-        max_length=255, blank=True)
+        max_length=255,
+        blank=True)
     email = models.EmailField(_("Email"), blank=True)
     homepage = models.URLField(_("URL"), blank=True)
 
     FOR_MODERATION, APPROVED, REJECTED = 0, 1, 2
     STATUS_CHOICES = (
-        (FOR_MODERATION, _("Requires moderation")),
-        (APPROVED, _("Approved")),
-        (REJECTED, _("Rejected")),
-    )
+        (FOR_MODERATION, _("Requires moderation")), (APPROVED, _("Approved")),
+        (REJECTED, _("Rejected")), )
     default_status = APPROVED
     if settings.OSCAR_MODERATE_REVIEWS:
         default_status = FOR_MODERATION
-    status = models.SmallIntegerField(
-        _("Status"), choices=STATUS_CHOICES, default=default_status)
+    status = models.SmallIntegerField(_("Status"), choices=STATUS_CHOICES, default=default_status)
 
     # Denormalised vote totals
-    total_votes = models.IntegerField(
-        _("Total Votes"), default=0)  # upvotes + down votes
+    total_votes = models.IntegerField(_("Total Votes"), default=0)  # upvotes + down votes
     delta_votes = models.IntegerField(
-        _("Delta Votes"), default=0, db_index=True)  # upvotes - down votes
+        _("Delta Votes"),
+        default=0,
+        db_index=True)  # upvotes - down votes
 
     date_created = models.DateTimeField(auto_now_add=True)
 
@@ -73,16 +74,12 @@ class AbstractProductReview(models.Model):
         abstract = True
         app_label = 'reviews'
         ordering = ['-delta_votes', 'id']
-        unique_together = (('product', 'user'),)
+        unique_together = (('product', 'user'), )
         verbose_name = _('Product review')
         verbose_name_plural = _('Product reviews')
 
     def get_absolute_url(self):
-        kwargs = {
-            'product_slug': self.product.slug,
-            'product_pk': self.product.id,
-            'pk': self.id
-        }
+        kwargs = {'product_slug': self.product.slug, 'product_pk': self.product.id, 'pk': self.id}
         return reverse('catalogue:reviews-detail', kwargs=kwargs)
 
     def __str__(self):
@@ -92,8 +89,7 @@ class AbstractProductReview(models.Model):
         self.title = self.title.strip()
         self.body = self.body.strip()
         if not self.user and not (self.name and self.email):
-            raise ValidationError(
-                _("Anonymous reviews must include a name and an email"))
+            raise ValidationError(_("Anonymous reviews must include a name and an email"))
 
     def vote_up(self, user):
         self.votes.create(user=user, delta=AbstractVote.UP)
@@ -156,8 +152,7 @@ class AbstractProductReview(models.Model):
         """
         Update total and delta votes
         """
-        result = self.votes.aggregate(
-            score=Sum('delta'), total_votes=Count('id'))
+        result = self.votes.aggregate(score=Sum('delta'), total_votes=Count('id'))
         self.total_votes = result['total_votes'] or 0
         self.delta_votes = result['score'] or 0
         self.save()
@@ -188,10 +183,7 @@ class AbstractVote(models.Model):
     review = models.ForeignKey('reviews.ProductReview', related_name='votes')
     user = models.ForeignKey(AUTH_USER_MODEL, related_name='review_votes')
     UP, DOWN = 1, -1
-    VOTE_CHOICES = (
-        (UP, _("Up")),
-        (DOWN, _("Down"))
-    )
+    VOTE_CHOICES = ((UP, _("Up")), (DOWN, _("Down")))
     delta = models.SmallIntegerField(_('Delta'), choices=VOTE_CHOICES)
     date_created = models.DateTimeField(auto_now_add=True)
 
@@ -199,7 +191,7 @@ class AbstractVote(models.Model):
         abstract = True
         app_label = 'reviews'
         ordering = ['-date_created']
-        unique_together = (('user', 'review'),)
+        unique_together = (('user', 'review'), )
         verbose_name = _('Vote')
         verbose_name_plural = _('Votes')
 
@@ -208,15 +200,12 @@ class AbstractVote(models.Model):
 
     def clean(self):
         if not self.review.is_anonymous and self.review.user == self.user:
-            raise ValidationError(_(
-                "You cannot vote on your own reviews"))
+            raise ValidationError(_("You cannot vote on your own reviews"))
         if not self.user.id:
-            raise ValidationError(_(
-                "Only signed-in users can vote on reviews"))
+            raise ValidationError(_("Only signed-in users can vote on reviews"))
         previous_votes = self.review.votes.filter(user=self.user)
         if len(previous_votes) > 0:
-            raise ValidationError(_(
-                "You can only vote once on a review"))
+            raise ValidationError(_("You can only vote once on a review"))
 
     def save(self, *args, **kwargs):
         super(AbstractVote, self).save(*args, **kwargs)

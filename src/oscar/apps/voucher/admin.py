@@ -6,18 +6,17 @@ VoucherApplication = get_model('voucher', 'VoucherApplication')
 
 
 class VoucherAdmin(admin.ModelAdmin):
-    list_display = ('name', 'code', 'usage', 'num_basket_additions',
-                    'num_orders', 'total_discount')
+    list_display = ('name', 'code', 'usage', 'num_basket_additions', 'num_orders',
+                    'total_discount')
     readonly_fields = ('num_basket_additions', 'num_orders', 'total_discount')
     fieldsets = (
         (None, {
-            'fields': ('name', 'code', 'usage', 'start_datetime',
-                       'end_datetime')}),
-        ('Benefit', {
-            'fields': ('offers',)}),
-        ('Usage', {
-            'fields': ('num_basket_additions', 'num_orders',
-                       'total_discount')}),
+            'fields': ('name', 'code', 'usage', 'start_datetime', 'end_datetime')
+        }), ('Benefit', {
+            'fields': ('offers', )
+        }), ('Usage', {
+            'fields': ('num_basket_additions', 'num_orders', 'total_discount')
+        }),
     )
 
 

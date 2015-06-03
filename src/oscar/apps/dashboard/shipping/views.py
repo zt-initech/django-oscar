@@ -25,11 +25,9 @@ class WeightBasedCreateView(generic.CreateView):
 
     def get_success_url(self):
         msg = render_to_string(
-            'dashboard/shipping/messages/method_created.html',
-            {'method': self.object})
+            'dashboard/shipping/messages/method_created.html', {'method': self.object})
         messages.success(self.request, msg, extra_tags='safe noicon')
-        return reverse('dashboard:shipping-method-detail',
-                       kwargs={'pk': self.object.pk})
+        return reverse('dashboard:shipping-method-detail', kwargs={'pk': self.object.pk})
 
 
 class WeightBasedDetailView(generic.CreateView):
@@ -38,10 +36,8 @@ class WeightBasedDetailView(generic.CreateView):
     template_name = "dashboard/shipping/weight_based_detail.html"
 
     def dispatch(self, request, *args, **kwargs):
-        self.method = shortcuts.get_object_or_404(
-            WeightBased, pk=kwargs['pk'])
-        return super(WeightBasedDetailView, self).dispatch(
-            request, *args, **kwargs)
+        self.method = shortcuts.get_object_or_404(WeightBased, pk=kwargs['pk'])
+        return super(WeightBasedDetailView, self).dispatch(request, *args, **kwargs)
 
     def get_form_kwargs(self, **kwargs):
         kwargs = super(WeightBasedDetailView, self).get_form_kwargs(**kwargs)
@@ -55,11 +51,9 @@ class WeightBasedDetailView(generic.CreateView):
 
     def get_success_url(self):
         msg = render_to_string(
-            'dashboard/shipping/messages/band_created.html',
-            {'band': self.object})
+            'dashboard/shipping/messages/band_created.html', {'band': self.object})
         messages.success(self.request, msg, extra_tags='safe noicon')
-        return reverse('dashboard:shipping-method-detail',
-                       kwargs={'pk': self.method.pk})
+        return reverse('dashboard:shipping-method-detail', kwargs={'pk': self.method.pk})
 
 
 class WeightBasedUpdateView(generic.UpdateView):
@@ -70,11 +64,9 @@ class WeightBasedUpdateView(generic.UpdateView):
 
     def get_success_url(self):
         msg = render_to_string(
-            'dashboard/shipping/messages/method_updated.html',
-            {'method': self.object})
+            'dashboard/shipping/messages/method_updated.html', {'method': self.object})
         messages.success(self.request, msg, extra_tags='safe noicon')
-        return reverse('dashboard:shipping-method-detail',
-                       kwargs={'pk': self.object.pk})
+        return reverse('dashboard:shipping-method-detail', kwargs={'pk': self.object.pk})
 
 
 class WeightBandUpdateView(generic.UpdateView):
@@ -84,10 +76,8 @@ class WeightBandUpdateView(generic.UpdateView):
     context_object_name = "band"
 
     def dispatch(self, request, *args, **kwargs):
-        self.method = shortcuts.get_object_or_404(
-            WeightBased, pk=kwargs['method_pk'])
-        return super(WeightBandUpdateView, self).dispatch(
-            request, *args, **kwargs)
+        self.method = shortcuts.get_object_or_404(WeightBased, pk=kwargs['method_pk'])
+        return super(WeightBandUpdateView, self).dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
         return self.method.bands.all()
@@ -99,11 +89,9 @@ class WeightBandUpdateView(generic.UpdateView):
 
     def get_success_url(self):
         msg = render_to_string(
-            'dashboard/shipping/messages/band_updated.html',
-            {'band': self.object})
+            'dashboard/shipping/messages/band_updated.html', {'band': self.object})
         messages.success(self.request, msg, extra_tags='safe noicon')
-        return reverse('dashboard:shipping-method-detail',
-                       kwargs={'pk': self.method.pk})
+        return reverse('dashboard:shipping-method-detail', kwargs={'pk': self.method.pk})
 
 
 class WeightBandDeleteView(generic.DeleteView):
@@ -112,21 +100,17 @@ class WeightBandDeleteView(generic.DeleteView):
     context_object_name = "band"
 
     def dispatch(self, request, *args, **kwargs):
-        self.method = shortcuts.get_object_or_404(
-            WeightBased, pk=kwargs['method_pk'])
-        return super(WeightBandDeleteView, self).dispatch(
-            request, *args, **kwargs)
+        self.method = shortcuts.get_object_or_404(WeightBased, pk=kwargs['method_pk'])
+        return super(WeightBandDeleteView, self).dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
         return self.method.bands.all()
 
     def get_success_url(self):
         msg = render_to_string(
-            'dashboard/shipping/messages/band_deleted.html',
-            {'band': self.object})
+            'dashboard/shipping/messages/band_deleted.html', {'band': self.object})
         messages.success(self.request, msg, extra_tags='safe noicon')
-        return reverse('dashboard:shipping-method-detail',
-                       kwargs={'pk': self.method.pk})
+        return reverse('dashboard:shipping-method-detail', kwargs={'pk': self.method.pk})
 
 
 class WeightBasedDeleteView(generic.DeleteView):
@@ -136,7 +120,6 @@ class WeightBasedDeleteView(generic.DeleteView):
 
     def get_success_url(self):
         msg = render_to_string(
-            'dashboard/shipping/messages/method_deleted.html',
-            {'method': self.object})
+            'dashboard/shipping/messages/method_deleted.html', {'method': self.object})
         messages.success(self.request, msg, extra_tags='safe noicon')
         return reverse('dashboard:shipping-method-list')

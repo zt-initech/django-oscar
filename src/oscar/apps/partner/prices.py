@@ -66,8 +66,7 @@ class FixedPrice(Base):
     def incl_tax(self):
         if self.is_tax_known:
             return self.excl_tax + self.tax
-        raise prices.TaxNotKnown(
-            "Can't calculate price.incl_tax as tax isn't known")
+        raise prices.TaxNotKnown("Can't calculate price.incl_tax as tax isn't known")
 
     @property
     def is_tax_known(self):

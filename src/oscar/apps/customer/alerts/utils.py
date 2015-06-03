@@ -20,9 +20,7 @@ def send_alerts():
     """
     Send out product alerts
     """
-    products = Product.objects.filter(
-        productalert__status=ProductAlert.ACTIVE
-    ).distinct()
+    products = Product.objects.filter(productalert__status=ProductAlert.ACTIVE).distinct()
     logger.info("Found %d products with active alerts", products.count())
     for product in products:
         send_product_alerts(product)
@@ -32,20 +30,12 @@ def send_alert_confirmation(alert):
     """
     Send an alert confirmation email.
     """
-    ctx = Context({
-        'alert': alert,
-        'site': Site.objects.get_current(),
-    })
-    subject_tpl = loader.get_template('customer/alerts/emails/'
-                                      'confirmation_subject.txt')
-    body_tpl = loader.get_template('customer/alerts/emails/'
-                                   'confirmation_body.txt')
+    ctx = Context({'alert': alert, 'site': Site.objects.get_current(), })
+    subject_tpl = loader.get_template('customer/alerts/emails/' 'confirmation_subject.txt')
+    body_tpl = loader.get_template('customer/alerts/emails/' 'confirmation_body.txt')
     mail.send_mail(
-        subject_tpl.render(ctx).strip(),
-        body_tpl.render(ctx),
-        settings.OSCAR_FROM_EMAIL,
-        [alert.email],
-    )
+        subject_tpl.render(ctx).strip(), body_tpl.render(ctx), settings.OSCAR_FROM_EMAIL,
+        [alert.email], )
 
 
 def send_product_alerts(product):
@@ -62,8 +52,7 @@ def send_product_alerts(product):
     logger.info("Sending alerts for '%s'", product)
     alerts = ProductAlert.objects.filter(
         product_id__in=(product.id, product.parent_id),
-        status=ProductAlert.ACTIVE,
-    )
+        status=ProductAlert.ACTIVE, )
 
     # Determine 'hurry mode'
     num_alerts = alerts.count()
@@ -78,10 +67,8 @@ def send_product_alerts(product):
 
     # Load templates
     message_tpl = loader.get_template('customer/alerts/message.html')
-    email_subject_tpl = loader.get_template('customer/alerts/emails/'
-                                            'alert_subject.txt')
-    email_body_tpl = loader.get_template('customer/alerts/emails/'
-                                         'alert_body.txt')
+    email_subject_tpl = loader.get_template('customer/alerts/emails/' 'alert_subject.txt')
+    email_body_tpl = loader.get_template('customer/alerts/emails/' 'alert_body.txt')
 
     emails = []
     num_notifications = 0
@@ -93,11 +80,7 @@ def send_product_alerts(product):
         if not data.availability.is_available_to_buy:
             continue
 
-        ctx = Context({
-            'alert': alert,
-            'site': Site.objects.get_current(),
-            'hurry': hurry_mode,
-        })
+        ctx = Context({'alert': alert, 'site': Site.objects.get_current(), 'hurry': hurry_mode, })
         if alert.user:
             # Send a site notification
             num_notifications += 1
@@ -106,12 +89,8 @@ def send_product_alerts(product):
         # Build email and add to list
         emails.append(
             mail.EmailMessage(
-                email_subject_tpl.render(ctx).strip(),
-                email_body_tpl.render(ctx),
-                settings.OSCAR_FROM_EMAIL,
-                [alert.get_email_address()],
-            )
-        )
+                email_subject_tpl.render(ctx).strip(), email_body_tpl.render(ctx),
+                settings.OSCAR_FROM_EMAIL, [alert.get_email_address()], ))
         alert.close()
 
     # Send all emails in one go to prevent multiple SMTP
@@ -122,5 +101,4 @@ def send_product_alerts(product):
         connection.send_messages(emails)
         connection.close()
 
-    logger.info("Sent %d notifications and %d emails", num_notifications,
-                len(emails))
+    logger.info("Sent %d notifications and %d emails", num_notifications, len(emails))

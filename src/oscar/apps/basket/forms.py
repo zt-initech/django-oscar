@@ -13,8 +13,7 @@ Product = get_model('catalogue', 'product')
 
 
 class BasketLineForm(forms.ModelForm):
-    save_for_later = forms.BooleanField(
-        initial=False, required=False, label=_('Save for Later'))
+    save_for_later = forms.BooleanField(initial=False, required=False, label=_('Save for Later'))
 
     def __init__(self, strategy, *args, **kwargs):
         super(BasketLineForm, self).__init__(*args, **kwargs)
@@ -34,8 +33,7 @@ class BasketLineForm(forms.ModelForm):
 
     def check_permission(self, qty):
         policy = self.instance.purchase_info.availability
-        is_available, reason = policy.is_purchase_permitted(
-            quantity=qty)
+        is_available, reason = policy.is_purchase_permitted(quantity=qty)
         if not is_available:
             raise forms.ValidationError(reason)
 
@@ -45,14 +43,14 @@ class BasketLineForm(forms.ModelForm):
 
 
 class BaseBasketLineFormSet(BaseModelFormSet):
-
     def __init__(self, strategy, *args, **kwargs):
         self.strategy = strategy
         super(BaseBasketLineFormSet, self).__init__(*args, **kwargs)
 
     def _construct_form(self, i, **kwargs):
         return super(BaseBasketLineFormSet, self)._construct_form(
-            i, strategy=self.strategy, **kwargs)
+            i,
+            strategy=self.strategy, **kwargs)
 
     def _should_delete_form(self, form):
         """
@@ -66,13 +64,15 @@ class BaseBasketLineFormSet(BaseModelFormSet):
 
 
 BasketLineFormSet = modelformset_factory(
-    Line, form=BasketLineForm, formset=BaseBasketLineFormSet, extra=0,
+    Line,
+    form=BasketLineForm,
+    formset=BaseBasketLineFormSet,
+    extra=0,
     can_delete=True)
 
 
 class SavedLineForm(forms.ModelForm):
-    move_to_basket = forms.BooleanField(initial=False, required=False,
-                                        label=_('Move to Basket'))
+    move_to_basket = forms.BooleanField(initial=False, required=False, label=_('Move to Basket'))
 
     class Meta:
         model = Line
@@ -96,15 +96,13 @@ class SavedLineForm(forms.ModelForm):
         desired_qty = current_qty + self.instance.quantity
 
         result = self.strategy.fetch_for_product(self.instance.product)
-        is_available, reason = result.availability.is_purchase_permitted(
-            quantity=desired_qty)
+        is_available, reason = result.availability.is_purchase_permitted(quantity=desired_qty)
         if not is_available:
             raise forms.ValidationError(reason)
         return cleaned_data
 
 
 class BaseSavedLineFormSet(BaseModelFormSet):
-
     def __init__(self, strategy, basket, *args, **kwargs):
         self.strategy = strategy
         self.basket = basket
@@ -112,11 +110,15 @@ class BaseSavedLineFormSet(BaseModelFormSet):
 
     def _construct_form(self, i, **kwargs):
         return super(BaseSavedLineFormSet, self)._construct_form(
-            i, strategy=self.strategy, basket=self.basket, **kwargs)
+            i,
+            strategy=self.strategy,
+            basket=self.basket, **kwargs)
 
 
-SavedLineFormSet = modelformset_factory(Line, form=SavedLineForm,
-                                        formset=BaseSavedLineFormSet, extra=0,
+SavedLineFormSet = modelformset_factory(Line,
+                                        form=SavedLineForm,
+                                        formset=BaseSavedLineFormSet,
+                                        extra=0,
                                         can_delete=True)
 
 
@@ -176,7 +178,8 @@ class AddToBasketForm(forms.Form):
             choices.append((child.id, summary))
 
         self.fields['child_id'] = forms.ChoiceField(
-            choices=tuple(choices), label=_("Variant"),
+            choices=tuple(choices),
+            label=_("Variant"),
             widget=widgets.AdvancedSelect(disabled_values=disabled_values))
 
     def _create_product_fields(self, product):
@@ -200,11 +203,9 @@ class AddToBasketForm(forms.Form):
 
     def clean_child_id(self):
         try:
-            child = self.parent_product.children.get(
-                id=self.cleaned_data['child_id'])
+            child = self.parent_product.children.get(id=self.cleaned_data['child_id'])
         except Product.DoesNotExist:
-            raise forms.ValidationError(
-                _("Please select a valid product"))
+            raise forms.ValidationError(_("Please select a valid product"))
 
         # To avoid duplicate SQL queries, we cache a copy of the loaded child
         # product as we're going to need it later.
@@ -223,9 +224,10 @@ class AddToBasketForm(forms.Form):
                 raise forms.ValidationError(
                     _("Due to technical limitations we are not able to ship"
                       " more than %(threshold)d items in one order. Your"
-                      " basket currently has %(basket)d items.")
-                    % {'threshold': basket_threshold,
-                       'basket': total_basket_quantity})
+                      " basket currently has %(basket)d items.") % {
+                          'threshold': basket_threshold,
+                          'basket': total_basket_quantity
+                      })
         return qty
 
     @property
@@ -241,8 +243,7 @@ class AddToBasketForm(forms.Form):
         info = self.basket.strategy.fetch_for_product(self.product)
 
         # Check currencies are sensible
-        if (self.basket.currency and
-                info.price.currency != self.basket.currency):
+        if (self.basket.currency and info.price.currency != self.basket.currency):
             raise forms.ValidationError(
                 _("This product cannot be added to the basket as its currency "
                   "isn't the same as other products in your basket"))
@@ -251,8 +252,7 @@ class AddToBasketForm(forms.Form):
         # basket.
         current_qty = self.basket.product_quantity(self.product)
         desired_qty = current_qty + self.cleaned_data.get('quantity', 1)
-        is_permitted, reason = info.availability.is_purchase_permitted(
-            desired_qty)
+        is_permitted, reason = info.availability.is_purchase_permitted(desired_qty)
         if not is_permitted:
             raise forms.ValidationError(reason)
 
@@ -267,9 +267,7 @@ class AddToBasketForm(forms.Form):
         options = []
         for option in self.parent_product.options:
             if option.code in self.cleaned_data:
-                options.append({
-                    'option': option,
-                    'value': self.cleaned_data[option.code]})
+                options.append({'option': option, 'value': self.cleaned_data[option.code]})
         return options
 
 
@@ -279,4 +277,7 @@ class SimpleAddToBasketForm(AddToBasketForm):
     defaulted to 1 and rendered in a hidden widget
     """
     quantity = forms.IntegerField(
-        initial=1, min_value=1, widget=forms.HiddenInput, label=_('Quantity'))
+        initial=1,
+        min_value=1,
+        widget=forms.HiddenInput,
+        label=_('Quantity'))

@@ -9,7 +9,6 @@ from oscar.core.loading import get_model
 
 from oscar.models.fields import ExtendedURLField
 
-
 # Linking models - these link promotions to content (eg pages, or keywords)
 
 
@@ -20,8 +19,7 @@ class LinkedPromotion(models.Model):
     object_id = models.PositiveIntegerField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
 
-    position = models.CharField(_("Position"), max_length=100,
-                                help_text="Position on page")
+    position = models.CharField(_("Position"), max_length=100, help_text="Position on page")
     display_order = models.PositiveIntegerField(_("Display Order"), default=0)
     clicks = models.PositiveIntegerField(_("Clicks"), default=0)
     date_created = models.DateTimeField(_("Date Created"), auto_now_add=True)
@@ -36,6 +34,7 @@ class LinkedPromotion(models.Model):
     def record_click(self):
         self.clicks += 1
         self.save()
+
     record_click.alters_data = True
 
 
@@ -44,15 +43,13 @@ class PagePromotion(LinkedPromotion):
     """
     A promotion embedded on a particular page.
     """
-    page_url = ExtendedURLField(
-        _('Page URL'), max_length=128, db_index=True, verify_exists=True)
+    page_url = ExtendedURLField(_('Page URL'), max_length=128, db_index=True, verify_exists=True)
 
     def __str__(self):
         return u"%s on %s" % (self.content_object, self.page_url)
 
     def get_link(self):
-        return reverse('promotions:page-click',
-                       kwargs={'page_promotion_id': self.id})
+        return reverse('promotions:page-click', kwargs={'page_promotion_id': self.id})
 
     class Meta(LinkedPromotion.Meta):
         verbose_name = _("Page Promotion")
@@ -74,8 +71,7 @@ class KeywordPromotion(LinkedPromotion):
     filter = models.CharField(_("Filter"), max_length=200, blank=True)
 
     def get_link(self):
-        return reverse('promotions:keyword-click',
-                       kwargs={'keyword_promotion_id': self.id})
+        return reverse('promotions:keyword-click', kwargs={'keyword_promotion_id': self.id})
 
     class Meta(LinkedPromotion.Meta):
         verbose_name = _("Keyword Promotion")
@@ -90,8 +86,7 @@ class AbstractPromotion(models.Model):
     that subclasses must implement.
     """
     _type = 'Promotion'
-    keywords = generic.GenericRelation(KeywordPromotion,
-                                       verbose_name=_('Keywords'))
+    keywords = generic.GenericRelation(KeywordPromotion, verbose_name=_('Keywords'))
     pages = generic.GenericRelation(PagePromotion, verbose_name=_('Pages'))
 
     class Meta:
@@ -128,11 +123,10 @@ class AbstractPromotion(models.Model):
     @property
     def num_times_used(self):
         ctype = self.content_type
-        page_count = PagePromotion.objects.filter(content_type=ctype,
-                                                  object_id=self.id).count()
+        page_count = PagePromotion.objects.filter(content_type=ctype, object_id=self.id).count()
         keyword_count \
             = KeywordPromotion.objects.filter(content_type=ctype,
-                                              object_id=self.id).count()
+                                                                      object_id=self.id).count()
         return page_count + keyword_count
 
 
@@ -148,7 +142,9 @@ class RawHTML(AbstractPromotion):
     # if a different width container is required).  This isn't always
     # required.
     display_type = models.CharField(
-        _("Display type"), max_length=128, blank=True,
+        _("Display type"),
+        max_length=128,
+        blank=True,
         help_text=_("This can be used to have different types of HTML blocks"
                     " (eg different widths)"))
     body = models.TextField(_("HTML"))
@@ -174,10 +170,12 @@ class Image(AbstractPromotion):
     _type = 'Image'
     name = models.CharField(_("Name"), max_length=128)
     link_url = ExtendedURLField(
-        _('Link URL'), blank=True,
+        _('Link URL'),
+        blank=True,
         help_text=_('This is where this promotion links to'))
     image = models.ImageField(
-        _('Image'), upload_to=settings.OSCAR_PROMOTION_FOLDER,
+        _('Image'),
+        upload_to=settings.OSCAR_PROMOTION_FOLDER,
         max_length=255)
     date_created = models.DateTimeField(auto_now_add=True)
 
@@ -200,7 +198,8 @@ class MultiImage(AbstractPromotion):
     _type = 'Multi-image'
     name = models.CharField(_("Name"), max_length=128)
     images = models.ManyToManyField(
-        'promotions.Image', blank=True,
+        'promotions.Image',
+        blank=True,
         help_text=_(
             "Choose the Image content blocks that this block will use. "
             "(You may need to create some first)."))
@@ -269,7 +268,8 @@ class HandPickedProductList(AbstractProductList):
     """
     _type = 'Product list'
     products = models.ManyToManyField('catalogue.Product',
-                                      through='OrderedProduct', blank=True,
+                                      through='OrderedProduct',
+                                      blank=True,
                                       verbose_name=_("Products"))
 
     def get_queryset(self):
@@ -287,14 +287,13 @@ class HandPickedProductList(AbstractProductList):
 
 class OrderedProduct(models.Model):
 
-    list = models.ForeignKey('promotions.HandPickedProductList',
-                             verbose_name=_("List"))
+    list = models.ForeignKey('promotions.HandPickedProductList', verbose_name=_("List"))
     product = models.ForeignKey('catalogue.Product', verbose_name=_("Product"))
     display_order = models.PositiveIntegerField(_('Display Order'), default=0)
 
     class Meta:
         app_label = 'promotions'
-        ordering = ('display_order',)
+        ordering = ('display_order', )
         unique_together = ('list', 'product')
         verbose_name = _("Ordered product")
         verbose_name_plural = _("Ordered product")
@@ -305,13 +304,10 @@ class AutomaticProductList(AbstractProductList):
     _type = 'Auto-product list'
     BESTSELLING, RECENTLY_ADDED = ('Bestselling', 'RecentlyAdded')
     METHOD_CHOICES = (
-        (BESTSELLING, _("Bestselling products")),
-        (RECENTLY_ADDED, _("Recently added products")),
+        (BESTSELLING, _("Bestselling products")), (RECENTLY_ADDED, _("Recently added products")),
     )
-    method = models.CharField(_('Method'), max_length=128,
-                              choices=METHOD_CHOICES)
-    num_products = models.PositiveSmallIntegerField(_('Number of Products'),
-                                                    default=4)
+    method = models.CharField(_('Method'), max_length=128, choices=METHOD_CHOICES)
+    num_products = models.PositiveSmallIntegerField(_('Number of Products'), default=4)
 
     def get_queryset(self):
         Product = get_model('catalogue', 'Product')
@@ -337,7 +333,7 @@ class OrderedProductList(HandPickedProductList):
 
     class Meta:
         app_label = 'promotions'
-        ordering = ('display_order',)
+        ordering = ('display_order', )
         verbose_name = _("Ordered Product List")
         verbose_name_plural = _("Ordered Product Lists")
 
@@ -345,8 +341,7 @@ class OrderedProductList(HandPickedProductList):
 class TabbedBlock(AbstractPromotion):
 
     _type = 'Tabbed block'
-    name = models.CharField(
-        pgettext_lazy(u"Tabbed block title", u"Title"), max_length=255)
+    name = models.CharField(pgettext_lazy(u"Tabbed block title", u"Title"), max_length=255)
     date_created = models.DateTimeField(_("Date Created"), auto_now_add=True)
 
     class Meta:

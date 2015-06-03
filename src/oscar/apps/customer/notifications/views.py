@@ -67,8 +67,7 @@ class DetailView(PageTitleMixin, generic.DetailView):
         return u'%s: %s' % (_('Notification'), title)
 
     def get_queryset(self):
-        return self.model._default_manager.filter(
-            recipient=self.request.user)
+        return self.model._default_manager.filter(recipient=self.request.user)
 
 
 class UpdateView(BulkEditMixin, generic.RedirectView):
@@ -77,12 +76,10 @@ class UpdateView(BulkEditMixin, generic.RedirectView):
     checkbox_object_name = 'notification'
 
     def get_object_dict(self, ids):
-        return self.model.objects.filter(
-            recipient=self.request.user).in_bulk(ids)
+        return self.model.objects.filter(recipient=self.request.user).in_bulk(ids)
 
     def get_success_response(self):
-        return redirect_to_referrer(
-            self.request, 'customer:notifications-inbox')
+        return redirect_to_referrer(self.request, 'customer:notifications-inbox')
 
     def archive(self, request, notifications):
         for notification in notifications:

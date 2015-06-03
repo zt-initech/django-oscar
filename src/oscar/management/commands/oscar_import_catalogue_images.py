@@ -18,8 +18,7 @@ class Command(BaseCommand):
         make_option('--filename',
                     dest='filename',
                     default='upc',
-                    help='Product field to lookup from image filename'),
-    )
+                    help='Product field to lookup from image filename'), )
 
     def handle(self, *args, **options):
         if len(args) != 1:

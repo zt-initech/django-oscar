@@ -85,6 +85,12 @@ Backwards incompatible changes in Oscar 1.2
   `TopVotedReviewsManager` managers are removed from the reviews app 
   since they were broken and unused.
 
+- `SimpleAddToBasketForm` doesn't override the quantity field any
+  more. Instead, it just hides the field declared by AddToBasketForm
+  and sets the quantity to one. This means `SimpleAddToBasketForm`
+  doesn't need to be overridden for most cases, but please check
+  things still work as expected for you if you have customized it.
+
 
 Undocumented
 ~~~~~~~~~~~~
